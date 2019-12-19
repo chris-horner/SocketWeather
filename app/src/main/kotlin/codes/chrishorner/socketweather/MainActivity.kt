@@ -20,4 +20,10 @@ class MainActivity : AppCompatActivity() {
     val rootContainer = BuildTypeConfig.getRootContainerFor(this)
     rootContainer.inflate<ViewGroup>(R.layout.activity_main, attach = true)
   }
+
+  override fun onBackPressed() {
+    // Guard against a leak introduced in Android 10.
+    // https://twitter.com/Piwai/status/1169274622614704129
+    if (isTaskRoot) finishAfterTransition() else super.onBackPressed()
+  }
 }

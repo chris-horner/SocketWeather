@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <color name="light_blue_50">#e1f5fe</color>
+  <color name="light_blue_100">#b3e5fc</color>
+  <color name="light_blue_300">#4fc3f7</color>
+  <color name="light_blue_800">#01579b</color>
+  <color name="light_blue_900">#0277bd</color>
+  <color name="amber_A100">#ffe57f</color>
+  <color name="amber_A200">#ffd740</color>
+  <color name="amber_A400">#ffc400</color>
+  <color name="amber_A700">#ffab00</color>
+  <color name="darkGrey">#121212</color>
+  <color name="scrimLight">#2203a9f4</color>
+  <color name="scrimDark">#cc000000</color>
+  <color name="black">#000000</color>
+  <color name="white">#ffffff</color>
+  <color name="transparent">#00000000</color>
+
+</resources>

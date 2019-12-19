@@ -1,0 +1,94 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+
+def versionMajor = 0
+def versionMinor = 1
+def versionPatch = 0
+
+android {
+  buildToolsVersion versions.android_build_tools
+  compileSdkVersion versions.compile_sdk
+
+  defaultConfig {
+    applicationId "codes.chrishorner.socketweather"
+    minSdkVersion versions.min_sdk
+    targetSdkVersion versions.compile_sdk
+    versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
+    versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+  }
+
+  sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    debug.java.srcDirs += 'src/debug/kotlin'
+    release.java.srcDirs += 'src/release/kotlin'
+  }
+
+  signingConfigs {
+    debug {
+      storeFile file('keys/debug.keystore')
+      storePassword 'android'
+      keyAlias 'androiddebugkey'
+    }
+
+    release {
+      def uploadKey = file('keys/upload.keystore')
+      storeFile uploadKey.exists() ? uploadKey : file('keys/debug.keystore')
+      storePassword System.getenv("socket_weather_password") ?: 'android'
+      keyAlias System.getenv("socket_weather_alias") ?: 'androiddebugkey'
+      keyPassword System.getenv("socket_weather_password") ?: 'android'
+    }
+  }
+
+  buildTypes {
+    debug {
+      versionNameSuffix '-DEBUG'
+      applicationIdSuffix '.debug'
+      signingConfig signingConfigs.debug
+    }
+
+    release {
+      minifyEnabled true
+      shrinkResources true
+      signingConfig signingConfigs.release
+      proguardFiles file('shrinker_rules.pro')
+    }
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  lintOptions {
+    // It's fine for external libs to optionally link against invalid packages.
+    disable 'InvalidPackage'
+  }
+
+  packagingOptions {
+    exclude 'kotlin/**'
+    exclude '**/*.kotlin_metadata'
+    exclude 'META-INF/*.kotlin_module'
+    exclude 'META-INF/*.version'
+  }
+
+  bundle {
+    language {
+      enableSplit = false // We currently only have one language.
+    }
+  }
+}
+
+dependencies {
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
+  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
+  implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+  implementation "androidx.core:core-ktx:${versions.androidx_core}"
+  implementation "com.google.android.material:material:${versions.material}"
+  implementation "com.jakewharton.timber:timber:${versions.timber}"
+  implementation "com.jakewharton.threetenabp:threetenabp:${versions.threetenabp}"
+  implementation "com.squareup.leakcanary:leakcanary-object-watcher-android:${versions.leakcanary}"
+  debugImplementation "com.squareup.leakcanary:leakcanary-android:${versions.leakcanary}"
+  debugImplementation "au.com.gridstone.debugdrawer:debugdrawer:${versions.debugdrawer}"
+  debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-leakcanary:${versions.debugdrawer}"
+  debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-timber:${versions.debugdrawer}"
+}

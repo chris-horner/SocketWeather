@@ -8,23 +8,23 @@ import codes.chrishorner.socketweather.util.inflate
 enum class Screen(@LayoutRes private val layoutRes: Int) {
 
   Home(R.layout.home) {
-    override fun getController(view: View): Controller = HomeController(view)
+    override fun getController(view: View, navigator: Navigator): Controller = HomeController(view)
   },
   ChooseLocation(R.layout.choose_location) {
-    override fun getController(view: View): Controller = ChooseLocationController()
+    override fun getController(view: View, navigator: Navigator): Controller = ChooseLocationController()
   },
   About(R.layout.about) {
-    override fun getController(view: View): Controller = AboutController()
+    override fun getController(view: View, navigator: Navigator): Controller = AboutController()
   };
 
   private var controller: Controller? = null
 
   fun getView(parent: ViewGroup): View = parent.inflate(layoutRes)
 
-  abstract fun getController(view: View): Controller
+  protected abstract fun getController(view: View, navigator: Navigator): Controller
 
-  fun bind(view: View) {
-    controller = getController(view)
+  fun bind(view: View, navigator: Navigator) {
+    controller = getController(view, navigator)
   }
 
   fun unbind(view: View) {
@@ -34,5 +34,10 @@ enum class Screen(@LayoutRes private val layoutRes: Int) {
 
   interface Controller {
     fun onDestroy(view: View) {}
+  }
+
+  interface Navigator {
+    fun goTo(screen: Screen)
+    fun goBack()
   }
 }

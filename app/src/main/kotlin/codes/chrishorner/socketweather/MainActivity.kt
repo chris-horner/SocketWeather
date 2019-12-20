@@ -8,7 +8,7 @@ import androidx.core.view.get
 import java.util.ArrayDeque
 import java.util.Deque
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), Screen.Navigator {
 
   private val backstack: Deque<Screen> = ArrayDeque(3)
   private lateinit var rootContainer: ViewGroup
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    getCurrentScreen().bind(getCurrentScreenView())
+    getCurrentScreen().bind(getCurrentScreenView(), this)
   }
 
   override fun onStop() {
@@ -51,12 +51,33 @@ class MainActivity : AppCompatActivity() {
 
   override fun onBackPressed() {
     if (backstack.size > 1) {
-      backstack.pop()
+      goBack()
     } else {
       // Guard against a leak introduced in Android 10.
       // https://twitter.com/Piwai/status/1169274622614704129
       finishAfterTransition()
     }
+  }
+
+  override fun goTo(screen: Screen) {
+    // TODO Watch for leaks.
+    getCurrentScreen().unbind(getCurrentScreenView())
+    rootContainer.removeAllViews()
+    backstack.push(screen)
+    val view = screen.getView(rootContainer)
+    rootContainer.addView(view)
+    screen.bind(view, this)
+  }
+
+  override fun goBack() {
+    // TODO Watch for leaks.
+    getCurrentScreen().unbind(getCurrentScreenView())
+    backstack.pop()
+    rootContainer.removeAllViews()
+    val screen = getCurrentScreen()
+    val view = screen.getView(rootContainer)
+    rootContainer.addView(view)
+    screen.bind(view, this)
   }
 
   private fun getCurrentScreen(): Screen = backstack.peek() ?: throw IllegalStateException("No current screen.")

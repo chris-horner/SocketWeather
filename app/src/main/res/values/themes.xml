@@ -5,6 +5,19 @@
   <style name="Base.Theme.SocketWeather" parent="Theme.MaterialComponents.DayNight.NoActionBar">
     <item name="android:statusBarColor">@color/statusBar</item>
     <item name="android:navigationBarColor">@color/navigationBar</item>
+    <item name="textAppearanceHeadline1">@style/TextAppearance.SocketWeather.Headline1</item>
+    <item name="textAppearanceHeadline2">@style/TextAppearance.SocketWeather.Headline2</item>
+    <item name="textAppearanceHeadline3">@style/TextAppearance.SocketWeather.Headline3</item>
+    <item name="textAppearanceHeadline4">@style/TextAppearance.SocketWeather.Headline4</item>
+    <item name="textAppearanceHeadline5">@style/TextAppearance.SocketWeather.Headline5</item>
+    <item name="textAppearanceHeadline6">@style/TextAppearance.SocketWeather.Headline6</item>
+    <item name="textAppearanceSubtitle1">@style/TextAppearance.SocketWeather.Subtitle1</item>
+    <item name="textAppearanceSubtitle2">@style/TextAppearance.SocketWeather.Subtitle2</item>
+    <item name="textAppearanceBody1">@style/TextAppearance.SocketWeather.Body1</item>
+    <item name="textAppearanceBody2">@style/TextAppearance.SocketWeather.Body2</item>
+    <item name="textAppearanceButton">@style/TextAppearance.SocketWeather.Button</item>
+    <item name="textAppearanceCaption">@style/TextAppearance.SocketWeather.Caption</item>
+    <item name="textAppearanceOverline">@style/TextAppearance.SocketWeather.Overline</item>
   </style>
 
   <style name="Theme.SocketWeather" parent="Base.Theme.SocketWeather">

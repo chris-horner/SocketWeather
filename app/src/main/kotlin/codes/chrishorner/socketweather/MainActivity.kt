@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import codes.chrishorner.socketweather.util.inflate
+import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 
 class MainActivity : AppCompatActivity() {
 
@@ -18,7 +19,11 @@ class MainActivity : AppCompatActivity() {
         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
     val rootContainer = BuildTypeConfig.getRootContainerFor(this)
-    rootContainer.inflate<ViewGroup>(R.layout.activity_main, attach = true)
+    val home: ViewGroup = rootContainer.inflate(R.layout.home)
+    rootContainer.addView(home)
+
+    val toolbar: View = home.findViewById(R.id.home_toolbar)
+    toolbar.updatePaddingWithInsets(top = true)
   }
 
   override fun onBackPressed() {

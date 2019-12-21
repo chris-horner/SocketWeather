@@ -97,4 +97,6 @@ dependencies {
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-leakcanary:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-timber:${versions.debugdrawer}"
+  debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-retrofit:${versions.debugdrawer}"
+  debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-okhttp-logger:${versions.debugdrawer}"
 }

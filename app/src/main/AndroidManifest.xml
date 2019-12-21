@@ -6,6 +6,8 @@
     package="codes.chrishorner.socketweather"
     >
 
+  <uses-permission android:name="android.permission.INTERNET" />
+
   <application
       android:name=".SocketWeatherApp"
       android:allowBackup="false"

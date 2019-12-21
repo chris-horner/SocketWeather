@@ -16,8 +16,8 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
       state = "VIC"
   )
 
-  override suspend fun seachForLocation(query: String): List<Location> {
-    return delegate.returningResponse(listOf(mockLocation)).seachForLocation(query)
+  override suspend fun searchForLocation(query: String): List<Location> {
+    return delegate.returningResponse(listOf(mockLocation)).searchForLocation(query)
   }
 
   override suspend fun searchForLocation(latitude: Double, longitude: Double): List<Location> {

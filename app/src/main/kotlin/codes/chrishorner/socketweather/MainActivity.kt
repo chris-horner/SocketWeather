@@ -25,8 +25,8 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
     rootContainer = BuildTypeConfig.getRootContainerFor(this)
 
     val backstackEntries = savedInstanceState?.getIntArray("backstack")
-      ?.map { Screen.values()[it] }
-      ?: listOf(Screen.Home)
+        ?.map { Screen.values()[it] }
+        ?: listOf(Screen.Home)
 
     backstack.addAll(backstackEntries)
 

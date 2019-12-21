@@ -13,9 +13,9 @@ object BuildTypeConfig {
     // modules to do their thing.
     val diskReadPolicy = StrictMode.allowThreadDiskReads()
     val container = DebugDrawer.with(activity)
-      .addSectionTitle("Device information")
-      .addModule(DeviceInfoModule())
-      .buildMainContainer()
+        .addSectionTitle("Device information")
+        .addModule(DeviceInfoModule())
+        .buildMainContainer()
 
     StrictMode.setThreadPolicy(diskReadPolicy)
     return container

@@ -10,7 +10,7 @@ import androidx.core.view.updatePadding
 
 @Suppress("UNCHECKED_CAST")
 fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int, attach: Boolean = false): T =
-  LayoutInflater.from(context).inflate(layout, this, attach) as T
+    LayoutInflater.from(context).inflate(layout, this, attach) as T
 
 /**
  * Indicates that this view should update its own padding to match that of [WindowInsets].
@@ -19,18 +19,18 @@ fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int, attach: Boolean = false
  * allowing content to be displayed edge-to-edge.
  */
 fun View.updatePaddingWithInsets(
-  left: Boolean = false,
-  top: Boolean = false,
-  right: Boolean = false,
-  bottom: Boolean = false
+    left: Boolean = false,
+    top: Boolean = false,
+    right: Boolean = false,
+    bottom: Boolean = false
 ) {
 
   doOnApplyWindowInsets { insets, padding ->
     updatePadding(
-      left = if (left) padding.left + insets.systemWindowInsetLeft else padding.left,
-      top = if (top) padding.top + insets.systemWindowInsetTop else padding.top,
-      right = if (right) padding.right + insets.systemWindowInsetRight else padding.right,
-      bottom = if (bottom) padding.bottom + insets.systemWindowInsetBottom else padding.bottom
+        left = if (left) padding.left + insets.systemWindowInsetLeft else padding.left,
+        top = if (top) padding.top + insets.systemWindowInsetTop else padding.top,
+        right = if (right) padding.right + insets.systemWindowInsetRight else padding.right,
+        bottom = if (bottom) padding.bottom + insets.systemWindowInsetBottom else padding.bottom
     )
   }
 }

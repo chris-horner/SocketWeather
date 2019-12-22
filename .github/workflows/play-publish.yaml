@@ -19,7 +19,7 @@ jobs:
           java-version: 1.8
 
       - name: Tests
-        run: ./gradlew testDebug --stacktrace
+        run: bash ./gradlew testDebug --stacktrace
 
   deploy:
     name: Publish to Play
@@ -47,4 +47,4 @@ jobs:
         env:
           socket_weather_alias: ${{ secrets.socket_weather_alias }}
           socket_weather_password: ${{ secrets.socket_weather_password }}
-        run: ./gradlew publishReleaseBundle
+        run: bash ./gradlew publishReleaseBundle

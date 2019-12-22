@@ -1,0 +1,5 @@
+A super simple app that uses data from Australia's Bureau of Meteorology to tell you what the weather is, and might be.
+
+Inspired by Shift Jelly's Pocket Weather that ended in 2019. The app doesn't have as many bells and whistles as other weather apps, but that's not what it's going for. It's designed to give most people what they want as simply and quickly as possible.
+
+This app respects your privacy, doesn't collect any data, and doesn't have any kind of login. It's also open source: https://github.com/chris-horner/SocketWeather

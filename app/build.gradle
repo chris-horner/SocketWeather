@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 0
 def versionMinor = 1
@@ -76,6 +77,11 @@ android {
       enableSplit = false // We currently only have one language.
     }
   }
+}
+
+play {
+  serviceAccountCredentials = file('keys/play_access.json')
+  defaultToAppBundles = true
 }
 
 dependencies {

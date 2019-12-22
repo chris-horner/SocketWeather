@@ -15,17 +15,20 @@ buildscript {
       'leakcanary'            : '2.0',
       'moshi'                 : '1.9.2',
       'okhttp'                : '4.2.2',
-      'retrofit'              : '2.7.1-SNAPSHOT'
+      'retrofit'              : '2.7.1-SNAPSHOT',
+      'play_publisher'        : '2.6.1'
   ]
 
   repositories {
     google()
     jcenter()
+    maven { url "https://plugins.gradle.org/m2/" }
   }
 
   dependencies {
     classpath "com.android.tools.build:gradle:${versions.android_gradle_plugin}"
     classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:${versions.kotlin}"
+    classpath "com.github.triplet.gradle:play-publisher:${versions.play_publisher}"
   }
 }
 

@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.data
 
 import android.app.Application
 import android.content.Context
+import android.os.StrictMode
 import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
 import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
 import au.com.gridstone.debugdrawer.retrofit.Endpoint
@@ -25,6 +26,8 @@ class NetworkComponents private constructor(app: Application) {
     )
     val networkBehavior = NetworkBehavior.create()
     debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
+    // Allow endpoint changes to be written to disk synchronously.
+    debugRetrofitConfig.doOnEndpointChange { _, _ -> StrictMode.allowThreadDiskWrites() }
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(httpLogger.interceptor)
@@ -34,6 +37,7 @@ class NetworkComponents private constructor(app: Application) {
     val retrofit: Retrofit = Retrofit.Builder()
         .baseUrl(currentEndpoint.url)
         .client(httpClient)
+        .addConverterFactory(EnvelopeConverter)
         .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
         .build()
 

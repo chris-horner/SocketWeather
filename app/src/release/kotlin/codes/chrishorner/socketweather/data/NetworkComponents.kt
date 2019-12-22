@@ -13,6 +13,7 @@ class NetworkComponents private constructor(
   val api: WeatherApi = Retrofit.Builder()
       .baseUrl(DataConfig.API_ENDPOINT)
       .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
+      .addConverterFactory(EnvelopeConverter)
       .build()
       .create()
 

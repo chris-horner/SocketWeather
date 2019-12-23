@@ -1,7 +1,8 @@
 package codes.chrishorner.socketweather.data
 
 /**
- * BOM's API returns the data we care about wrapped in an envelope.
+ * A representation of the wrapped payloads the BOM API returns. Any Envelope objects
+ * returned by the API will be unwrapped by [EnvelopeConverter].
  */
 data class Envelope<T>(val data: T)
 

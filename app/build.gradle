@@ -66,10 +66,11 @@ android {
   }
 
   packagingOptions {
-    exclude 'kotlin/**'
     exclude '**/*.kotlin_metadata'
     exclude 'META-INF/*.kotlin_module'
     exclude 'META-INF/*.version'
+    exclude 'META-INF/*.properties'
+    exclude '/*.properties'
   }
 
   bundle {

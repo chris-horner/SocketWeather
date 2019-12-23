@@ -29,7 +29,7 @@ jobs:
       - name: Retrieve upload keystore
         env:
           upload_keystore: ${{ secrets.upload_keystore }}
-        run: echo $upload_keystore | base64 -d > app/keys/upload.keystore
+        run: echo $upload_keystore | base64 -di > app/keys/upload.keystore
 
       - name: Publish app to internal test track
         env:

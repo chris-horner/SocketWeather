@@ -16,7 +16,14 @@ class SocketWeatherApp : Application() {
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
       StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyDeath().build())
-      StrictMode.setVmPolicy(VmPolicy.Builder().detectAll().penaltyDeath().build())
+      StrictMode.setVmPolicy(
+          VmPolicy.Builder()
+              .detectActivityLeaks()
+              .detectLeakedClosableObjects()
+              .detectLeakedRegistrationObjects()
+              .penaltyDeath()
+              .build()
+      )
     }
 
     AndroidThreeTen.init(this)

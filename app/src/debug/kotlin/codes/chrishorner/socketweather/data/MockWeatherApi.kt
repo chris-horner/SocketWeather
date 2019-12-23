@@ -5,6 +5,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
 import org.threeten.bp.LocalTime
 import org.threeten.bp.Period
+import org.threeten.bp.ZoneId
 import org.threeten.bp.ZoneOffset
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.MockRetrofit
@@ -14,12 +15,16 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
 
   private val delegate: BehaviorDelegate<WeatherApi> = mockRetrofit.create()
 
-  override suspend fun searchForLocation(query: String): List<Location> {
-    return delegate.returningResponse(listOf(location)).searchForLocation(query)
+  override suspend fun searchForLocation(query: String): List<SearchResult> {
+    return delegate.returningResponse(listOf(searchResult)).searchForLocation(query)
   }
 
-  override suspend fun searchForLocation(latitude: Double, longitude: Double): List<Location> {
-    return delegate.returningResponse(location).searchForLocation(latitude, longitude)
+  override suspend fun searchForLocation(latitude: Double, longitude: Double): List<SearchResult> {
+    return delegate.returningResponse(searchResult).searchForLocation(latitude, longitude)
+  }
+
+  override suspend fun getLocation(geohash: String): Location {
+    return delegate.returningResponse(location).getLocation(geohash)
   }
 
   override suspend fun getObservations(geohash: String): CurrentObservations {
@@ -36,12 +41,22 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
 
   private companion object MockData {
 
-    val location = Location(
+    val searchResult = SearchResult(
         id = "Fakezroy-r1r0gnd",
         geohash = "r1r0gnd",
         name = "Fakezroy",
         postcode = "3065",
         state = "VIC"
+    )
+
+    val location = Location(
+        id = "Fakezroy-r1r0gnd",
+        geohash = "r1r0gnd",
+        name = "Fakezroy",
+        state = "VIC",
+        latitude = -37.80052185058594,
+        longitude = 144.97901916503906,
+        timezone = ZoneId.of("Australia/Melbourne")
     )
 
     val currentObservations = CurrentObservations(

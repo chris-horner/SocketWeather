@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.data
 
 import org.threeten.bp.Instant
+import org.threeten.bp.ZoneId
 
 /**
  * A representation of the wrapped payloads the BOM API returns. Any Envelope objects
@@ -8,12 +9,22 @@ import org.threeten.bp.Instant
  */
 data class Envelope<T>(val data: T)
 
-data class Location(
+data class SearchResult(
     val id: String,
     val geohash: String,
     val name: String,
     val postcode: String,
     val state: String
+)
+
+data class Location(
+    val id: String,
+    val geohash: String,
+    val name: String,
+    val state: String,
+    val latitude: Double,
+    val longitude: Double,
+    val timezone: ZoneId
 )
 
 data class CurrentObservations(

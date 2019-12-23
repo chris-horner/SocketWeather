@@ -7,10 +7,13 @@ import retrofit2.http.Query
 interface WeatherApi {
 
   @GET("locations")
-  suspend fun searchForLocation(@Query("search") query: String): List<Location>
+  suspend fun searchForLocation(@Query("search") query: String): List<SearchResult>
 
   @GET("locations?search={lat},{lng}")
-  suspend fun searchForLocation(@Path("lat") latitude: Double, @Path("lng") longitude: Double): List<Location>
+  suspend fun searchForLocation(@Path("lat") latitude: Double, @Path("lng") longitude: Double): List<SearchResult>
+
+  @GET("locations/{geohash}")
+  suspend fun getLocation(@Path("geohash") geohash: String): Location
 
   @GET("locations/{geohash}/observations")
   suspend fun getObservations(@Path("geohash") geohash: String): CurrentObservations

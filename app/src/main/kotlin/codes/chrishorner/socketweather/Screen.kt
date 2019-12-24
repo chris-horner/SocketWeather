@@ -11,7 +11,7 @@ enum class Screen(@LayoutRes private val layoutRes: Int) {
     override fun getController(view: View, navigator: Navigator): Controller = HomeController(view)
   },
   ChooseLocation(R.layout.choose_location) {
-    override fun getController(view: View, navigator: Navigator): Controller = ChooseLocationController()
+    override fun getController(view: View, navigator: Navigator): Controller = ChooseLocationController(view)
   },
   About(R.layout.about) {
     override fun getController(view: View, navigator: Navigator): Controller = AboutController()

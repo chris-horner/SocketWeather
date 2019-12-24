@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <resources>
+
   <string name="appName">Socket Weather</string>
+
+  <string name="chooseLocation_title">Where\'s your weather?</string>
+  <string name="chooseLocation_myLocationButton">Use my location</string>
+  <string name="chooseLocation_searchHint">Search</string>
+
 </resources>

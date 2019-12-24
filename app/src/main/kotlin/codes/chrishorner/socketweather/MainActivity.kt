@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
 
     val backstackEntries = savedInstanceState?.getIntArray("backstack")
         ?.map { Screen.values()[it] }
-        ?: listOf(Screen.Home)
+        ?: listOf(Screen.ChooseLocation)
 
     backstack.addAll(backstackEntries)
 
@@ -42,6 +42,11 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
   override fun onStop() {
     super.onStop()
     getCurrentScreen().unbind(getCurrentScreenView())
+  }
+
+  override fun onDestroy() {
+    super.onDestroy()
+    getCurrentScreen().destroy()
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -62,6 +67,7 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
   override fun goTo(screen: Screen) {
     // TODO Watch for leaks.
     getCurrentScreen().unbind(getCurrentScreenView())
+    getCurrentScreen().destroy()
     rootContainer.removeAllViews()
     backstack.push(screen)
     val view = screen.getView(rootContainer)
@@ -72,6 +78,7 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
   override fun goBack() {
     // TODO Watch for leaks.
     getCurrentScreen().unbind(getCurrentScreenView())
+    getCurrentScreen().destroy()
     backstack.pop()
     rootContainer.removeAllViews()
     val screen = getCurrentScreen()

@@ -24,16 +24,21 @@ enum class Screen(@LayoutRes private val layoutRes: Int) {
   protected abstract fun getController(view: View, navigator: Navigator): Controller
 
   fun bind(view: View, navigator: Navigator) {
-    controller = getController(view, navigator)
+    val bindingController = controller ?: getController(view, navigator).also { controller = it }
+    bindingController.onBind(view)
   }
 
   fun unbind(view: View) {
-    controller?.onDestroy(view)
+    controller?.onUnbind(view)
+  }
+
+  fun destroy() {
     controller = null
   }
 
   interface Controller {
-    fun onDestroy(view: View) {}
+    fun onBind(view: View) {}
+    fun onUnbind(view: View) {}
   }
 
   interface Navigator {

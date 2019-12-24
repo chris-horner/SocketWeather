@@ -4,6 +4,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.annotation.LayoutRes
 import codes.chrishorner.socketweather.util.inflate
+import leakcanary.AppWatcher
 
 enum class Screen(@LayoutRes private val layoutRes: Int) {
 
@@ -24,21 +25,18 @@ enum class Screen(@LayoutRes private val layoutRes: Int) {
   protected abstract fun getController(view: View, navigator: Navigator): Controller
 
   fun bind(view: View, navigator: Navigator) {
-    val bindingController = controller ?: getController(view, navigator).also { controller = it }
-    bindingController.onBind(view)
+    controller = getController(view, navigator)
   }
 
   fun unbind(view: View) {
-    controller?.onUnbind(view)
-  }
-
-  fun destroy() {
+    controller?.onDestroy(view)
+    controller?.let { AppWatcher.objectWatcher.watch(it) }
+    AppWatcher.objectWatcher.watch(view)
     controller = null
   }
 
   interface Controller {
-    fun onBind(view: View) {}
-    fun onUnbind(view: View) {}
+    fun onDestroy(view: View) {}
   }
 
   interface Navigator {

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.get
+import leakcanary.AppWatcher
 import java.util.ArrayDeque
 import java.util.Deque
 
@@ -32,21 +33,12 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
 
     val initialView = backstackEntries[0].getView(rootContainer)
     rootContainer.addView(initialView)
-  }
-
-  override fun onStart() {
-    super.onStart()
     getCurrentScreen().bind(getCurrentScreenView(), this)
-  }
-
-  override fun onStop() {
-    super.onStop()
-    getCurrentScreen().unbind(getCurrentScreenView())
   }
 
   override fun onDestroy() {
     super.onDestroy()
-    getCurrentScreen().destroy()
+    getCurrentScreen().unbind(getCurrentScreenView())
   }
 
   override fun onSaveInstanceState(outState: Bundle) {
@@ -65,9 +57,7 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
   }
 
   override fun goTo(screen: Screen) {
-    // TODO Watch for leaks.
     getCurrentScreen().unbind(getCurrentScreenView())
-    getCurrentScreen().destroy()
     rootContainer.removeAllViews()
     backstack.push(screen)
     val view = screen.getView(rootContainer)
@@ -76,9 +66,7 @@ class MainActivity : AppCompatActivity(), Screen.Navigator {
   }
 
   override fun goBack() {
-    // TODO Watch for leaks.
     getCurrentScreen().unbind(getCurrentScreenView())
-    getCurrentScreen().destroy()
     backstack.pop()
     rootContainer.removeAllViews()
     val screen = getCurrentScreen()

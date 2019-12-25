@@ -22,6 +22,7 @@ android {
     main.java.srcDirs += 'src/main/kotlin'
     debug.java.srcDirs += 'src/debug/kotlin'
     release.java.srcDirs += 'src/release/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
   }
 
   signingConfigs {
@@ -106,4 +107,6 @@ dependencies {
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-timber:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-retrofit:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-okhttp-logger:${versions.debugdrawer}"
+  testImplementation "org.threeten:threetenbp:${versions.threetenbp}"
+  testImplementation "junit:junit:${versions.junit}"
 }

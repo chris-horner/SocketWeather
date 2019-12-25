@@ -65,3 +65,15 @@ data class ThreeHourlyForecast(
     val time: Instant,
     val is_night: Boolean
 )
+
+data class CurrentLocationForecast(
+    val location: Location,
+    val observations: CurrentObservations,
+    val dateForecasts: List<DateForecast>,
+    val threeHourlyForecasts: List<ThreeHourlyForecast>
+)
+
+sealed class SelectedLocation {
+  object FollowMe : SelectedLocation()
+  data class Static(val location: Location) : SelectedLocation()
+}

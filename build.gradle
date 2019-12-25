@@ -16,7 +16,9 @@ buildscript {
       'moshi'                 : '1.9.2',
       'okhttp'                : '4.2.2',
       'retrofit'              : '2.7.1-SNAPSHOT',
-      'play_publisher'        : '2.6.1'
+      'play_publisher'        : '2.6.1',
+      'threetenbp'            : '1.4.0',
+      'junit'                 : '4.12'
   ]
 
   repositories {

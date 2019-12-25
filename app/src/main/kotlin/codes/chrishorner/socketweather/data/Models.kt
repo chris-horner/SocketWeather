@@ -76,4 +76,5 @@ data class CurrentLocationForecast(
 sealed class LocationSelection {
   object FollowMe : LocationSelection()
   data class Static(val location: Location) : LocationSelection()
+  object None : LocationSelection()
 }

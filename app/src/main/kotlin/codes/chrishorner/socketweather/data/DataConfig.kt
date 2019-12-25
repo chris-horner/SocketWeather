@@ -43,11 +43,12 @@ object DataConfig {
     @ToJson fun toJson(
         writer: JsonWriter,
         value: LocationSelection,
-        followMeAdapter: JsonAdapter<String>,
+        stringAdapter: JsonAdapter<String>,
         staticAdapter: JsonAdapter<LocationSelection.Static>
     ) {
       when (value) {
-        is LocationSelection.FollowMe -> followMeAdapter.toJson(writer, "FollowMe")
+        is LocationSelection.None -> stringAdapter.toJson(writer, "None")
+        is LocationSelection.FollowMe -> stringAdapter.toJson(writer, "FollowMe")
         is LocationSelection.Static -> staticAdapter.toJson(writer, value)
       }
     }
@@ -57,10 +58,10 @@ object DataConfig {
         staticAdapter: JsonAdapter<LocationSelection.Static>
     ): LocationSelection {
 
-      val selection = if (reader.peek() == Token.BEGIN_OBJECT) {
-        staticAdapter.fromJson(reader)
-      } else {
-        LocationSelection.FollowMe.also { reader.skipValue() }
+      val selection: LocationSelection? = when {
+        reader.peek() == Token.BEGIN_OBJECT -> staticAdapter.fromJson(reader)
+        reader.nextString() == "FollowMe" -> LocationSelection.FollowMe
+        else -> LocationSelection.None
       }
 
       return selection ?: throw JsonDataException("Failed to deserialize SelectedLocation.")

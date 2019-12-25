@@ -8,13 +8,13 @@ class JsonParsingTest {
 
   private val adapter: JsonAdapter<LocationSelection> = DataConfig.moshi.adapter(LocationSelection::class.java)
 
-  @Test fun `FollowMe SelectedLocation serialises and deserialises`() {
+  @Test fun `FollowMe LocationSelection serialises and deserialises`() {
     val json = adapter.toJson(LocationSelection.FollowMe)
     val deserialised: LocationSelection? = adapter.fromJson(json)
     assert(deserialised is LocationSelection.FollowMe)
   }
 
-  @Test fun `Static SelectedLocation serialises and deserialises`() {
+  @Test fun `Static LocationSelection serialises and deserialises`() {
     val location = Location(
         id = "Fakezroy-r1r0gnd",
         geohash = "r1r0gnd",
@@ -29,5 +29,11 @@ class JsonParsingTest {
     val json = adapter.toJson(selectedLocation)
     val deserialised: LocationSelection? = adapter.fromJson(json)
     assert(deserialised == selectedLocation)
+  }
+
+  @Test fun `None LocationSelection serialises and deserialises`() {
+    val json = adapter.toJson(LocationSelection.None)
+    val deserialised: LocationSelection? = adapter.fromJson(json)
+    assert(deserialised is LocationSelection.None)
   }
 }

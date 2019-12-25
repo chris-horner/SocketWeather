@@ -19,7 +19,7 @@ object DataConfig {
   val moshi: Moshi = Moshi.Builder()
       .add(InstantAdapter)
       .add(ZoneIdAdapter)
-      .add(SelectedLocationAdapter)
+      .add(LocationSelectionAdapter)
       .add(KotlinJsonAdapterFactory())
       .build()
 
@@ -38,32 +38,32 @@ object DataConfig {
    * more of these in the future it might be worth using the `moshi-sealed` library,
    * but for now we'll parse this one type by hand.
    */
-  private object SelectedLocationAdapter {
+  private object LocationSelectionAdapter {
 
     @ToJson fun toJson(
         writer: JsonWriter,
-        value: SelectedLocation,
+        value: LocationSelection,
         followMeAdapter: JsonAdapter<String>,
-        staticAdapter: JsonAdapter<SelectedLocation.Static>
+        staticAdapter: JsonAdapter<LocationSelection.Static>
     ) {
       when (value) {
-        is SelectedLocation.FollowMe -> followMeAdapter.toJson(writer, "FollowMe")
-        is SelectedLocation.Static -> staticAdapter.toJson(writer, value)
+        is LocationSelection.FollowMe -> followMeAdapter.toJson(writer, "FollowMe")
+        is LocationSelection.Static -> staticAdapter.toJson(writer, value)
       }
     }
 
     @FromJson fun fromJson(
         reader: JsonReader,
-        staticAdapter: JsonAdapter<SelectedLocation.Static>
-    ): SelectedLocation {
+        staticAdapter: JsonAdapter<LocationSelection.Static>
+    ): LocationSelection {
 
-      val selectedLocation = if (reader.peek() == Token.BEGIN_OBJECT) {
+      val selection = if (reader.peek() == Token.BEGIN_OBJECT) {
         staticAdapter.fromJson(reader)
       } else {
-        SelectedLocation.FollowMe.also { reader.skipValue() }
+        LocationSelection.FollowMe.also { reader.skipValue() }
       }
 
-      return selectedLocation ?: throw JsonDataException("Failed to deserialize SelectedLocation.")
+      return selection ?: throw JsonDataException("Failed to deserialize SelectedLocation.")
     }
   }
 }

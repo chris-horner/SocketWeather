@@ -73,7 +73,7 @@ data class CurrentLocationForecast(
     val threeHourlyForecasts: List<ThreeHourlyForecast>
 )
 
-sealed class SelectedLocation {
-  object FollowMe : SelectedLocation()
-  data class Static(val location: Location) : SelectedLocation()
+sealed class LocationSelection {
+  object FollowMe : LocationSelection()
+  data class Static(val location: Location) : LocationSelection()
 }

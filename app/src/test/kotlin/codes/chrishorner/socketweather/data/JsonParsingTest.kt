@@ -6,12 +6,12 @@ import org.threeten.bp.ZoneId
 
 class JsonParsingTest {
 
-  private val adapter: JsonAdapter<SelectedLocation> = DataConfig.moshi.adapter(SelectedLocation::class.java)
+  private val adapter: JsonAdapter<LocationSelection> = DataConfig.moshi.adapter(LocationSelection::class.java)
 
   @Test fun `FollowMe SelectedLocation serialises and deserialises`() {
-    val json = adapter.toJson(SelectedLocation.FollowMe)
-    val deserialised: SelectedLocation? = adapter.fromJson(json)
-    assert(deserialised is SelectedLocation.FollowMe)
+    val json = adapter.toJson(LocationSelection.FollowMe)
+    val deserialised: LocationSelection? = adapter.fromJson(json)
+    assert(deserialised is LocationSelection.FollowMe)
   }
 
   @Test fun `Static SelectedLocation serialises and deserialises`() {
@@ -25,9 +25,9 @@ class JsonParsingTest {
         timezone = ZoneId.of("Australia/Melbourne")
     )
 
-    val selectedLocation = SelectedLocation.Static(location)
+    val selectedLocation = LocationSelection.Static(location)
     val json = adapter.toJson(selectedLocation)
-    val deserialised: SelectedLocation? = adapter.fromJson(json)
+    val deserialised: LocationSelection? = adapter.fromJson(json)
     assert(deserialised == selectedLocation)
   }
 }

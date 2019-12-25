@@ -26,8 +26,11 @@ class NetworkComponents private constructor(app: Application) {
     )
     val networkBehavior = NetworkBehavior.create()
     debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
-    // Allow endpoint changes to be written to disk synchronously.
-    debugRetrofitConfig.doOnEndpointChange { _, _ -> StrictMode.allowThreadDiskWrites() }
+    debugRetrofitConfig.doOnEndpointChange { _, _ ->
+      // Allow endpoint changes to be written to disk synchronously.
+      StrictMode.allowThreadDiskWrites()
+      LocationChoices.clear()
+    }
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
         .addInterceptor(httpLogger.interceptor)

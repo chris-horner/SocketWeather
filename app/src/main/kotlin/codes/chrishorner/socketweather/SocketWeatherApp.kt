@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
+import codes.chrishorner.socketweather.data.initialisePersistenceFiles
 import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
 
@@ -27,5 +28,6 @@ class SocketWeatherApp : Application() {
     }
 
     AndroidThreeTen.init(this)
+    initialisePersistenceFiles(this)
   }
 }

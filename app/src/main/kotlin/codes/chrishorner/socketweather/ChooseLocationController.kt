@@ -1,16 +1,20 @@
 package codes.chrishorner.socketweather
 
+import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.EditText
+import androidx.core.os.bundleOf
+import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
-import codes.chrishorner.socketweather.data.networkComponents
+import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
-import com.bluelinelabs.conductor.Controller
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
@@ -19,13 +23,24 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import reactivecircus.flowbinding.android.widget.textChanges
 
-class ChooseLocationController : Controller() {
+class ChooseLocationController(args: Bundle) : ScopedController(args) {
+
+  constructor(showCloseButton: Boolean) : this(bundleOf("showCloseButton" to showCloseButton))
 
   private val scope = MainScope()
+  private val statesChannel = ConflatedBroadcastChannel<State>()
+  private val api: WeatherApi = NetworkComponents.get().api
 
-  override fun onAttach(view: View) {
+  init {
+    val showCloseButton: Boolean = args.getBoolean("showCloseButton")
+  }
+
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
+    return inflater.inflate(R.layout.choose_location, container, false)
+  }
+
+  override fun onAttach(view: View, viewScope: CoroutineScope) {
     view.updatePaddingWithInsets(top = true)
-    val api: WeatherApi = view.context.networkComponents().api
     val searchView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
 
     searchView.textChanges()
@@ -34,32 +49,27 @@ class ChooseLocationController : Controller() {
         .filter { it.isNotBlank() }
         .mapLatest { query -> api.searchForLocation(query.trim().toString()) }
         .onEach { }
-        .launchIn(scope)
+        .launchIn(viewScope)
   }
 
-  override fun onDetach(view: View) {
+  override fun onDestroy() {
     scope.cancel()
   }
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-    return inflater.inflate(R.layout.choose_location, container, false)
-  }
-
-  private sealed class ChooseLocationUiState {
+  private sealed class State {
 
     data class Idle(
         val showFollowMe: Boolean,
         val rootScreen: Boolean
-    ) : ChooseLocationUiState()
+    ) : State()
 
     data class Searching(
         val results: List<SearchResult>,
         val loading: Boolean,
         val error: Boolean,
         val rootScreen: Boolean
-    ) : ChooseLocationUiState()
+    ) : State()
 
-    object AttemptingToAdd : ChooseLocationUiState()
+    object AttemptingToAdd : State()
   }
-
 }

@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.data
 
 import android.app.Application
 import android.content.Context
+import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import com.squareup.moshi.Types
 import okio.buffer
 import okio.sink
@@ -11,7 +12,9 @@ import java.io.File
 private lateinit var directory: File
 
 fun initialisePersistenceFiles(app: Application) {
-  directory = app.getDir("persistence", Context.MODE_PRIVATE)
+  allowMainThreadDiskOperations {
+    directory = app.getDir("persistence", Context.MODE_PRIVATE)
+  }
 }
 
 fun getFileForSavedLocations(): File = File(directory, "saved_locations")

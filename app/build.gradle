@@ -97,6 +97,7 @@ dependencies {
   implementation "androidx.appcompat:appcompat:${versions.appcompat}"
   implementation "androidx.core:core-ktx:${versions.androidx_core}"
   implementation "com.google.android.material:material:${versions.material}"
+  implementation "com.bluelinelabs:conductor:${versions.conductor}"
   implementation "com.jakewharton.timber:timber:${versions.timber}"
   implementation "com.jakewharton.threetenabp:threetenabp:${versions.threetenabp}"
   implementation "com.squareup.leakcanary:leakcanary-object-watcher-android:${versions.leakcanary}"

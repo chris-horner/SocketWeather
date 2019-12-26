@@ -1,12 +1,14 @@
 package codes.chrishorner.socketweather
 
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
-import codes.chrishorner.socketweather.Screen.Controller
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.networkComponents
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
+import com.bluelinelabs.conductor.Controller
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.debounce
@@ -17,12 +19,12 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import reactivecircus.flowbinding.android.widget.textChanges
 
-class ChooseLocationController(view: View) : Controller {
+class ChooseLocationController : Controller() {
 
   private val scope = MainScope()
 
-  init {
-
+  override fun onAttach(view: View) {
+    view.updatePaddingWithInsets(top = true)
     val api: WeatherApi = view.context.networkComponents().api
     val searchView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
 
@@ -33,12 +35,14 @@ class ChooseLocationController(view: View) : Controller {
         .mapLatest { query -> api.searchForLocation(query.trim().toString()) }
         .onEach { }
         .launchIn(scope)
-
-    view.updatePaddingWithInsets(top = true)
   }
 
-  override fun onDestroy(view: View) {
+  override fun onDetach(view: View) {
     scope.cancel()
+  }
+
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
+    return inflater.inflate(R.layout.choose_location, container, false)
   }
 
   private sealed class ChooseLocationUiState {
@@ -57,4 +61,5 @@ class ChooseLocationController(view: View) : Controller {
 
     object AttemptingToAdd : ChooseLocationUiState()
   }
+
 }

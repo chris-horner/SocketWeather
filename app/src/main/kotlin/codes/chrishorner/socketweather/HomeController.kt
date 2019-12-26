@@ -1,13 +1,13 @@
 package codes.chrishorner.socketweather
 
+import android.view.LayoutInflater
 import android.view.View
-import codes.chrishorner.socketweather.Screen.Controller
-import codes.chrishorner.socketweather.util.updatePaddingWithInsets
+import android.view.ViewGroup
+import com.bluelinelabs.conductor.Controller
 
-class HomeController(view: View) : Controller {
+class HomeController : Controller() {
 
-  init {
-    val toolbar: View = view.findViewById(R.id.home_toolbar)
-    toolbar.updatePaddingWithInsets(top = true)
+  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
+    return inflater.inflate(R.layout.home, container, false)
   }
 }

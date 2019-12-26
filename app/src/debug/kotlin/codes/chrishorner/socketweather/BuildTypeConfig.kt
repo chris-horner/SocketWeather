@@ -11,6 +11,7 @@ import au.com.gridstone.debugdrawer.timber.TimberModule
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.networkComponents
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
+import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
 
 object BuildTypeConfig {
 
@@ -20,7 +21,7 @@ object BuildTypeConfig {
     // modules to do their thing.
     allowMainThreadDiskOperations {
       val networkComponents: NetworkComponents = activity.networkComponents()
-          drawerBuilder
+      drawerBuilder
           .addSectionTitle("Network")
           .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))
           .addSectionTitle("Logs")
@@ -30,6 +31,7 @@ object BuildTypeConfig {
           .addModule(LeakCanaryModule)
           .addSectionTitle("Device information")
           .addModule(DeviceInfoModule())
+          .overrideMainContainer(ChangeHandlerFrameLayout(activity))
     }
 
     return drawerBuilder.buildMainContainer()

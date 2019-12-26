@@ -9,6 +9,7 @@ import au.com.gridstone.debugdrawer.okhttplogs.OkHttpLoggerModule
 import au.com.gridstone.debugdrawer.retrofit.RetrofitModule
 import au.com.gridstone.debugdrawer.timber.TimberModule
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.data.networkComponents
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 
 object BuildTypeConfig {
@@ -18,7 +19,7 @@ object BuildTypeConfig {
     // Temporarily allow disk operations on main thread to allow debug drawer
     // modules to do their thing.
     allowMainThreadDiskOperations {
-      val networkComponents = NetworkComponents.from(activity)
+      val networkComponents: NetworkComponents = activity.networkComponents()
           drawerBuilder
           .addSectionTitle("Network")
           .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))

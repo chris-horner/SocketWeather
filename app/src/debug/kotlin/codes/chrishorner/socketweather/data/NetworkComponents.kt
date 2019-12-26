@@ -13,6 +13,8 @@ import retrofit2.create
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 
+fun Context.networkComponents() = NetworkComponents.from(this)
+
 class NetworkComponents private constructor(app: Application) {
 
   val api: WeatherApi

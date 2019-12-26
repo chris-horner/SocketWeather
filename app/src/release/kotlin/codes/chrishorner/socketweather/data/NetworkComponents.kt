@@ -6,6 +6,8 @@ import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 
+fun Context.networkComponents() = NetworkComponents.from(this)
+
 class NetworkComponents private constructor(
     @Suppress("UNUSED_PARAMETER") app: Application // Match signature of debug variant.
 ) {

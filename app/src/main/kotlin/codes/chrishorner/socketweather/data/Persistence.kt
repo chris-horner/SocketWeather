@@ -17,9 +17,9 @@ fun initialisePersistenceFiles(app: Application) {
   }
 }
 
-fun getFileForSavedLocations(): File = File(directory, "saved_locations")
+fun getFileForSavedSelections(): File = File(directory, "saved_selections")
 
-fun getFileForSelectedLocation(): File = File(directory, "selected_location")
+fun getFileForCurrentSelection(): File = File(directory, "current_selection")
 
 fun getFileForCurrentForecast(): File = File(directory, "current_forecast")
 

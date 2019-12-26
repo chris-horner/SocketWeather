@@ -13,43 +13,41 @@ import kotlinx.coroutines.launch
 object LocationChoices {
 
   private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-  private val savedLocationsChannel = ConflatedBroadcastChannel<Set<Location>>()
-  private val locationSelectionChannel = ConflatedBroadcastChannel<LocationSelection>()
+  private val savedSelectionsChannel = ConflatedBroadcastChannel<Set<LocationSelection>>()
+  private val currentSelectionChannel = ConflatedBroadcastChannel<LocationSelection>()
 
   init {
     scope.launch {
-      val savedLocations: Set<Location> = getFileForSavedLocations().readSet()
-      savedLocationsChannel.offer(savedLocations)
+      val savedLocations: Set<LocationSelection> = getFileForSavedSelections().readSet()
+      savedSelectionsChannel.offer(savedLocations)
     }
 
     scope.launch {
-      val locationSelection: LocationSelection? = getFileForSelectedLocation().readValue()
-      locationSelectionChannel.offer(locationSelection ?: LocationSelection.None)
+      val locationSelection: LocationSelection? = getFileForCurrentSelection().readValue()
+      currentSelectionChannel.offer(locationSelection ?: LocationSelection.None)
     }
   }
 
-  fun observeSavedLocations(): Flow<Set<Location>> = savedLocationsChannel.asFlow()
+  fun observeSavedSelections(): Flow<Set<LocationSelection>> = savedSelectionsChannel.asFlow()
 
-  fun observeLocationSelection(): Flow<LocationSelection> = locationSelectionChannel.asFlow()
+  fun observeCurrentSelection(): Flow<LocationSelection> = currentSelectionChannel.asFlow()
 
   fun saveAndSelect(selection: LocationSelection) {
-    locationSelectionChannel.offer(selection)
+    currentSelectionChannel.offer(selection)
 
-    if (selection is LocationSelection.Static) {
-      scope.launch {
-        val file = getFileForSavedLocations()
-        file.writeSet(file.readSet<Location>() + selection.location)
-      }
+    scope.launch {
+      val file = getFileForSavedSelections()
+      file.writeSet(file.readSet<LocationSelection>() + selection)
     }
   }
 
   fun select(selection: LocationSelection) {
-    locationSelectionChannel.offer(selection)
-    scope.launch { getFileForSelectedLocation().writeValue(selection) }
+    currentSelectionChannel.offer(selection)
+    scope.launch { getFileForCurrentSelection().writeValue(selection) }
   }
 
   fun clear() {
-    getFileForSelectedLocation().delete()
-    getFileForSavedLocations().delete()
+    getFileForCurrentSelection().delete()
+    getFileForSavedSelections().delete()
   }
 }

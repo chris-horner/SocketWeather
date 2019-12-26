@@ -107,6 +107,7 @@ dependencies {
   implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
   implementation "com.squareup.retrofit2:retrofit-mock:${versions.retrofit}"
   implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
+  implementation "io.github.reactivecircus.flowbinding:flowbinding-android:${versions.flowbinding}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-leakcanary:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-timber:${versions.debugdrawer}"

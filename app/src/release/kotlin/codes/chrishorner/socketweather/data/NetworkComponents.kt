@@ -1,12 +1,9 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
-import android.content.Context
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
-
-fun Context.networkComponents() = NetworkComponents.from(this)
 
 class NetworkComponents private constructor(
     @Suppress("UNUSED_PARAMETER") app: Application // Match signature of debug variant.
@@ -22,9 +19,12 @@ class NetworkComponents private constructor(
   companion object {
     private var instance: NetworkComponents? = null
 
-    @Synchronized fun from(context: Context): NetworkComponents {
-      instance?.let { return it }
-      return NetworkComponents(context.applicationContext as Application).also { instance = it }
+    fun init(app: Application) {
+      instance = NetworkComponents(app)
+    }
+
+    fun get(): NetworkComponents {
+      return requireNotNull(instance) { "NetworkComponents.init(app) must be called first." }
     }
   }
 }

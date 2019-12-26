@@ -1,7 +1,6 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
-import android.content.Context
 import android.os.StrictMode
 import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
 import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
@@ -12,8 +11,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
-
-fun Context.networkComponents() = NetworkComponents.from(this)
 
 class NetworkComponents private constructor(app: Application) {
 
@@ -59,9 +56,12 @@ class NetworkComponents private constructor(app: Application) {
   companion object {
     private var instance: NetworkComponents? = null
 
-    @Synchronized fun from(context: Context): NetworkComponents {
-      instance?.let { return it }
-      return NetworkComponents(context.applicationContext as Application).also { instance = it }
+    fun init(app: Application) {
+      instance = NetworkComponents(app)
+    }
+
+    fun get(): NetworkComponents {
+      return requireNotNull(instance) { "NetworkComponents.init(app) must be called first." }
     }
   }
 }

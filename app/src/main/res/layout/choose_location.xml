@@ -16,8 +16,10 @@
       />
 
   <TextView
+      android:id="@+id/chooseLocation_title"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginTop="32dp"
       android:paddingStart="32dp"
       android:paddingEnd="32dp"
       android:text="@string/chooseLocation_title"
@@ -25,6 +27,7 @@
       />
 
   <com.google.android.material.button.MaterialButton
+      android:id="@+id/chooseLocation_followMeButton"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginStart="32dp"

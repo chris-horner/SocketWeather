@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @MainThread
 object LocationChoices {
@@ -32,13 +33,13 @@ object LocationChoices {
 
   fun observeCurrentSelection(): Flow<LocationSelection> = currentSelectionChannel.asFlow()
 
-  fun saveAndSelect(selection: LocationSelection) {
-    currentSelectionChannel.offer(selection)
-
-    scope.launch {
+  suspend fun saveAndSelect(selection: LocationSelection) {
+    withContext(Dispatchers.IO) {
       val file = getFileForSavedSelections()
       file.writeSet(file.readSet<LocationSelection>() + selection)
     }
+
+    currentSelectionChannel.offer(selection)
   }
 
   fun select(selection: LocationSelection) {

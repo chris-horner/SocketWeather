@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
+import codes.chrishorner.socketweather.choose_location.ChooseLocationController
 import codes.chrishorner.socketweather.util.ControllerLeakListener
 import codes.chrishorner.socketweather.util.asTransaction
 import com.bluelinelabs.conductor.Conductor
@@ -24,12 +25,11 @@ class MainActivity : AppCompatActivity() {
 
     val rootContainer: ViewGroup = BuildTypeConfig.getRootContainerFor(this)
     router = Conductor.attachRouter(this, rootContainer, savedInstanceState)
+    router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      router.setRoot(ChooseLocationController().asTransaction())
+      router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
     }
-
-    router.addChangeListener(ControllerLeakListener)
   }
 
   override fun onBackPressed() {

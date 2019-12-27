@@ -15,6 +15,10 @@ class SocketWeatherApp : Application() {
   override fun onCreate() {
     super.onCreate()
 
+    AndroidThreeTen.init(this)
+    NetworkComponents.init(this)
+    initialisePersistenceFiles(this)
+
     if (BuildConfig.DEBUG) {
       Timber.plant(Timber.DebugTree())
       StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyDeath().build())
@@ -27,9 +31,5 @@ class SocketWeatherApp : Application() {
               .build()
       )
     }
-
-    AndroidThreeTen.init(this)
-    NetworkComponents.init(this)
-    initialisePersistenceFiles(this)
   }
 }

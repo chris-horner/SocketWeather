@@ -17,30 +17,42 @@ fun initialisePersistenceFiles(app: Application) {
   }
 }
 
-fun getFileForSavedSelections(): File = File(directory, "saved_selections")
+fun getFileForSavedSelections(): File = getFile("saved_selections")
 
-fun getFileForCurrentSelection(): File = File(directory, "current_selection")
+fun getFileForCurrentSelection(): File = getFile("current_selection")
 
-fun getFileForCurrentForecast(): File = File(directory, "current_forecast")
+fun getFileForCurrentForecast(): File = getFile("current_forecast")
+
+private fun getFile(name: String): File {
+  val file = File(directory, name)
+  if (!file.exists()) file.createNewFile()
+  return file
+}
 
 inline fun <reified T> File.readValue(): T? {
-  val adapter = DataConfig.moshi.adapter(T::class.java)
-  return adapter.fromJson(source().buffer())
+  source().buffer().use { source ->
+    if (source.exhausted()) return null
+    val adapter = DataConfig.moshi.adapter(T::class.java)
+    return adapter.fromJson(source)
+  }
 }
 
 inline fun <reified T> File.writeValue(value: T) {
   val adapter = DataConfig.moshi.adapter(T::class.java)
-  adapter.toJson(sink().buffer(), value)
+  sink().buffer().use { sink -> adapter.toJson(sink, value) }
 }
 
 inline fun <reified T> File.readSet(): Set<T> {
-  val setType = Types.newParameterizedType(Set::class.java, T::class.java)
-  val adapter = DataConfig.moshi.adapter<Set<T>>(setType)
-  return adapter.fromJson(source().buffer()) ?: emptySet()
+  source().buffer().use { source ->
+    if (source.exhausted()) return emptySet()
+    val setType = Types.newParameterizedType(Set::class.java, T::class.java)
+    val adapter = DataConfig.moshi.adapter<Set<T>>(setType)
+    return adapter.fromJson(source) ?: emptySet()
+  }
 }
 
 inline fun <reified T> File.writeSet(values: Set<T>) {
   val setType = Types.newParameterizedType(Set::class.java, T::class.java)
   val adapter = DataConfig.moshi.adapter<Set<T>>(setType)
-  adapter.toJson(sink().buffer(), values)
+  sink().buffer().use { sink -> adapter.toJson(sink, values) }
 }

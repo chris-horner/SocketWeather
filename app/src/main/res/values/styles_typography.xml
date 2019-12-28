@@ -24,6 +24,10 @@
     <item name="fontFamily">@font/zilla_slab_medium</item>
   </style>
 
+  <style name="TextAppearance.SocketWeather.Headline5.Secondary" parent="TextAppearance.SocketWeather.Headline5">
+    <item name="android:textColor">?android:attr/textColorSecondary</item>
+  </style>
+
   <style name="TextAppearance.SocketWeather.Headline6" parent="TextAppearance.MaterialComponents.Headline6">
     <item name="fontFamily">@font/zilla_slab_medium</item>
   </style>
@@ -54,6 +58,15 @@
 
   <style name="TextAppearance.SocketWeather.Overline" parent="TextAppearance.MaterialComponents.Overline">
     <item name="fontFamily">@font/zilla_slab_medium</item>
+  </style>
+
+  <style name="TextAppearance.SocketWeather.LargeTemp" parent="TextAppearance.MaterialComponents.Headline1">
+    <item name="fontFamily">@font/roboto_slab_regular</item>
+    <item name="android:textColor">?android:attr/textColorPrimary</item>
+  </style>
+
+  <style name="TextAppearance.SocketWeather.SmallTemp" parent="TextAppearance.MaterialComponents.Headline5">
+    <item name="fontFamily">@font/roboto_slab_medium</item>
   </style>
 
 </resources>

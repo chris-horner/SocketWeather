@@ -58,9 +58,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="32.7°"
-          android:textAppearance="?attr/textAppearanceHeadline1"
-          android:textColor="?attr/colorOnBackground"
-          app:fontFamily="@font/roboto_slab_regular"
+          android:textAppearance="@style/TextAppearance.SocketWeather.LargeTemp"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toTopOf="parent"
           />
@@ -71,8 +69,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="16dp"
           android:text="@string/home_feelsLike"
-          android:textAppearance="?attr/textAppearanceHeadline5"
-          android:textColor="?android:attr/textColorSecondary"
+          android:textAppearance="@style/TextAppearance.SocketWeather.Headline5.Secondary"
           app:layout_constraintStart_toStartOf="parent"
           app:layout_constraintTop_toBottomOf="@id/home_currentTemp"
           />
@@ -83,8 +80,7 @@
           android:layout_height="wrap_content"
           android:layout_marginStart="8dp"
           android:text="29.2°"
-          android:textAppearance="?attr/textAppearanceHeadline5"
-          app:fontFamily="@font/roboto_slab_medium"
+          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
           app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
           app:layout_constraintStart_toEndOf="@id/home_feelsLikeTitle"
           />
@@ -95,8 +91,7 @@
           android:layout_height="wrap_content"
           android:layout_marginTop="24dp"
           android:text="38°"
-          android:textAppearance="?attr/textAppearanceHeadline5"
-          app:fontFamily="@font/roboto_slab_medium"
+          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
           app:layout_constraintEnd_toEndOf="parent"
           app:layout_constraintTop_toTopOf="parent"
           />
@@ -106,8 +101,7 @@
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:text="18°"
-          android:textAppearance="?attr/textAppearanceHeadline5"
-          app:fontFamily="@font/roboto_slab_medium"
+          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
           app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
           app:layout_constraintEnd_toEndOf="parent"
           />

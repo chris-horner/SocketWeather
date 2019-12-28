@@ -9,6 +9,7 @@ buildscript {
       'appcompat'             : '1.1.0',
       'material'              : '1.1.0-beta02',
       'androidx_core'         : '1.1.0',
+      'constraintlayout'      : '2.0.0-beta4',
       'conductor'             : '3.0.0-rc2',
       'threetenabp'           : '1.2.1',
       'debugdrawer'           : '0.9.7-SNAPSHOT',

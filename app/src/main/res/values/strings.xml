@@ -14,5 +14,6 @@
   <string name="chooseLocation_permissionError">Location permission required</string>
 
   <string name="home_about">About</string>
+  <string name="home_feelsLike">Feels like</string>
 
 </resources>

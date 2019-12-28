@@ -1,18 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     >
 
-  <androidx.appcompat.widget.Toolbar
-      android:id="@+id/home_toolbar"
+  <com.google.android.material.appbar.AppBarLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      app:title="@string/appName"
-      />
+      android:background="?android:attr/windowBackground"
+      app:liftOnScroll="true"
+      >
 
-</LinearLayout>
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/home_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:contentInsetStart="0dp"
+        app:menu="@menu/home"
+        >
+
+      <TextView
+          android:id="@+id/home_locationDropdown"
+          android:layout_width="wrap_content"
+          android:layout_height="?attr/actionBarSize"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:background="?attr/selectableItemBackground"
+          android:gravity="center_vertical"
+          android:maxLines="1"
+          android:text="Collingwood"
+          android:textAppearance="?attr/textAppearanceHeadline6"
+          app:drawableEndCompat="@drawable/ic_arrow_drop_down_24dp"
+          />
+
+    </androidx.appcompat.widget.Toolbar>
+
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <androidx.core.widget.NestedScrollView
+      android:id="@+id/home_scroller"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      >
+
+  </androidx.core.widget.NestedScrollView>
+
+  <FrameLayout
+      android:id="@+id/home_switchLocationContainer"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:padding="8dp"
+      android:background="@color/scrimNeutral"
+      android:clipToPadding="false"
+      android:visibility="gone"
+      >
+
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/home_locationCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        >
+
+      <androidx.recyclerview.widget.RecyclerView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="8dp"
+          android:paddingEnd="8dp"
+          android:scrollbars="vertical"
+          />
+
+    </com.google.android.material.card.MaterialCardView>
+
+  </FrameLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

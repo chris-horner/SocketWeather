@@ -2,6 +2,7 @@
 
 <resources>
 
+  <color name="light_blue_10">#f0ffff</color>
   <color name="light_blue_50">#e1f5fe</color>
   <color name="light_blue_100">#b3e5fc</color>
   <color name="light_blue_300">#4fc3f7</color>
@@ -14,6 +15,7 @@
   <color name="darkGrey">#121212</color>
   <color name="scrimLight">#2203a9f4</color>
   <color name="scrimDark">#cc000000</color>
+  <color name="scrimNeutral">#22000000</color>
   <color name="black">#000000</color>
   <color name="white">#ffffff</color>
   <color name="transparent">#00000000</color>

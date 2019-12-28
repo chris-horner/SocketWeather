@@ -27,7 +27,7 @@
     <item name="colorSecondary">@color/amber_A100</item>
     <item name="colorSecondaryVariant">@color/amber_A200</item>
     <item name="colorOnSecondary">@color/black</item>
-    <item name="colorSurface">@color/light_blue_50</item>
+    <item name="colorSurface">@color/light_blue_10</item>
     <item name="colorOnSurface">@color/black</item>
     <item name="android:windowBackground">@color/light_blue_50</item>
     <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>

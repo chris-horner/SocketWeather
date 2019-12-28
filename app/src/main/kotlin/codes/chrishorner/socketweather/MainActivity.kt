@@ -6,6 +6,8 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import codes.chrishorner.socketweather.choose_location.ChooseLocationController
 import codes.chrishorner.socketweather.data.LocationChoices
+import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ControllerLeakListener
 import codes.chrishorner.socketweather.util.asTransaction
 import com.bluelinelabs.conductor.Conductor
@@ -29,12 +31,16 @@ class MainActivity : AppCompatActivity() {
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      router.setRoot(
-          ChooseLocationController(
-              displayAsRoot = true,
-              showFollowMe = !LocationChoices.get().hasFollowMeSaved()
-          ).asTransaction()
-      )
+      if (LocationChoices.get().getCurrentSelection() == LocationSelection.None) {
+        router.setRoot(
+            ChooseLocationController(
+                displayAsRoot = true,
+                showFollowMe = !LocationChoices.get().hasFollowMeSaved()
+            ).asTransaction()
+        )
+      } else {
+        router.setRoot(HomeController().asTransaction())
+      }
     }
   }
 

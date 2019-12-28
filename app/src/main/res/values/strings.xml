@@ -13,4 +13,6 @@
   <string name="chooseLocation_searchEmpty">No locations found</string>
   <string name="chooseLocation_permissionError">Location permission required</string>
 
+  <string name="home_about">About</string>
+
 </resources>

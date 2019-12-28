@@ -4,11 +4,15 @@ import android.view.View
 import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
+import androidx.recyclerview.widget.RecyclerView
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingDone
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import com.google.android.material.snackbar.Snackbar
@@ -25,6 +29,10 @@ class ChooseLocationPresenter(private val view: View) {
   private val toolbar: Toolbar = view.findViewById(R.id.chooseLocation_toolbar)
   private val followMeButton: View = view.findViewById(R.id.chooseLocation_followMeButton)
   private val topContainer: View = view.findViewById(R.id.chooseLocation_topContainer)
+  private val recycler: RecyclerView = view.findViewById(R.id.chooseLocation_recycler)
+  private val loadingView: View = view.findViewById(R.id.chooseLocation_loadingResults)
+  private val errorView: View = view.findViewById(R.id.chooseLocation_error)
+  private val emptyView: View = view.findViewById(R.id.chooseLocation_empty)
 
   val events: Flow<Event>
 
@@ -44,11 +52,15 @@ class ChooseLocationPresenter(private val view: View) {
   }
 
   fun display(state: State) {
-    toolbar.isVisible = state.rootScreen
+    toolbar.isVisible = !state.rootScreen
     followMeButton.isVisible = state.showFollowMe
+    recycler.isVisible = state.loadingStatus == SearchingDone && state.results.isNotEmpty()
+    errorView.isVisible = state.loadingStatus == SearchingError
+    emptyView.isVisible = state.loadingStatus == SearchingDone && state.results.isEmpty()
+    loadingView.isVisible = state.loadingStatus == Searching
   }
 
-  fun showError() {
+  fun showSelectionError() {
     Snackbar.make(view, R.string.chooseLocation_submissionError, Snackbar.LENGTH_SHORT).show()
   }
 

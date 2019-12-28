@@ -4,6 +4,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingDone
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.data.LocationChoices
@@ -86,9 +87,10 @@ class ChooseLocationViewModel(
 
   private fun searchForResults(query: String): Flow<State> = flow {
     emit(idleState.copy(loadingStatus = Searching))
+
     try {
       val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
-      emit(idleState.copy(results = results))
+      emit(idleState.copy(results = results, loadingStatus = SearchingDone))
     } catch (e: Exception) {
       emit(idleState.copy(loadingStatus = SearchingError))
     }
@@ -100,7 +102,7 @@ class ChooseLocationViewModel(
       val results: List<SearchResult> = emptyList(),
       val loadingStatus: LoadingStatus = Idle
   ) {
-    enum class LoadingStatus { Idle, Searching, SearchingError, Submitting }
+    enum class LoadingStatus { Idle, Searching, SearchingError, SearchingDone, Submitting }
   }
 
   enum class Event { SubmissionError, SubmissionSuccess }

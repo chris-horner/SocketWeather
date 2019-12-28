@@ -51,7 +51,7 @@ class ChooseLocationController(args: Bundle) : ScopedController(args) {
     viewModel.observeEvents()
         .onEach { event ->
           when (event) {
-            SubmissionError -> presenter.showError()
+            SubmissionError -> presenter.showSelectionError()
             SubmissionSuccess -> router.setRoot(HomeController().asTransaction())
           }
         }

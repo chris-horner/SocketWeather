@@ -27,6 +27,7 @@
         android:id="@+id/chooseLocation_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:paddingStart="32dp"
         android:paddingEnd="32dp"
         android:text="@string/chooseLocation_title"
@@ -75,11 +76,79 @@
 
   </com.google.android.material.textfield.TextInputLayout>
 
+  <LinearLayout
+      android:id="@+id/chooseLocation_loadingResults"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:gravity="center"
+      android:orientation="vertical"
+      android:visibility="gone"
+      >
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/chooseLocation_searchLoading"
+        android:textAppearance="?attr/textAppearanceSubtitle1"
+        />
+
+  </LinearLayout>
+
+  <FrameLayout
+      android:id="@+id/chooseLocation_error"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:visibility="gone"
+      >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="16dp"
+        android:text="@string/chooseLocation_searchError"
+        android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
+        app:drawableTint="?attr/colorOnBackground"
+        app:drawableTopCompat="@drawable/ic_error_outline_48dp"
+        />
+
+  </FrameLayout>
+
+  <FrameLayout
+      android:id="@+id/chooseLocation_empty"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      android:visibility="gone"
+      >
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:drawablePadding="16dp"
+        android:text="@string/chooseLocation_searchEmpty"
+        android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
+        app:drawableTint="?attr/colorOnBackground"
+        app:drawableTopCompat="@drawable/ic_terrain_48dp"
+        />
+
+  </FrameLayout>
+
   <androidx.recyclerview.widget.RecyclerView
       android:id="@+id/chooseLocation_recycler"
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_weight="1"
+      android:visibility="gone"
       />
 
 </LinearLayout>

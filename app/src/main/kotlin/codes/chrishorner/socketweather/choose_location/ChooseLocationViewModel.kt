@@ -41,7 +41,7 @@ class ChooseLocationViewModel(
 
   init {
     searchQueryChannel.asFlow()
-        .debounce(200)
+        .debounce(400)
         .flatMapLatest { query ->
           if (query.isBlank()) {
             flow { emit(idleState) }

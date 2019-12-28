@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import codes.chrishorner.socketweather.choose_location.ChooseLocationController
+import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.util.ControllerLeakListener
 import codes.chrishorner.socketweather.util.asTransaction
 import com.bluelinelabs.conductor.Conductor
@@ -28,7 +29,12 @@ class MainActivity : AppCompatActivity() {
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
+      router.setRoot(
+          ChooseLocationController(
+              displayAsRoot = true,
+              showFollowMe = !LocationChoices.get().hasFollowMeSaved()
+          ).asTransaction()
+      )
     }
   }
 

@@ -1,29 +1,13 @@
-package codes.chrishorner.socketweather.data
+package codes.chrishorner.socketweather.util
 
-import android.app.Application
-import android.content.Context
-import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
+import codes.chrishorner.socketweather.data.DataConfig
 import com.squareup.moshi.Types
 import okio.buffer
 import okio.sink
 import okio.source
 import java.io.File
 
-private lateinit var directory: File
-
-fun initialisePersistenceFiles(app: Application) {
-  allowMainThreadDiskOperations {
-    directory = app.getDir("persistence", Context.MODE_PRIVATE)
-  }
-}
-
-fun getFileForSavedSelections(): File = getFile("saved_selections")
-
-fun getFileForCurrentSelection(): File = getFile("current_selection")
-
-fun getFileForCurrentForecast(): File = getFile("current_forecast")
-
-private fun getFile(name: String): File {
+fun getOrCreateFile(directory: File, name: String): File {
   val file = File(directory, name)
   if (!file.exists()) file.createNewFile()
   return file

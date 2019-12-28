@@ -9,14 +9,13 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.Idle
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.Searching
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import reactivecircus.flowbinding.android.view.clicks
 import reactivecircus.flowbinding.android.widget.textChanges
 import reactivecircus.flowbinding.appcompat.navigationClicks
@@ -25,35 +24,28 @@ class ChooseLocationPresenter(private val view: View) {
 
   private val toolbar: Toolbar = view.findViewById(R.id.chooseLocation_toolbar)
   private val followMeButton: View = view.findViewById(R.id.chooseLocation_followMeButton)
-  private val title: View = view.findViewById(R.id.chooseLocation_title)
+  private val topContainer: View = view.findViewById(R.id.chooseLocation_topContainer)
 
   val events: Flow<Event>
 
   init {
-    view.updatePaddingWithInsets(top = true)
+    view.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
 
     val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
+    val inputSearches: Flow<InputSearch> = inputView.textChanges()
+        .onEach { topContainer.isVisible = it.isBlank() }
+        .map { InputSearch(it.toString()) }
 
     events = merge(
         toolbar.navigationClicks().map { CloseClicked },
         followMeButton.clicks().map { FollowMeClicked },
-        inputView.textChanges().map { InputSearch(it.toString()) }
+        inputSearches
     )
   }
 
   fun display(state: State) {
-    when (state) {
-      is Idle -> {
-        title.isVisible = true
-        toolbar.isVisible = !state.rootScreen
-        followMeButton.isVisible = state.showFollowMe
-      }
-
-      is Searching -> {
-        title.isVisible = false
-        followMeButton.isVisible = false
-      }
-    }
+    toolbar.isVisible = state.rootScreen
+    followMeButton.isVisible = state.showFollowMe
   }
 
   fun showError() {

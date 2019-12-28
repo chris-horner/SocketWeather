@@ -1,54 +1,79 @@
 package codes.chrishorner.socketweather.data
 
-import androidx.annotation.MainThread
-import kotlinx.coroutines.CoroutineScope
+import android.app.Application
+import android.content.Context
+import codes.chrishorner.socketweather.util.getOrCreateFile
+import codes.chrishorner.socketweather.util.readSet
+import codes.chrishorner.socketweather.util.readValue
+import codes.chrishorner.socketweather.util.writeSet
+import codes.chrishorner.socketweather.util.writeValue
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.io.File
 
-@MainThread
-object LocationChoices {
+class LocationChoices private constructor(app: Application) {
 
-  private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
   private val savedSelectionsChannel = ConflatedBroadcastChannel<Set<LocationSelection>>()
   private val currentSelectionChannel = ConflatedBroadcastChannel<LocationSelection>()
+  private val savedSelections: File
+  private val currentSelection: File
 
   init {
-    scope.launch {
-      val savedLocations: Set<LocationSelection> = getFileForSavedSelections().readSet()
-      savedSelectionsChannel.offer(savedLocations)
-    }
+    val directory = app.getDir("location_choices", Context.MODE_PRIVATE)
+    savedSelections = getOrCreateFile(directory, "saved_selections")
+    currentSelection = getOrCreateFile(directory, "current_selection")
 
-    scope.launch {
-      val locationSelection: LocationSelection? = getFileForCurrentSelection().readValue()
-      currentSelectionChannel.offer(locationSelection ?: LocationSelection.None)
-    }
+    val savedLocations: Set<LocationSelection> = savedSelections.readSet()
+    savedSelectionsChannel.offer(savedLocations)
+
+    val locationSelection: LocationSelection? = currentSelection.readValue()
+    currentSelectionChannel.offer(locationSelection ?: LocationSelection.None)
   }
 
   fun observeSavedSelections(): Flow<Set<LocationSelection>> = savedSelectionsChannel.asFlow()
 
   fun observeCurrentSelection(): Flow<LocationSelection> = currentSelectionChannel.asFlow()
 
+  fun getSavedSelections(): Set<LocationSelection> = savedSelectionsChannel.value
+
+  fun getCurrentSelection(): LocationSelection = currentSelectionChannel.value
+
+  fun hasFollowMeSaved(): Boolean = getSavedSelections().contains(LocationSelection.FollowMe)
+
   suspend fun saveAndSelect(selection: LocationSelection) {
     withContext(Dispatchers.IO) {
-      val file = getFileForSavedSelections()
-      file.writeSet(file.readSet<LocationSelection>() + selection)
+      val selections = savedSelections.readSet<LocationSelection>() + selection
+      savedSelections.writeSet(selections)
+      currentSelection.writeValue(selection)
+      savedSelectionsChannel.offer(selections)
+      currentSelectionChannel.offer(selection)
     }
-
-    currentSelectionChannel.offer(selection)
   }
 
-  fun select(selection: LocationSelection) {
-    currentSelectionChannel.offer(selection)
-    scope.launch { getFileForCurrentSelection().writeValue(selection) }
+  suspend fun select(selection: LocationSelection) {
+    withContext(Dispatchers.IO) {
+      savedSelections.writeValue(selection)
+      currentSelectionChannel.offer(selection)
+    }
   }
 
   fun clear() {
-    getFileForCurrentSelection().delete()
-    getFileForSavedSelections().delete()
+    savedSelections.delete()
+    currentSelection.delete()
+  }
+
+  companion object {
+    private var instance: LocationChoices? = null
+
+    fun init(app: Application) {
+      instance = LocationChoices(app)
+    }
+
+    fun get(): LocationChoices {
+      return requireNotNull(instance) { "LocationChoices.init(app) must be called first." }
+    }
   }
 }

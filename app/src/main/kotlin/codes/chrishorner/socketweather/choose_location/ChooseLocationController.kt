@@ -13,6 +13,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.ResultSelected
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
+import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
@@ -22,11 +23,18 @@ import kotlinx.coroutines.flow.onEach
 
 class ChooseLocationController(args: Bundle) : ScopedController(args) {
 
-  constructor(displayAsRoot: Boolean = false) : this(bundleOf("displayAsRoot" to displayAsRoot))
+  constructor(showFollowMe: Boolean, displayAsRoot: Boolean = false) : this(
+      bundleOf(
+          "showFollowMe" to showFollowMe,
+          "displayAsRoot" to displayAsRoot
+      )
+  )
 
   private val viewModel = ChooseLocationViewModel(
       args.getBoolean("displayAsRoot"),
-      NetworkComponents.get().api
+      args.getBoolean("showFollowMe"),
+      NetworkComponents.get().api,
+      LocationChoices.get()
   )
 
   override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {

@@ -3,11 +3,10 @@ package codes.chrishorner.socketweather.choose_location
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import codes.chrishorner.socketweather.R.layout
+import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
@@ -20,11 +19,12 @@ import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
+import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ChooseLocationController(args: Bundle) : ScopedController(args) {
+class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPresenter>(args) {
 
   constructor(showFollowMe: Boolean, displayAsRoot: Boolean = false) : this(
       bundleOf(
@@ -40,13 +40,11 @@ class ChooseLocationController(args: Bundle) : ScopedController(args) {
       LocationChoices.get()
   )
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-    return inflater.inflate(layout.choose_location, container, false)
-  }
+  override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.choose_location)
 
-  override fun onAttach(view: View, viewScope: CoroutineScope) {
-    val presenter = ChooseLocationPresenter(view)
+  override fun onCreatePresenter(view: View): ChooseLocationPresenter = ChooseLocationPresenter(view)
 
+  override fun onAttach(view: View, presenter: ChooseLocationPresenter, viewScope: CoroutineScope) {
     viewModel.observeStates()
         .onEach { presenter.display(it) }
         .launchIn(viewScope)

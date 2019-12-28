@@ -1,26 +1,24 @@
 package codes.chrishorner.socketweather.home
 
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import codes.chrishorner.socketweather.R.layout
-import com.bluelinelabs.conductor.Controller
+import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.util.ScopedController
+import codes.chrishorner.socketweather.util.inflate
+import kotlinx.coroutines.CoroutineScope
 
-class HomeController : Controller() {
+class HomeController : ScopedController<HomePresenter>() {
 
-  private var presenter: HomePresenter? = null
+  override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.home)
 
-  override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
-    return inflater.inflate(layout.home, container, false)
-  }
+  override fun onCreatePresenter(view: View): HomePresenter = HomePresenter(view)
 
-  override fun onAttach(view: View) {
-    presenter = HomePresenter(view)
+  override fun onAttach(view: View, presenter: HomePresenter, viewScope: CoroutineScope) {
     // TODO: Render state into presenter.
   }
 
   override fun handleBack(): Boolean {
-    if (presenter?.handleBack() == true) return true
+    if (getPresenter()?.handleBack() == true) return true
     return super.handleBack()
   }
 }

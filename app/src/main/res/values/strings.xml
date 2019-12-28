@@ -11,5 +11,6 @@
   <string name="chooseLocation_searchLoading">Loading results…</string>
   <string name="chooseLocation_searchError">Something went wrong</string>
   <string name="chooseLocation_searchEmpty">No locations found</string>
+  <string name="chooseLocation_permissionError">Location permission required</string>
 
 </resources>

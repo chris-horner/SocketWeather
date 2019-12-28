@@ -1,5 +1,7 @@
 package codes.chrishorner.socketweather.choose_location
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,6 +13,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.ResultSelected
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
 import codes.chrishorner.socketweather.data.LocationChoices
@@ -52,6 +55,7 @@ class ChooseLocationController(args: Bundle) : ScopedController(args) {
         .onEach { event ->
           when (event) {
             SubmissionError -> presenter.showSelectionError()
+            PermissionError -> presenter.showPermissionError()
             SubmissionSuccess -> router.setRoot(HomeController().asTransaction())
           }
         }
@@ -61,7 +65,7 @@ class ChooseLocationController(args: Bundle) : ScopedController(args) {
         .onEach { event ->
           when (event) {
             is InputSearch -> viewModel.inputSearchQuery(event.query)
-            is FollowMeClicked -> viewModel.selectFollowMe()
+            is FollowMeClicked -> processFollowMe()
             is ResultSelected -> viewModel.selectResult(event.result)
             is CloseClicked -> router.popCurrentController()
           }
@@ -69,8 +73,22 @@ class ChooseLocationController(args: Bundle) : ScopedController(args) {
         .launchIn(viewScope)
   }
 
+  private fun processFollowMe() {
+    val activity = requireNotNull(activity)
+    val locationPermission: Int = activity.checkSelfPermission(ACCESS_COARSE_LOCATION)
+
+    if (locationPermission != PackageManager.PERMISSION_GRANTED) {
+      requestPermissions(arrayOf(ACCESS_COARSE_LOCATION), 0)
+    } else {
+      viewModel.selectFollowMe(true)
+    }
+  }
+
+  override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+    viewModel.selectFollowMe(grantResults.contains(PackageManager.PERMISSION_GRANTED))
+  }
+
   override fun onDestroy() {
     viewModel.destroy()
   }
 }
-

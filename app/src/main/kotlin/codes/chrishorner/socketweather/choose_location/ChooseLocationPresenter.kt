@@ -41,7 +41,8 @@ class ChooseLocationPresenter(private val view: View) {
   val events: Flow<Event>
 
   init {
-    view.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
+    view.updatePaddingWithInsets(left = true, top = true, right = true)
+    recycler.updatePaddingWithInsets(bottom = true)
 
     val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
     val inputSearches: Flow<InputSearch> = inputView.textChanges()
@@ -72,6 +73,10 @@ class ChooseLocationPresenter(private val view: View) {
 
   fun showSelectionError() {
     Snackbar.make(view, R.string.chooseLocation_submissionError, Snackbar.LENGTH_SHORT).show()
+  }
+
+  fun showPermissionError() {
+    Snackbar.make(view, R.string.chooseLocation_permissionError, Snackbar.LENGTH_SHORT).show()
   }
 
   sealed class Event {

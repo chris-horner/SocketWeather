@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.choose_location
 
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Idle
@@ -77,8 +78,15 @@ class ChooseLocationViewModel(
     }
   }
 
-  fun selectFollowMe() {
-    // TODO: Implement method.
+  fun selectFollowMe(locationPermissionGranted: Boolean) {
+    if (locationPermissionGranted) {
+      scope.launch {
+        locationChoices.saveAndSelect(LocationSelection.FollowMe)
+        eventsChannel.offer(SubmissionSuccess)
+      }
+    } else {
+      eventsChannel.offer(PermissionError)
+    }
   }
 
   fun destroy() {
@@ -105,5 +113,5 @@ class ChooseLocationViewModel(
     enum class LoadingStatus { Idle, Searching, SearchingError, SearchingDone, Submitting }
   }
 
-  enum class Event { SubmissionError, SubmissionSuccess }
+  enum class Event { SubmissionError, SubmissionSuccess, PermissionError }
 }

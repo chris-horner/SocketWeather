@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
-import codes.chrishorner.socketweather.HomeController
 import codes.chrishorner.socketweather.R.layout
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
@@ -18,6 +17,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
 import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
 import kotlinx.coroutines.CoroutineScope

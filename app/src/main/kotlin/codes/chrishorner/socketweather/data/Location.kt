@@ -11,6 +11,7 @@ import com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_A
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.LocationSettingsRequest
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
@@ -65,6 +66,6 @@ fun getLocationUpdates(context: Context): Flow<DeviceLocation> {
     }
 
     client.requestLocationUpdates(request, callback, null)
-    invokeOnClose { client.removeLocationUpdates(callback) }
+    awaitClose { client.removeLocationUpdates(callback) }
   }
 }

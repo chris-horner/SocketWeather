@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.util
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -15,10 +16,11 @@ import leakcanary.AppWatcher
 
 fun Controller.asTransaction() = RouterTransaction.with(this)
 
-abstract class ScopedController<P : Any>(args: Bundle? = null) : Controller(args) {
+abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Controller(args) {
 
   private var viewScope: CoroutineScope? = null
   private var presenter: P? = null
+  private var viewModel: VM? = null
 
   final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
     val view = onCreateView(container)
@@ -27,32 +29,43 @@ abstract class ScopedController<P : Any>(args: Bundle? = null) : Controller(args
   }
 
   final override fun onAttach(view: View) {
+    val vmToAttach: VM = viewModel ?: onCreateViewModel(view.context).also { viewModel = it }
     val scope = MainScope()
     viewScope = scope
     val presenterToAttach = requireNotNull(presenter) { "presenter shouldn't be null in onAttach()." }
-    onAttach(view, presenterToAttach, scope)
+    onAttach(view, presenterToAttach, vmToAttach, scope)
   }
 
   final override fun onDetach(view: View) {
     val scope = requireNotNull(viewScope) { "viewScope shouldn't be null in onDetach()." }
     val presenterToDetach = requireNotNull(presenter) { "presenter shouldn't be null in onDetach()." }
-    onDetach(view, presenterToDetach, scope)
+    val vmToDetach = requireNotNull(viewModel) { "viewModel shouldn't be null in onDetach()." }
+    onDetach(view, presenterToDetach, vmToDetach, scope)
     scope.cancel()
+    viewScope = null
   }
 
-  override fun onDestroyView(view: View) {
+  final override fun onDestroyView(view: View) {
     val currentPresenter = requireNotNull(presenter) { "presenter shouldn't be null in onDestroyView()." }
     onDestroyView(view, currentPresenter)
     presenter = null
   }
 
+  final override fun onDestroy() {
+    onDestroy(viewModel)
+    viewModel = null
+  }
+
   protected fun getPresenter(): P? = presenter
+  protected fun getViewModel(): VM? = viewModel
 
   abstract fun onCreateView(container: ViewGroup): View
   abstract fun onCreatePresenter(view: View): P
-  open fun onAttach(view: View, presenter: P, viewScope: CoroutineScope) {}
-  open fun onDetach(view: View, presenter: P, viewScope: CoroutineScope) {}
+  abstract fun onCreateViewModel(context: Context): VM
+  open fun onAttach(view: View, presenter: P, viewModel: VM, viewScope: CoroutineScope) {}
+  open fun onDetach(view: View, presenter: P, viewModel: VM, viewScope: CoroutineScope) {}
   open fun onDestroyView(view: View, presenter: P) {}
+  open fun onDestroy(viewModel: VM?) {}
 }
 
 /**

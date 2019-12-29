@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.choose_location
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.View
@@ -24,7 +25,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPresenter>(args) {
+class ChooseLocationController(
+    args: Bundle
+) : ScopedController<ChooseLocationViewModel, ChooseLocationPresenter>(args) {
 
   constructor(showFollowMe: Boolean, displayAsRoot: Boolean = false) : this(
       bundleOf(
@@ -33,18 +36,24 @@ class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPr
       )
   )
 
-  private val viewModel = ChooseLocationViewModel(
+  override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.choose_location)
+
+  override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
       args.getBoolean("displayAsRoot"),
       args.getBoolean("showFollowMe"),
       NetworkComponents.get().api,
       LocationChoices.get()
   )
 
-  override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.choose_location)
-
   override fun onCreatePresenter(view: View): ChooseLocationPresenter = ChooseLocationPresenter(view)
 
-  override fun onAttach(view: View, presenter: ChooseLocationPresenter, viewScope: CoroutineScope) {
+  override fun onAttach(
+      view: View,
+      presenter: ChooseLocationPresenter,
+      viewModel: ChooseLocationViewModel,
+      viewScope: CoroutineScope
+  ) {
+
     viewModel.observeStates()
         .onEach { presenter.display(it) }
         .launchIn(viewScope)
@@ -63,7 +72,7 @@ class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPr
         .onEach { event ->
           when (event) {
             is InputSearch -> viewModel.inputSearchQuery(event.query)
-            is FollowMeClicked -> processFollowMe()
+            is FollowMeClicked -> processFollowMe(viewModel)
             is ResultSelected -> viewModel.selectResult(event.result)
             is CloseClicked -> router.popCurrentController()
           }
@@ -71,7 +80,7 @@ class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPr
         .launchIn(viewScope)
   }
 
-  private fun processFollowMe() {
+  private fun processFollowMe(viewModel: ChooseLocationViewModel) {
     val activity = requireNotNull(activity)
     val locationPermission: Int = activity.checkSelfPermission(ACCESS_COARSE_LOCATION)
 
@@ -83,10 +92,10 @@ class ChooseLocationController(args: Bundle) : ScopedController<ChooseLocationPr
   }
 
   override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
-    viewModel.selectFollowMe(grantResults.contains(PackageManager.PERMISSION_GRANTED))
+    getViewModel()?.selectFollowMe(grantResults.contains(PackageManager.PERMISSION_GRANTED))
   }
 
-  override fun onDestroy() {
-    viewModel.destroy()
+  override fun onDestroy(viewModel: ChooseLocationViewModel?) {
+    viewModel?.destroy()
   }
 }

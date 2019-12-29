@@ -10,13 +10,10 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import com.google.android.gms.location.LocationSettingsRequest
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.emptyFlow
-import kotlinx.coroutines.suspendCancellableCoroutine
-import kotlin.coroutines.resume
 
 private val request = LocationRequest()
     .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
@@ -25,39 +22,20 @@ private val request = LocationRequest()
 
 private var cachedLocation: DeviceLocation? = null
 
-suspend fun getGetDeviceLocation(context: Context): Boolean {
-  if (!arePlayServicesAvailable(context)) return false
-
-  val settingsRequest = LocationSettingsRequest.Builder().addLocationRequest(request).build()
-  val settingsClient = LocationServices.getSettingsClient(context)
-  val task = settingsClient.checkLocationSettings(settingsRequest)
-
-  return suspendCancellableCoroutine { continuation ->
-    task.addOnSuccessListener {
-      if (continuation.isCancelled) continuation.cancel() else continuation.resume(true)
-    }
-
-    task.addOnFailureListener {
-      if (continuation.isCancelled) continuation.cancel() else continuation.resume(false)
-    }
-  }
-}
-
-fun getLocationUpdates(context: Context): Flow<DeviceLocation> {
+fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
   if (!arePlayServicesAvailable(context)) return emptyFlow()
-
-  val client = LocationServices.getFusedLocationProviderClient(context)
 
   return channelFlow {
     cachedLocation?.let { offer(it) }
 
+    val client = LocationServices.getFusedLocationProviderClient(context)
     val lastKnownLocation: Location? = try {
       client.lastLocation.await()
     } catch (e: Exception) {
       null
     }
 
-    if (lastKnownLocation != null) {
+    if (lastKnownLocation != null && !isClosedForSend) {
       val deviceLocation = DeviceLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
       cachedLocation = deviceLocation
       send(deviceLocation)
@@ -66,17 +44,15 @@ fun getLocationUpdates(context: Context): Flow<DeviceLocation> {
     val callback = object : LocationCallback() {
 
       override fun onLocationResult(result: LocationResult) {
-        with(result.lastLocation) {
-          val deviceLocation = DeviceLocation(latitude, longitude)
-          cachedLocation = deviceLocation
-          offer(deviceLocation)
-        }
+        val deviceLocation = DeviceLocation(result.lastLocation.latitude, result.lastLocation.longitude)
+        cachedLocation = deviceLocation
+        offer(deviceLocation)
       }
 
       override fun onLocationAvailability(availability: LocationAvailability) {}
     }
 
-    if (!channel.isClosedForSend) {
+    if (!isClosedForSend) {
       client.requestLocationUpdates(request, callback, null)
     }
 

@@ -7,55 +7,130 @@ import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Loading
+import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.LocationFailed
+import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.NetworkFailed
+import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.scanReduce
+import timber.log.Timber
 
 class HomeViewModel(
     private val api: WeatherApi,
-    private val savedSelectionUpdates: Flow<Set<LocationSelection>>,
-    private val currentSelectionUpdates: Flow<LocationSelection>,
-    private val deviceLocationUpdates: Flow<DeviceLocation>
+    savedSelectionUpdates: Flow<Set<LocationSelection>>,
+    currentSelectionUpdates: Flow<LocationSelection>,
+    deviceLocationUpdates: Flow<DeviceLocation>
 ) {
 
   private val scope = MainScope()
   private val statesChannel = ConflatedBroadcastChannel<State>()
 
   init {
-    // NOTE: Don't forget to multicast!
-
-    val followMeUpdates = deviceLocationUpdates
+    val followMeUpdates: Flow<Location> = deviceLocationUpdates
         .mapLatest { api.searchForLocation(it.latitude, it.longitude) }
         .map { api.getLocation(it[0].geohash) }
         .distinctUntilChanged()
 
     val locationUpdates: Flow<LocationUpdate> = currentSelectionUpdates
-        .flatMapLatest {
-          when (it) {
-            is LocationSelection.Static -> flowOf(it.location)
-            LocationSelection.None -> emptyFlow()
+        .flatMapLatest { selection ->
+          when (selection) {
+            is LocationSelection.Static -> flowOf(LocationUpdate.Loaded(selection, selection.location))
+            LocationSelection.None -> flowOf(LocationUpdate.Error(selection))
             LocationSelection.FollowMe -> followMeUpdates
+                .map<Location, LocationUpdate> { LocationUpdate.Loaded(selection, it) }
+                .catch { emit(LocationUpdate.Error(selection)) }
+                .onStart { emit(LocationUpdate.Loading(selection)) }
           }
         }
-        .map<Location, LocationUpdate> { LocationUpdate.Loaded(it) }
-        .catch { emit(LocationUpdate.Error) }
-        .onStart { emit(LocationUpdate.Loading) }
 
-    combine(currentSelectionUpdates, savedSelectionUpdates) { selection, set -> selection to set }
+    val states: Flow<State> =
+        combineTransform(locationUpdates, savedSelectionUpdates) { locationUpdate, savedSelections ->
+          when (locationUpdate) {
+            is LocationUpdate.Loading -> {
+              emit(State(locationUpdate.selection, savedSelections = savedSelections, loadingStatus = Loading))
+            }
+
+            is LocationUpdate.Error -> {
+              emit(State(locationUpdate.selection, savedSelections = savedSelections, loadingStatus = LocationFailed))
+            }
+
+            is LocationUpdate.Loaded -> {
+              emitAll(loadForecasts(locationUpdate, savedSelections))
+            }
+          }
+        }
+
+    states
+        .scanReduce { previousState: State, newState: State ->
+          // If we're changing from one state to another and would lose our forecast information, check if we're
+          // presenting the same location. If we are, we can reuse our previously calculated forecasts.
+          if (newState.currentLocation == previousState.currentLocation &&
+            newState.observations == null &&
+            newState.dateForecasts.isEmpty()
+          ) {
+            newState.copy(observations = previousState.observations, dateForecasts = previousState.dateForecasts)
+          } else {
+            newState
+          }
+        }
+        .onEach { statesChannel.offer(it) }
+        .launchIn(scope)
   }
 
   fun destroy() {
     scope.cancel()
+  }
+
+  private fun loadForecasts(
+      locationUpdate: LocationUpdate.Loaded,
+      savedSelections: Set<LocationSelection>
+  ): Flow<State> = flow {
+
+    val loadingState = State(
+        currentSelection = locationUpdate.selection,
+        currentLocation = locationUpdate.location,
+        savedSelections = savedSelections,
+        loadingStatus = Loading
+    )
+
+    emit(loadingState)
+
+    try {
+      val forecasts = getForecasts(locationUpdate.location)
+      val successState = loadingState.copy(
+          loadingStatus = Success,
+          observations = forecasts.observations,
+          dateForecasts = forecasts.dateForecasts
+      )
+
+      emit(successState)
+    } catch (e: Exception) {
+      Timber.e(e, "Failed to get forecasts for %s", locationUpdate.location.name)
+      emit(loadingState.copy(loadingStatus = NetworkFailed))
+    }
+  }
+
+  private suspend fun getForecasts(location: Location): Forecasts = coroutineScope {
+    // Request observations and date forecasts simultaneously.
+    val observations = async { api.getObservations(location.geohash) }
+    val dateForecasts = async { api.getDateForecasts(location.geohash) }
+    return@coroutineScope Forecasts(observations.await(), dateForecasts.await())
   }
 
   data class State(
@@ -67,11 +142,13 @@ class HomeViewModel(
       val loadingStatus: LoadingStatus = Loading
   )
 
-  enum class LoadingStatus { Loading, LocationFailed, NetworkFailed }
+  enum class LoadingStatus { Loading, LocationFailed, NetworkFailed, Success }
 
-  private sealed class LocationUpdate {
-    object Loading : LocationUpdate()
-    object Error : LocationUpdate()
-    data class Loaded(val location: Location) : LocationUpdate()
+  private sealed class LocationUpdate(open val selection: LocationSelection) {
+    data class Loading(override val selection: LocationSelection) : LocationUpdate(selection)
+    data class Error(override val selection: LocationSelection) : LocationUpdate(selection)
+    data class Loaded(override val selection: LocationSelection, val location: Location) : LocationUpdate(selection)
   }
+
+  private data class Forecasts(val observations: CurrentObservations, val dateForecasts: List<DateForecast>)
 }

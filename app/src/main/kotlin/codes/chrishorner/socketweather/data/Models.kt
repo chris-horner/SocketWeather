@@ -78,3 +78,5 @@ sealed class LocationSelection {
   data class Static(val location: Location) : LocationSelection()
   object None : LocationSelection()
 }
+
+data class DeviceLocation(val latitude: Double, val longitude: Double)

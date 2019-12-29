@@ -23,7 +23,9 @@ private val request = LocationRequest()
     .setFastestInterval(1000)
     .setSmallestDisplacement(100f)
 
-suspend fun canGetLocation(context: Context): Boolean {
+private var cachedLocation: DeviceLocation? = null
+
+suspend fun getGetDeviceLocation(context: Context): Boolean {
   if (!arePlayServicesAvailable(context)) return false
 
   val settingsRequest = LocationSettingsRequest.Builder().addLocationRequest(request).build()
@@ -47,6 +49,7 @@ fun getLocationUpdates(context: Context): Flow<DeviceLocation> {
   val client = LocationServices.getFusedLocationProviderClient(context)
 
   return channelFlow {
+    cachedLocation?.let { offer(it) }
 
     val lastKnownLocation: Location? = try {
       client.lastLocation.await()
@@ -54,18 +57,29 @@ fun getLocationUpdates(context: Context): Flow<DeviceLocation> {
       null
     }
 
-    lastKnownLocation?.let { send(DeviceLocation(it.latitude, it.longitude)) }
+    if (lastKnownLocation != null) {
+      val deviceLocation = DeviceLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
+      cachedLocation = deviceLocation
+      send(deviceLocation)
+    }
 
     val callback = object : LocationCallback() {
 
       override fun onLocationResult(result: LocationResult) {
-        with(result.lastLocation) { offer(DeviceLocation(latitude, longitude)) }
+        with(result.lastLocation) {
+          val deviceLocation = DeviceLocation(latitude, longitude)
+          cachedLocation = deviceLocation
+          offer(deviceLocation)
+        }
       }
 
       override fun onLocationAvailability(availability: LocationAvailability) {}
     }
 
-    client.requestLocationUpdates(request, callback, null)
+    if (!channel.isClosedForSend) {
+      client.requestLocationUpdates(request, callback, null)
+    }
+
     awaitClose { client.removeLocationUpdates(callback) }
   }
 }

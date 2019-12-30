@@ -66,13 +66,6 @@ data class ThreeHourlyForecast(
     val is_night: Boolean
 )
 
-data class CurrentLocationForecast(
-    val location: Location,
-    val observations: CurrentObservations,
-    val dateForecasts: List<DateForecast>,
-    val threeHourlyForecasts: List<ThreeHourlyForecast>
-)
-
 sealed class LocationSelection {
   object FollowMe : LocationSelection()
   data class Static(val location: Location) : LocationSelection()
@@ -80,3 +73,9 @@ sealed class LocationSelection {
 }
 
 data class DeviceLocation(val latitude: Double, val longitude: Double)
+
+data class Forecasts(val observations: CurrentObservations, val dateForecasts: List<DateForecast>) {
+  val info: CurrentInformation = requireNotNull(dateForecasts.getOrNull(0)?.now) {
+    "Invalid dateForecasts. First element must contain a valid 'now' field."
+  }
+}

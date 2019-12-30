@@ -3,6 +3,7 @@
 <resources>
 
   <string name="appName">Socket Weather</string>
+  <string name="temperatureFormat">%s°</string>
 
   <string name="chooseLocation_title">Where\'s your weather?</string>
   <string name="chooseLocation_myLocationButton">Use my location</string>
@@ -13,7 +14,12 @@
   <string name="chooseLocation_searchEmpty">No locations found</string>
   <string name="chooseLocation_permissionError">Location permission required</string>
 
+  <string name="home_findingLocation">Finding location…</string>
   <string name="home_about">About</string>
   <string name="home_feelsLike">Feels like</string>
+  <string name="home_loading">Loading forecast…</string>
+  <string name="home_networkError">Network request failed</string>
+  <string name="home_locationError">Failed to find current location</string>
+  <string name="home_retryButton">Retry</string>
 
 </resources>

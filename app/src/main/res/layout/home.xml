@@ -31,10 +31,25 @@
           android:background="?attr/selectableItemBackground"
           android:gravity="center_vertical"
           android:maxLines="1"
-          android:text="Collingwood"
           android:textAppearance="?attr/textAppearanceHeadline5"
           app:drawableEndCompat="@drawable/ic_arrow_drop_down_24dp"
           />
+
+      <FrameLayout
+          android:id="@+id/home_secondaryLoading"
+          android:layout_width="48dp"
+          android:layout_height="match_parent"
+          android:layout_gravity="end"
+          android:visibility="gone"
+          >
+
+        <ProgressBar
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_gravity="center"
+            />
+
+      </FrameLayout>
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -44,81 +59,75 @@
       android:id="@+id/home_scroller"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
+      android:fillViewport="true"
       app:layout_behavior="@string/appbar_scrolling_view_behavior"
       >
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
+        android:id="@+id/home_contentContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="16dp"
         >
 
-      <TextView
-          android:id="@+id/home_currentTemp"
-          android:layout_width="wrap_content"
+      <include layout="@layout/home_forecast" />
+
+      <LinearLayout
+          android:id="@+id/home_loading"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:text="32.7°"
-          android:textAppearance="@style/TextAppearance.SocketWeather.LargeTemp"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          />
+          android:layout_gravity="center_vertical"
+          android:paddingStart="32dp"
+          android:paddingEnd="32dp"
+          android:gravity="center_horizontal"
+          android:orientation="vertical"
+          android:visibility="gone"
+          >
 
-      <TextView
-          android:id="@+id/home_feelsLikeTitle"
-          android:layout_width="wrap_content"
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="@string/home_loading"
+            android:textAppearance="?textAppearanceSubtitle1"
+            />
+
+      </LinearLayout>
+
+      <LinearLayout
+          android:id="@+id/home_error"
+          android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_marginTop="16dp"
-          android:text="@string/home_feelsLike"
-          android:textAppearance="@style/TextAppearance.SocketWeather.Headline5.Secondary"
-          app:layout_constraintStart_toStartOf="parent"
-          app:layout_constraintTop_toBottomOf="@id/home_currentTemp"
-          />
+          android:layout_gravity="center_vertical"
+          android:paddingStart="32dp"
+          android:paddingEnd="32dp"
+          android:gravity="center_horizontal"
+          android:orientation="vertical"
+          android:visibility="gone"
+          >
 
-      <TextView
-          android:id="@+id/home_feelsLikeTemp"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginStart="8dp"
-          android:text="29.2°"
-          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
-          app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
-          app:layout_constraintStart_toEndOf="@id/home_feelsLikeTitle"
-          />
+        <TextView
+            android:id="@+id/home_errorMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:drawablePadding="16dp"
+            android:textAppearance="?textAppearanceSubtitle1"
+            app:drawableTopCompat="@drawable/ic_error_outline_48dp"
+            />
 
-      <TextView
-          android:id="@+id/home_highTemp"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_marginTop="24dp"
-          android:text="38°"
-          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          />
+        <com.google.android.material.button.MaterialButton
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/home_retryButton"
+            />
 
-      <TextView
-          android:id="@+id/home_lowTemp"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:text="18°"
-          android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
-          app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
-          app:layout_constraintEnd_toEndOf="parent"
-          />
+      </LinearLayout>
 
-      <View
-          android:layout_width="4dp"
-          android:layout_height="0dp"
-          android:layout_marginTop="16dp"
-          android:layout_marginBottom="16dp"
-          android:background="@drawable/bg_line"
-          app:layout_constraintBottom_toTopOf="@id/home_lowTemp"
-          app:layout_constraintEnd_toEndOf="@id/home_highTemp"
-          app:layout_constraintStart_toStartOf="@id/home_highTemp"
-          app:layout_constraintTop_toBottomOf="@id/home_highTemp"
-          />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
   </androidx.core.widget.NestedScrollView>
 

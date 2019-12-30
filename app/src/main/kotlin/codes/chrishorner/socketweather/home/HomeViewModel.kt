@@ -1,8 +1,7 @@
 package codes.chrishorner.socketweather.home
 
-import codes.chrishorner.socketweather.data.CurrentObservations
-import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.data.DeviceLocation
+import codes.chrishorner.socketweather.data.Forecasts
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.WeatherApi
@@ -81,11 +80,8 @@ class HomeViewModel(
         .scanReduce { previousState: State, newState: State ->
           // If we're changing from one state to another and would lose our forecast information, check if we're
           // presenting the same location. If we are, we can reuse our previously calculated forecasts.
-          if (newState.currentLocation == previousState.currentLocation &&
-            newState.observations == null &&
-            newState.dateForecasts.isEmpty()
-          ) {
-            newState.copy(observations = previousState.observations, dateForecasts = previousState.dateForecasts)
+          if (newState.currentLocation == previousState.currentLocation && newState.forecasts == null) {
+            newState.copy(forecasts = previousState.forecasts)
           } else {
             newState
           }
@@ -116,12 +112,7 @@ class HomeViewModel(
 
     try {
       val forecasts = getForecasts(locationUpdate.location)
-      val successState = loadingState.copy(
-          loadingStatus = Success,
-          observations = forecasts.observations,
-          dateForecasts = forecasts.dateForecasts
-      )
-
+      val successState = loadingState.copy(loadingStatus = Success, forecasts = forecasts)
       emit(successState)
     } catch (e: Exception) {
       Timber.e(e, "Failed to get forecasts for %s", locationUpdate.location.name)
@@ -133,15 +124,17 @@ class HomeViewModel(
     // Request observations and date forecasts simultaneously.
     val observations = async { api.getObservations(location.geohash) }
     val dateForecasts = async { api.getDateForecasts(location.geohash) }
-    return@coroutineScope Forecasts(observations.await(), dateForecasts.await())
+    return@coroutineScope Forecasts(
+        observations.await(),
+        dateForecasts.await()
+    )
   }
 
   data class State(
       val currentSelection: LocationSelection,
       val currentLocation: Location? = null,
       val savedSelections: Set<LocationSelection> = emptySet(),
-      val observations: CurrentObservations? = null,
-      val dateForecasts: List<DateForecast> = emptyList(),
+      val forecasts: Forecasts? = null,
       val loadingStatus: LoadingStatus = Loading
   )
 
@@ -152,6 +145,4 @@ class HomeViewModel(
     data class Error(override val selection: LocationSelection) : LocationUpdate(selection)
     data class Loaded(override val selection: LocationSelection, val location: Location) : LocationUpdate(selection)
   }
-
-  private data class Forecasts(val observations: CurrentObservations, val dateForecasts: List<DateForecast>)
 }

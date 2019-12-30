@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/home_forecastContainer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"
+    android:visibility="gone"
+    >
+
+  <TextView
+      android:id="@+id/home_currentTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/TextAppearance.SocketWeather.LargeTemp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:text="32.7°"
+      />
+
+  <TextView
+      android:id="@+id/home_feelsLikeTitle"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="16dp"
+      android:text="@string/home_feelsLike"
+      android:textAppearance="@style/TextAppearance.SocketWeather.Headline5.Secondary"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_currentTemp"
+      />
+
+  <TextView
+      android:id="@+id/home_feelsLikeTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="8dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
+      app:layout_constraintStart_toEndOf="@id/home_feelsLikeTitle"
+      tools:text="29.2°"
+      />
+
+  <TextView
+      android:id="@+id/home_highTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="24dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintTop_toTopOf="parent"
+      tools:text="38°"
+      />
+
+  <TextView
+      android:id="@+id/home_lowTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
+      app:layout_constraintEnd_toEndOf="parent"
+      tools:text="18°"
+      />
+
+  <View
+      android:layout_width="4dp"
+      android:layout_height="0dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="16dp"
+      android:background="@drawable/bg_line"
+      app:layout_constraintBottom_toTopOf="@id/home_lowTemp"
+      app:layout_constraintEnd_toEndOf="@id/home_highTemp"
+      app:layout_constraintStart_toStartOf="@id/home_highTemp"
+      app:layout_constraintTop_toBottomOf="@id/home_highTemp"
+      />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

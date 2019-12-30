@@ -40,7 +40,7 @@ data class DateForecast(
     val temp_min: Int?,
     val temp_max: Int,
     val extended_text: String,
-    val short_text: String,
+    val short_text: String?,
     val icon_descriptor: String,
     val rain: Rain,
     val now: CurrentInformation? = null

@@ -20,6 +20,7 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -40,10 +41,15 @@ class HomeViewModel(
 
   private val scope = MainScope()
   private val statesChannel = ConflatedBroadcastChannel<State>()
+  // Whether or not a subscription to device location updates should be maintained.
+  private val locationUpdatesToggleChannel = ConflatedBroadcastChannel(false)
 
   init {
-    val followMeUpdates: Flow<Location> = deviceLocationUpdates
-        .mapLatest { api.searchForLocation(it.latitude, it.longitude) }
+
+    val followMeUpdates: Flow<Location> = locationUpdatesToggleChannel.asFlow()
+        .flatMapLatest { enabled -> if (enabled) deviceLocationUpdates else emptyFlow() }
+        .distinctUntilChanged()
+        .mapLatest { api.searchForLocation("${it.latitude},${it.longitude}") }
         .map { api.getLocation(it[0].geohash) }
         .distinctUntilChanged()
 
@@ -54,7 +60,10 @@ class HomeViewModel(
             LocationSelection.None -> flowOf(LocationUpdate.Error(selection))
             LocationSelection.FollowMe -> followMeUpdates
                 .map<Location, LocationUpdate> { LocationUpdate.Loaded(selection, it) }
-                .catch { emit(LocationUpdate.Error(selection)) }
+                .catch {
+                  Timber.e(it, "Location updates failed.")
+                  emit(LocationUpdate.Error(selection))
+                }
                 .onStart { emit(LocationUpdate.Loading(selection)) }
           }
         }
@@ -88,6 +97,10 @@ class HomeViewModel(
         }
         .onEach { statesChannel.offer(it) }
         .launchIn(scope)
+  }
+
+  fun enableLocationUpdates(enable: Boolean) {
+    locationUpdatesToggleChannel.offer(enable)
   }
 
   fun observeStates(): Flow<State> = statesChannel.asFlow()

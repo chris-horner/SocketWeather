@@ -9,9 +9,6 @@ interface WeatherApi {
   @GET("locations")
   suspend fun searchForLocation(@Query("search") query: String): List<SearchResult>
 
-  @GET("locations?search={lat},{lng}")
-  suspend fun searchForLocation(@Path("lat") latitude: Double, @Path("lng") longitude: Double): List<SearchResult>
-
   @GET("locations/{geohash}")
   suspend fun getLocation(@Path("geohash") geohash: String): Location
 

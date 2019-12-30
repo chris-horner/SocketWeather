@@ -13,7 +13,7 @@ data class SearchResult(
     val id: String,
     val geohash: String,
     val name: String,
-    val postcode: String,
+    val postcode: String?,
     val state: String
 )
 

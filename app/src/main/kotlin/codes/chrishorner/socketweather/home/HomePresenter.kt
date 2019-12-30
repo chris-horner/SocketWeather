@@ -8,6 +8,7 @@ import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.CurrentInformation
 import codes.chrishorner.socketweather.data.CurrentObservations
+import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Loading
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.LocationFailed
@@ -54,12 +55,15 @@ class HomePresenter(view: View) {
     if (state.forecasts != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
       val observations: CurrentObservations = state.forecasts.observations
       val info: CurrentInformation = state.forecasts.info
+      val dateForecasts: List<DateForecast> = state.forecasts.dateForecasts
       loading.isVisible = false
       forecastContainer.isVisible = true
       currentTemp.text = res.getString(R.string.temperatureFormat, observations.temp.format())
       feelsLikeTemp.text = res.getString(R.string.temperatureFormat, observations.temp_feels_like.format())
-      highTemp.text = res.getString(R.string.temperatureFormat, info.temp_now.format())
-      lowTemp.text = res.getString(R.string.temperatureFormat, info.temp_later.format())
+
+      highTemp.text = res.getString(R.string.temperatureFormat, dateForecasts[0].temp_max.format())
+      val lowTempDegrees = dateForecasts[0].temp_min ?: if (info.is_night) info.temp_now else info.temp_later
+      lowTemp.text = res.getString(R.string.temperatureFormat, lowTempDegrees.format())
     }
 
     error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed

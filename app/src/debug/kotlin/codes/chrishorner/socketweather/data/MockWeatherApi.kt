@@ -19,10 +19,6 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
     return delegate.returningResponse(listOf(searchResult)).searchForLocation(query)
   }
 
-  override suspend fun searchForLocation(latitude: Double, longitude: Double): List<SearchResult> {
-    return delegate.returningResponse(searchResult).searchForLocation(latitude, longitude)
-  }
-
   override suspend fun getLocation(geohash: String): Location {
     return delegate.returningResponse(location).getLocation(geohash)
   }

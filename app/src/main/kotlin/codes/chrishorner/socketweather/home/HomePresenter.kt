@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.home.HomeViewModel.State
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 
 class HomePresenter(view: View) {
@@ -17,6 +18,10 @@ class HomePresenter(view: View) {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
     switchLocationContainer.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
     locationDropdown.setOnClickListener { switchLocationContainer.isVisible = !switchLocationContainer.isVisible }
+  }
+
+  fun display(state: State) {
+    // TODO: Display state
   }
 
   fun handleBack(): Boolean {

@@ -16,6 +16,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -92,6 +93,8 @@ class HomeViewModel(
         .onEach { statesChannel.offer(it) }
         .launchIn(scope)
   }
+
+  fun observeStates(): Flow<State> = statesChannel.asFlow()
 
   fun destroy() {
     scope.cancel()

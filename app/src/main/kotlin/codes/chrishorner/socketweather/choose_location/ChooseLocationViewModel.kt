@@ -63,7 +63,7 @@ class ChooseLocationViewModel(
         .launchIn(scope)
   }
 
-  fun observeStates(): Flow<State> = statesChannel.asFlow().distinctUntilChanged()
+  fun observeStates(): Flow<State> = statesChannel.asFlow()
 
   fun observeEvents(): Flow<Event> = eventsChannel.asFlow()
 
@@ -103,7 +103,6 @@ class ChooseLocationViewModel(
   }
 
   private suspend fun search(query: String): State {
-    Timber.d("Search for: $query")
     return try {
       val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
       idleState.copy(results = results, loadingStatus = SearchingDone)

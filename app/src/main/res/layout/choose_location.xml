@@ -3,9 +3,9 @@
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/chooseLocation_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:animateLayoutChanges="true"
     android:orientation="vertical"
     >
 
@@ -49,29 +49,36 @@
       style="@style/Widget.MaterialComponents.Button.Icon"
       />
 
-  <com.google.android.material.textfield.TextInputLayout
-      android:id="@+id/chooseLocation_searchInputLayout"
+  <FrameLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="32dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="32dp"
-      android:hint="@string/chooseLocation_searchHint"
-      app:startIconDrawable="@drawable/ic_search_24dp"
-      app:startIconTint="?android:attr/textColorPrimary"
-      style="@style/Widget.SocketWeather.TextInputLayout.OutlinedBox"
       >
 
-    <com.google.android.material.textfield.TextInputEditText
-        android:id="@+id/chooseLocation_searchInput"
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/chooseLocation_searchInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:imeOptions="actionDone"
-        android:inputType="textCapWords"
-        android:singleLine="true"
-        />
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="32dp"
+        android:hint="@string/chooseLocation_searchHint"
+        app:startIconDrawable="@drawable/ic_search_24dp"
+        app:startIconTint="?android:attr/textColorPrimary"
+        style="@style/Widget.SocketWeather.TextInputLayout.OutlinedBox"
+        >
 
-  </com.google.android.material.textfield.TextInputLayout>
+      <com.google.android.material.textfield.TextInputEditText
+          android:id="@+id/chooseLocation_searchInput"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:imeOptions="actionDone"
+          android:inputType="textCapWords"
+          android:singleLine="true"
+          />
+
+    </com.google.android.material.textfield.TextInputLayout>
+
+  </FrameLayout>
 
   <Space
       android:id="@+id/chooseLocation_bottomSpace"

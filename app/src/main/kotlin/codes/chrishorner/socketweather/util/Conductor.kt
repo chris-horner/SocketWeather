@@ -10,7 +10,8 @@ import com.bluelinelabs.conductor.ControllerChangeHandler
 import com.bluelinelabs.conductor.ControllerChangeHandler.ControllerChangeListener
 import com.bluelinelabs.conductor.RouterTransaction
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import leakcanary.AppWatcher
 
@@ -30,7 +31,7 @@ abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Contr
 
   final override fun onAttach(view: View) {
     val vmToAttach: VM = viewModel ?: onCreateViewModel(view.context).also { viewModel = it }
-    val scope = MainScope()
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     viewScope = scope
     val presenterToAttach = requireNotNull(presenter) { "presenter shouldn't be null in onAttach()." }
     onAttach(view, presenterToAttach, vmToAttach, scope)

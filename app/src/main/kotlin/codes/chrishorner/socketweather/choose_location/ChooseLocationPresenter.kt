@@ -1,6 +1,8 @@
 package codes.chrishorner.socketweather.choose_location
 
+import android.transition.TransitionManager
 import android.view.View
+import android.view.ViewGroup
 import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -28,9 +30,11 @@ import reactivecircus.flowbinding.appcompat.navigationClicks
 
 class ChooseLocationPresenter(private val view: View) {
 
+  private val container = view.findViewById<ViewGroup>(R.id.chooseLocation_container)
   private val toolbar: Toolbar = view.findViewById(R.id.chooseLocation_toolbar)
   private val titleView: View = view.findViewById(R.id.chooseLocation_title)
   private val followMeButton: View = view.findViewById(R.id.chooseLocation_followMeButton)
+  private val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
   private val recycler: RecyclerView = view.findViewById(R.id.chooseLocation_recycler)
   private val loadingView: View = view.findViewById(R.id.chooseLocation_loadingResults)
   private val errorView: View = view.findViewById(R.id.chooseLocation_error)
@@ -42,13 +46,12 @@ class ChooseLocationPresenter(private val view: View) {
 
   val events: Flow<Event>
 
+  private var previousState: State? = null
+
   init {
-    view.updatePaddingWithInsets(left = true, top = true, right = true)
-    recycler.updatePaddingWithInsets(bottom = true)
+    container.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(view.context)
-
-    val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
 
     events = merge(
         toolbar.navigationClicks().map { CloseClicked },
@@ -59,6 +62,11 @@ class ChooseLocationPresenter(private val view: View) {
   }
 
   fun display(state: State) {
+
+    if (previousState != state) {
+      TransitionManager.beginDelayedTransition(container)
+    }
+
     toolbar.isVisible = !state.rootScreen
     titleView.isVisible = state.loadingStatus == Idle
     followMeButton.isVisible = state.showFollowMe && state.loadingStatus == Idle
@@ -70,6 +78,8 @@ class ChooseLocationPresenter(private val view: View) {
     loadingView.isVisible = state.loadingStatus == Searching
 
     adapter.set(state.results)
+
+    previousState = state
   }
 
   fun showSelectionError() {

@@ -9,49 +9,45 @@
     android:orientation="vertical"
     >
 
-  <LinearLayout
-      android:id="@+id/chooseLocation_topContainer"
+  <androidx.appcompat.widget.Toolbar
+      android:id="@+id/chooseLocation_toolbar"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:clipChildren="false"
-      android:orientation="vertical"
-      >
+      app:navigationIcon="@drawable/ic_close_24dp"
+      />
 
-    <androidx.appcompat.widget.Toolbar
-        android:id="@+id/chooseLocation_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:navigationIcon="@drawable/ic_close_24dp"
-        />
+  <Space
+      android:id="@+id/chooseLocation_topSpace"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="1"
+      />
 
-    <TextView
-        android:id="@+id/chooseLocation_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:paddingStart="32dp"
-        android:paddingEnd="32dp"
-        android:text="@string/chooseLocation_title"
-        android:textAppearance="?attr/textAppearanceHeadline4"
-        />
+  <TextView
+      android:id="@+id/chooseLocation_title"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingStart="32dp"
+      android:paddingEnd="32dp"
+      android:text="@string/chooseLocation_title"
+      android:textAppearance="?attr/textAppearanceHeadline4"
+      />
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/chooseLocation_followMeButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="32dp"
-        android:gravity="start|center_vertical"
-        android:minHeight="56dp"
-        android:text="@string/chooseLocation_myLocationButton"
-        app:icon="@drawable/ic_my_location_24dp"
-        app:iconGravity="start"
-        app:iconPadding="16dp"
-        style="@style/Widget.MaterialComponents.Button.Icon"
-        />
-
-  </LinearLayout>
+  <com.google.android.material.button.MaterialButton
+      android:id="@+id/chooseLocation_followMeButton"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="32dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginEnd="32dp"
+      android:gravity="start|center_vertical"
+      android:minHeight="56dp"
+      android:text="@string/chooseLocation_myLocationButton"
+      app:icon="@drawable/ic_my_location_24dp"
+      app:iconGravity="start"
+      app:iconPadding="16dp"
+      style="@style/Widget.MaterialComponents.Button.Icon"
+      />
 
   <com.google.android.material.textfield.TextInputLayout
       android:id="@+id/chooseLocation_searchInputLayout"
@@ -76,6 +72,13 @@
         />
 
   </com.google.android.material.textfield.TextInputLayout>
+
+  <Space
+      android:id="@+id/chooseLocation_bottomSpace"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_weight="3"
+      />
 
   <LinearLayout
       android:id="@+id/chooseLocation_loadingResults"

@@ -3,11 +3,11 @@ package codes.chrishorner.socketweather.choose_location
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Idle
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Searching
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingDone
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Submitting
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Idle
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingDone
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.SearchResult
@@ -17,15 +17,17 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 
 class ChooseLocationViewModel(
     displayAsRoot: Boolean,
@@ -42,19 +44,26 @@ class ChooseLocationViewModel(
 
   init {
     searchQueryChannel.asFlow()
-        .debounce(400)
-        .flatMapLatest { query ->
+        .map { query ->
           if (query.isBlank()) {
-            flow { emit(idleState) }
+            query to idleState
           } else {
-            searchForResults(query)
+            query to idleState.copy(loadingStatus = Searching)
           }
         }
-        .onEach { statesChannel.offer(it) }
+        .transformLatest { (query, state) ->
+          emit(state)
+          if (state.loadingStatus == Searching) {
+            delay(300)
+            emit(search(query))
+          }
+        }
+        .distinctUntilChanged()
+        .onEach { statesChannel.send(it) }
         .launchIn(scope)
   }
 
-  fun observeStates(): Flow<State> = statesChannel.asFlow()
+  fun observeStates(): Flow<State> = statesChannel.asFlow().distinctUntilChanged()
 
   fun observeEvents(): Flow<Event> = eventsChannel.asFlow()
 
@@ -93,14 +102,14 @@ class ChooseLocationViewModel(
     scope.cancel()
   }
 
-  private fun searchForResults(query: String): Flow<State> = flow {
-    emit(idleState.copy(loadingStatus = Searching))
-
-    try {
+  private suspend fun search(query: String): State {
+    Timber.d("Search for: $query")
+    return try {
       val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
-      emit(idleState.copy(results = results, loadingStatus = SearchingDone))
+      idleState.copy(results = results, loadingStatus = SearchingDone)
     } catch (e: Exception) {
-      emit(idleState.copy(loadingStatus = SearchingError))
+      Timber.e(e, "Search failed with query %s", query)
+      idleState.copy(loadingStatus = SearchingError)
     }
   }
 
@@ -109,9 +118,9 @@ class ChooseLocationViewModel(
       val showFollowMe: Boolean,
       val results: List<SearchResult> = emptyList(),
       val loadingStatus: LoadingStatus = Idle
-  ) {
-    enum class LoadingStatus { Idle, Searching, SearchingError, SearchingDone, Submitting }
-  }
+  )
+
+  enum class LoadingStatus { Idle, Searching, SearchingError, SearchingDone, Submitting }
 
   enum class Event { SubmissionError, SubmissionSuccess, PermissionError }
 }

@@ -11,17 +11,17 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.ResultSelected
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Idle
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingDone
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.Searching
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingDone
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
-import kotlinx.coroutines.flow.onEach
 import reactivecircus.flowbinding.android.view.clicks
 import reactivecircus.flowbinding.android.widget.textChanges
 import reactivecircus.flowbinding.appcompat.navigationClicks
@@ -29,12 +29,14 @@ import reactivecircus.flowbinding.appcompat.navigationClicks
 class ChooseLocationPresenter(private val view: View) {
 
   private val toolbar: Toolbar = view.findViewById(R.id.chooseLocation_toolbar)
+  private val titleView: View = view.findViewById(R.id.chooseLocation_title)
   private val followMeButton: View = view.findViewById(R.id.chooseLocation_followMeButton)
-  private val topContainer: View = view.findViewById(R.id.chooseLocation_topContainer)
   private val recycler: RecyclerView = view.findViewById(R.id.chooseLocation_recycler)
   private val loadingView: View = view.findViewById(R.id.chooseLocation_loadingResults)
   private val errorView: View = view.findViewById(R.id.chooseLocation_error)
   private val emptyView: View = view.findViewById(R.id.chooseLocation_empty)
+  private val topSpace: View = view.findViewById(R.id.chooseLocation_topSpace)
+  private val bottomSpace: View = view.findViewById(R.id.chooseLocation_bottomSpace)
 
   private val adapter = ChooseLocationSearchAdapter()
 
@@ -43,26 +45,25 @@ class ChooseLocationPresenter(private val view: View) {
   init {
     view.updatePaddingWithInsets(left = true, top = true, right = true)
     recycler.updatePaddingWithInsets(bottom = true)
-
-    val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
-    val inputSearches: Flow<InputSearch> = inputView.textChanges()
-        .onEach { topContainer.isVisible = it.isBlank() }
-        .map { InputSearch(it.toString()) }
-
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(view.context)
+
+    val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
 
     events = merge(
         toolbar.navigationClicks().map { CloseClicked },
         followMeButton.clicks().map { FollowMeClicked },
         adapter.clicks().map { ResultSelected(it) },
-        inputSearches
+        inputView.textChanges().map { InputSearch(it.toString()) }
     )
   }
 
   fun display(state: State) {
     toolbar.isVisible = !state.rootScreen
-    followMeButton.isVisible = state.showFollowMe
+    titleView.isVisible = state.loadingStatus == Idle
+    followMeButton.isVisible = state.showFollowMe && state.loadingStatus == Idle
+    topSpace.isVisible = state.loadingStatus == Idle
+    bottomSpace.isVisible = state.loadingStatus == Idle
     recycler.isVisible = state.loadingStatus == SearchingDone && state.results.isNotEmpty()
     errorView.isVisible = state.loadingStatus == SearchingError
     emptyView.isVisible = state.loadingStatus == SearchingDone && state.results.isEmpty()

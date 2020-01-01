@@ -10,12 +10,20 @@ import codes.chrishorner.socketweather.data.CurrentInformation
 import codes.chrishorner.socketweather.data.CurrentObservations
 import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
+import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
+import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Loading
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.LocationFailed
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.NetworkFailed
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import codes.chrishorner.socketweather.home.HomeViewModel.State
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.merge
+import reactivecircus.flowbinding.android.view.clicks
+import reactivecircus.flowbinding.appcompat.itemClicks
 import java.text.DecimalFormat
 
 class HomePresenter(view: View) {
@@ -35,14 +43,25 @@ class HomePresenter(view: View) {
   private val res: Resources = view.resources
   private val decimalFormat = DecimalFormat("0.#")
 
+  val events: Flow<Event>
+
   init {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
     val scroller: View = view.findViewById(R.id.home_scroller)
     scroller.updatePaddingWithInsets(bottom = true)
 
-    locationDropdown.setOnClickListener {
-      // TODO: Navigate to Switch Location screen.
+    val menuEvents: Flow<Event> = toolbar.itemClicks().map {
+      when (it.itemId) {
+        R.id.menu_refresh -> RefreshClicked
+        R.id.menu_about -> AboutClicked
+        else -> throw IllegalArgumentException("Unknown item selected.")
+      }
     }
+
+    events = merge(
+        locationDropdown.clicks().map { SwitchLocationClicked },
+        menuEvents
+    )
   }
 
   fun display(state: State) {
@@ -76,6 +95,8 @@ class HomePresenter(view: View) {
     loading.isVisible = state.loadingStatus == Loading && state.forecasts == null
     secondaryLoading.isVisible = state.loadingStatus == Loading && state.forecasts != null
   }
+
+  enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }
 
   private fun Float.format(): String = decimalFormat.format(this)
   private fun Int.format(): String = decimalFormat.format(this)

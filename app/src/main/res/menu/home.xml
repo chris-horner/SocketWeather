@@ -6,6 +6,12 @@
     >
 
   <item
+      android:id="@+id/menu_refresh"
+      android:title="@string/home_refresh"
+      app:showAsAction="never"
+      />
+
+  <item
       android:id="@+id/menu_about"
       android:title="@string/home_about"
       app:showAsAction="never"

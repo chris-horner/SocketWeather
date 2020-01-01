@@ -12,13 +12,12 @@ import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -29,6 +28,7 @@ import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scanReduce
+import kotlinx.coroutines.flow.transform
 import timber.log.Timber
 
 class HomeViewModel(
@@ -38,7 +38,7 @@ class HomeViewModel(
 ) {
 
   private val scope = MainScope()
-  private val refreshChannel = BroadcastChannel<Unit>(1)
+  private val refreshChannel = ConflatedBroadcastChannel(Unit)
   private val statesChannel = ConflatedBroadcastChannel<State>()
   // Whether or not a subscription to device location updates should be maintained.
   private val locationUpdatesToggleChannel = ConflatedBroadcastChannel(false)
@@ -52,7 +52,10 @@ class HomeViewModel(
         .map { api.getLocation(it[0].geohash) }
         .distinctUntilChanged()
 
-    val locationUpdates: Flow<LocationUpdate> = currentSelectionUpdates
+    val selectionTriggers: Flow<LocationSelection> =
+        combine(currentSelectionUpdates, refreshChannel.asFlow()) { selection, _ -> selection }
+
+    val locationUpdates: Flow<LocationUpdate> = selectionTriggers
         .flatMapLatest { selection ->
           when (selection) {
             is LocationSelection.Static -> flowOf(LocationUpdate.Loaded(selection, selection.location))
@@ -67,26 +70,23 @@ class HomeViewModel(
           }
         }
 
-    val refreshEvents = refreshChannel.asFlow().onStart { emit(Unit) }
+    val states: Flow<State> = locationUpdates
+        .transform { locationUpdate ->
+          when (locationUpdate) {
+            is LocationUpdate.Loading -> {
+              emit(State(locationUpdate.selection, loadingStatus = Loading))
+            }
 
-    val states: Flow<State> = combineTransform(locationUpdates, refreshEvents) { locationUpdate, _ ->
-      when (locationUpdate) {
-        is LocationUpdate.Loading -> {
-          emit(State(locationUpdate.selection, loadingStatus = Loading))
+            is LocationUpdate.Error -> {
+              emit(State(locationUpdate.selection, loadingStatus = LocationFailed))
+            }
+
+            is LocationUpdate.Loaded -> {
+              emit(State(locationUpdate.selection, currentLocation = locationUpdate.location, loadingStatus = Loading))
+              emit(loadForecasts(locationUpdate))
+            }
+          }
         }
-
-        is LocationUpdate.Error -> {
-          emit(State(locationUpdate.selection, loadingStatus = LocationFailed))
-        }
-
-        is LocationUpdate.Loaded -> {
-          emit(State(locationUpdate.selection, currentLocation = locationUpdate.location, loadingStatus = Loading))
-          emit(loadForecasts(locationUpdate))
-        }
-      }
-    }
-
-    states
         .scanReduce { previousState: State, newState: State ->
           // If we're changing from one state to another and would lose our forecast information, check if we're
           // presenting the same location. If we are, we can reuse our previously calculated forecasts.
@@ -96,8 +96,8 @@ class HomeViewModel(
             newState
           }
         }
-        .onEach { statesChannel.offer(it) }
-        .launchIn(scope)
+
+    states.onEach { statesChannel.offer(it) }.launchIn(scope)
   }
 
   fun enableLocationUpdates(enable: Boolean) {
@@ -105,6 +105,10 @@ class HomeViewModel(
   }
 
   fun observeStates(): Flow<State> = statesChannel.asFlow()
+
+  fun forceRefresh() {
+    refreshChannel.offer(Unit)
+  }
 
   fun destroy() {
     scope.cancel()

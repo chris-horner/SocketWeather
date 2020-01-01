@@ -1,7 +1,10 @@
 package codes.chrishorner.socketweather.home
 
+import codes.chrishorner.socketweather.data.CurrentInformation
+import codes.chrishorner.socketweather.data.CurrentObservations
+import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.data.DeviceLocation
-import codes.chrishorner.socketweather.data.Forecasts
+import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.WeatherApi
@@ -29,10 +32,13 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scanReduce
 import kotlinx.coroutines.flow.transform
+import org.threeten.bp.Clock
+import org.threeten.bp.Instant
 import timber.log.Timber
 
 class HomeViewModel(
     private val api: WeatherApi,
+    private val clock: Clock,
     currentSelectionUpdates: Flow<LocationSelection>,
     deviceLocationUpdates: Flow<DeviceLocation>
 ) {
@@ -83,15 +89,15 @@ class HomeViewModel(
 
             is LocationUpdate.Loaded -> {
               emit(State(locationUpdate.selection, currentLocation = locationUpdate.location, loadingStatus = Loading))
-              emit(loadForecasts(locationUpdate))
+              emit(loadForecast(locationUpdate))
             }
           }
         }
         .scanReduce { previousState: State, newState: State ->
           // If we're changing from one state to another and would lose our forecast information, check if we're
           // presenting the same location. If we are, we can reuse our previously calculated forecasts.
-          if (newState.currentLocation == previousState.currentLocation && newState.forecasts == null) {
-            newState.copy(forecasts = previousState.forecasts)
+          if (newState.currentLocation == previousState.currentLocation && newState.forecast == null) {
+            newState.copy(forecast = previousState.forecast)
           } else {
             newState
           }
@@ -114,18 +120,47 @@ class HomeViewModel(
     scope.cancel()
   }
 
-  private suspend fun loadForecasts(locationUpdate: LocationUpdate.Loaded): State {
+  private suspend fun loadForecast(locationUpdate: LocationUpdate.Loaded): State = coroutineScope {
     try {
-      val forecasts = getForecasts(locationUpdate.location)
-      return State(
+      val geohash: String = locationUpdate.location.geohash
+      // Request observations and date forecasts simultaneously.
+      val observationsRequest = async { api.getObservations(geohash) }
+      val dateForecastsRequest = async { api.getDateForecasts(geohash) }
+
+      val observations: CurrentObservations = observationsRequest.await()
+      val dateForecasts: List<DateForecast> = dateForecastsRequest.await()
+
+      val currentInfo: CurrentInformation = requireNotNull(dateForecasts.getOrNull(0)?.now) {
+        "Invalid dateForecasts. First element must contain a valid 'now' field."
+      }
+
+      // Determining the lowest temperature for the current time is a bit weird. There's
+      // probably a better way to do this, but the API we're using is currently undocumented!
+      val lowTemp: Int = dateForecasts[0].temp_min ?: if (currentInfo.is_night) {
+        currentInfo.temp_now
+      } else {
+        currentInfo.temp_later
+      }
+
+      val forecast = Forecast(
+          updateTime = Instant.now(clock),
+          location = locationUpdate.location,
+          currentTemp = observations.temp,
+          tempFeelsLike = observations.temp_feels_like,
+          highTemp = dateForecasts[0].temp_max,
+          lowTemp = lowTemp,
+          dateForecasts = dateForecasts
+      )
+
+      return@coroutineScope State(
           currentSelection = locationUpdate.selection,
           currentLocation = locationUpdate.location,
-          forecasts = forecasts,
+          forecast = forecast,
           loadingStatus = Success
       )
     } catch (e: Exception) {
       Timber.e(e, "Failed to get forecasts for %s", locationUpdate.location.name)
-      return State(
+      return@coroutineScope State(
           currentSelection = locationUpdate.selection,
           currentLocation = locationUpdate.location,
           loadingStatus = NetworkFailed
@@ -133,20 +168,10 @@ class HomeViewModel(
     }
   }
 
-  private suspend fun getForecasts(location: Location): Forecasts = coroutineScope {
-    // Request observations and date forecasts simultaneously.
-    val observations = async { api.getObservations(location.geohash) }
-    val dateForecasts = async { api.getDateForecasts(location.geohash) }
-    return@coroutineScope Forecasts(
-        observations.await(),
-        dateForecasts.await()
-    )
-  }
-
   data class State(
       val currentSelection: LocationSelection,
       val currentLocation: Location? = null,
-      val forecasts: Forecasts? = null,
+      val forecast: Forecast? = null,
       val loadingStatus: LoadingStatus = Loading
   )
 

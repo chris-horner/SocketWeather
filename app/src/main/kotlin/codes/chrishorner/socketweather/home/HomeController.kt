@@ -17,6 +17,7 @@ import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import org.threeten.bp.Clock
 
 class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
@@ -27,6 +28,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
   override fun onCreateViewModel(context: Context): HomeViewModel {
     return HomeViewModel(
         NetworkComponents.get().api,
+        Clock.systemDefaultZone(),
         LocationChoices.get().observeCurrentSelection(),
         getDeviceLocationUpdates(context)
     )

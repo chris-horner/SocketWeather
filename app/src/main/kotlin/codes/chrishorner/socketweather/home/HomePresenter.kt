@@ -6,9 +6,7 @@ import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.data.CurrentInformation
-import codes.chrishorner.socketweather.data.CurrentObservations
-import codes.chrishorner.socketweather.data.DateForecast
+import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
@@ -71,18 +69,15 @@ class HomePresenter(view: View) {
       is LocationSelection.None -> throw IllegalArgumentException("Cannot display LocationSelection.None")
     }
 
-    if (state.forecasts != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
-      val observations: CurrentObservations = state.forecasts.observations
-      val info: CurrentInformation = state.forecasts.info
-      val dateForecasts: List<DateForecast> = state.forecasts.dateForecasts
+    val forecast: Forecast? = state.forecast
+
+    if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
       loading.isVisible = false
       forecastContainer.isVisible = true
-      currentTemp.text = res.getString(R.string.temperatureFormat, observations.temp.format())
-      feelsLikeTemp.text = res.getString(R.string.temperatureFormat, observations.temp_feels_like.format())
-
-      highTemp.text = res.getString(R.string.temperatureFormat, dateForecasts[0].temp_max.format())
-      val lowTempDegrees = dateForecasts[0].temp_min ?: if (info.is_night) info.temp_now else info.temp_later
-      lowTemp.text = res.getString(R.string.temperatureFormat, lowTempDegrees.format())
+      currentTemp.text = res.getString(R.string.temperatureFormat, forecast.currentTemp.format())
+      feelsLikeTemp.text = res.getString(R.string.temperatureFormat, forecast.tempFeelsLike.format())
+      highTemp.text = res.getString(R.string.temperatureFormat, forecast.highTemp.format())
+      lowTemp.text = res.getString(R.string.temperatureFormat, forecast.lowTemp.format())
     }
 
     error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed
@@ -92,8 +87,8 @@ class HomePresenter(view: View) {
       errorMessage.setText(R.string.home_networkError)
     }
 
-    loading.isVisible = state.loadingStatus == Loading && state.forecasts == null
-    secondaryLoading.isVisible = state.loadingStatus == Loading && state.forecasts != null
+    loading.isVisible = state.loadingStatus == Loading && forecast == null
+    secondaryLoading.isVisible = state.loadingStatus == Loading && forecast != null
   }
 
   enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }

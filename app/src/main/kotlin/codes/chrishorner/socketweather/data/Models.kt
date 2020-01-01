@@ -3,6 +3,24 @@ package codes.chrishorner.socketweather.data
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 
+sealed class LocationSelection {
+  object FollowMe : LocationSelection()
+  data class Static(val location: Location) : LocationSelection()
+  object None : LocationSelection()
+}
+
+data class Forecast(
+    val updateTime: Instant,
+    val location: Location,
+    val currentTemp: Float,
+    val tempFeelsLike: Float,
+    val highTemp: Int,
+    val lowTemp: Int,
+    val dateForecasts: List<DateForecast>
+)
+
+data class DeviceLocation(val latitude: Double, val longitude: Double)
+
 /**
  * A representation of the wrapped payloads the BOM API returns. Any Envelope objects
  * returned by the API will be unwrapped by [EnvelopeConverter].
@@ -65,17 +83,3 @@ data class ThreeHourlyForecast(
     val time: Instant,
     val is_night: Boolean
 )
-
-sealed class LocationSelection {
-  object FollowMe : LocationSelection()
-  data class Static(val location: Location) : LocationSelection()
-  object None : LocationSelection()
-}
-
-data class DeviceLocation(val latitude: Double, val longitude: Double)
-
-data class Forecasts(val observations: CurrentObservations, val dateForecasts: List<DateForecast>) {
-  val info: CurrentInformation = requireNotNull(dateForecasts.getOrNull(0)?.now) {
-    "Invalid dateForecasts. First element must contain a valid 'now' field."
-  }
-}

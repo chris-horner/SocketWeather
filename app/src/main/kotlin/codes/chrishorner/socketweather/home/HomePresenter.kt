@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.home
 
 import android.content.res.Resources
+import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
@@ -20,6 +21,8 @@ import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 import reactivecircus.flowbinding.android.view.clicks
 import reactivecircus.flowbinding.appcompat.itemClicks
 import java.text.DecimalFormat
@@ -27,12 +30,15 @@ import java.text.DecimalFormat
 class HomePresenter(view: View) {
 
   private val toolbar: Toolbar = view.findViewById(R.id.home_toolbar)
-  private val locationDropdown: TextView = view.findViewById(R.id.home_locationDropdown)
+  private val locationDropdown: View = view.findViewById(R.id.home_locationDropdown)
+  private val toolbarTitle: TextView = view.findViewById(R.id.home_toolbarTitle)
+  private val toolbarSubtitle: TextView = view.findViewById(R.id.home_toolbarSubtitle)
   private val forecastContainer: View = view.findViewById(R.id.home_forecastContainer)
   private val loading: View = view.findViewById(R.id.home_loading)
   private val secondaryLoading: View = view.findViewById(R.id.home_secondaryLoading)
   private val error: View = view.findViewById(R.id.home_error)
   private val errorMessage: TextView = view.findViewById(R.id.home_errorMessage)
+  private val retryButton: View = view.findViewById(R.id.home_retryButton)
   private val currentTemp: TextView = view.findViewById(R.id.home_currentTemp)
   private val feelsLikeTemp: TextView = view.findViewById(R.id.home_feelsLikeTemp)
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
@@ -42,6 +48,8 @@ class HomePresenter(view: View) {
   private val decimalFormat = DecimalFormat("0.#")
 
   val events: Flow<Event>
+
+  private var currentState: State? = null
 
   init {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
@@ -58,12 +66,13 @@ class HomePresenter(view: View) {
 
     events = merge(
         locationDropdown.clicks().map { SwitchLocationClicked },
+        retryButton.clicks().map { RefreshClicked },
         menuEvents
     )
   }
 
   fun display(state: State) {
-    locationDropdown.text = when (state.currentSelection) {
+    toolbarTitle.text = when (state.currentSelection) {
       is LocationSelection.Static -> state.currentSelection.location.name
       is LocationSelection.FollowMe -> state.currentLocation?.name ?: res.getString(R.string.home_findingLocation)
       is LocationSelection.None -> throw IllegalArgumentException("Cannot display LocationSelection.None")
@@ -89,6 +98,35 @@ class HomePresenter(view: View) {
 
     loading.isVisible = state.loadingStatus == Loading && forecast == null
     secondaryLoading.isVisible = state.loadingStatus == Loading && forecast != null
+
+    currentState = state
+    updateRefreshTimeText()
+  }
+
+  fun updateRefreshTimeText() {
+    val state = currentState
+
+    if (state == null || state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed) {
+      toolbarSubtitle.isVisible = false
+      return
+    }
+
+    toolbarSubtitle.isVisible = true
+
+    if (state.loadingStatus == Loading) {
+      toolbarSubtitle.setText(R.string.home_refreshingNow)
+    } else if (state.forecast != null) {
+
+      val updateTime = state.forecast.updateTime
+      val now = Instant.now()
+
+      if (Duration.between(updateTime, now).toMinutes() > 0) {
+        val timeAgoText = DateUtils.getRelativeTimeSpanString(updateTime.toEpochMilli())
+        toolbarSubtitle.text = res.getString(R.string.home_lastRefreshed, timeAgoText)
+      } else {
+        toolbarSubtitle.setText(R.string.home_justRefreshed)
+      }
+    }
   }
 
   enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }

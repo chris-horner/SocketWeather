@@ -15,8 +15,10 @@ import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
 import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import org.threeten.bp.Clock
 
 class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
@@ -47,6 +49,14 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
           }
         }
         .launchIn(viewScope)
+
+    // Update the refreshed time text every 60 seconds while the view is displayed.
+    viewScope.launch {
+      while (true) {
+        delay(60_000)
+        presenter.updateRefreshTimeText()
+      }
+    }
   }
 
   override fun onDetach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {

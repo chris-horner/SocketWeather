@@ -47,6 +47,7 @@ class HomeViewModel(
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
   private val statesChannel = ConflatedBroadcastChannel<State>()
   // Whether or not a subscription to device location updates should be maintained.
+  // This allows location updates to be disabled when the UI is not displayed.
   private val locationUpdatesToggleChannel = ConflatedBroadcastChannel(false)
 
   init {
@@ -94,6 +95,7 @@ class HomeViewModel(
           }
         }
         .scanReduce { previousState: State, newState: State ->
+          // TODO: Replace this with some kind of repository for the current forecast.
           // If we're changing from one state to another and would lose our forecast information, check if we're
           // presenting the same location. If we are, we can reuse our previously calculated forecasts.
           if (newState.currentLocation == previousState.currentLocation && newState.forecast == null) {

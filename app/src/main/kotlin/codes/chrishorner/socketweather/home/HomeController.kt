@@ -16,10 +16,15 @@ import codes.chrishorner.socketweather.util.asTransaction
 import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import org.threeten.bp.Clock
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
 class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
@@ -50,6 +55,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
         }
         .launchIn(viewScope)
 
+    // TODO: Move this logic into the presenter.
     // Update the refreshed time text every 10 seconds while the view is displayed.
     viewScope.launch {
       while (true) {
@@ -57,6 +63,15 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
         presenter.updateRefreshTimeText()
       }
     }
+
+    // TODO: Move this logic into some kind of repository.
+    // Refresh if we're displaying a forecast more than 1 minute old.
+    viewModel.observeStates()
+        .mapNotNull { it.forecast }
+        .map { Duration.between(it.updateTime, Instant.now()) }
+        .filter { it.toMinutes() > 1 }
+        .onEach { viewModel.forceRefresh() }
+        .launchIn(viewScope)
   }
 
   override fun onDetach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {

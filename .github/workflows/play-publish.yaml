@@ -21,18 +21,18 @@ jobs:
       - name: Run tests
         run: bash ./gradlew testDebug --stacktrace
 
-      - name: Retrieve access json
-        env:
-          play_access_json: ${{ secrets.play_access_json }}
-        run: echo $play_access_json > app/keys/play_access.json
+      #- name: Retrieve access json
+      #  env:
+      #    play_access_json: ${{ secrets.play_access_json }}
+      #  run: echo $play_access_json > app/keys/play_access.json
 
-      - name: Retrieve upload keystore
-        env:
-          upload_keystore: ${{ secrets.upload_keystore }}
-        run: echo $upload_keystore | base64 -di > app/keys/upload.keystore
+      #- name: Retrieve upload keystore
+      #  env:
+      #    upload_keystore: ${{ secrets.upload_keystore }}
+      #  run: echo $upload_keystore | base64 -di > app/keys/upload.keystore
 
-      - name: Publish app to internal test track
-        env:
-          socket_weather_alias: ${{ secrets.socket_weather_alias }}
-          socket_weather_password: ${{ secrets.socket_weather_password }}
-        run: bash ./gradlew publishReleaseBundle
+      #- name: Publish app to internal test track
+      #  env:
+      #    socket_weather_alias: ${{ secrets.socket_weather_alias }}
+      #    socket_weather_password: ${{ secrets.socket_weather_password }}
+      #  run: bash ./gradlew publishReleaseBundle

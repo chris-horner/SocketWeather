@@ -22,7 +22,6 @@ class HomePresenter(view: View) {
 
   private val toolbar: Toolbar = view.findViewById(R.id.home_toolbar)
   private val locationDropdown: TextView = view.findViewById(R.id.home_locationDropdown)
-  private val switchLocationContainer: View = view.findViewById(R.id.home_switchLocationContainer)
   private val forecastContainer: View = view.findViewById(R.id.home_forecastContainer)
   private val loading: View = view.findViewById(R.id.home_loading)
   private val secondaryLoading: View = view.findViewById(R.id.home_secondaryLoading)
@@ -38,11 +37,12 @@ class HomePresenter(view: View) {
 
   init {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
-    switchLocationContainer.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
     val scroller: View = view.findViewById(R.id.home_scroller)
     scroller.updatePaddingWithInsets(bottom = true)
 
-    locationDropdown.setOnClickListener { switchLocationContainer.isVisible = !switchLocationContainer.isVisible }
+    locationDropdown.setOnClickListener {
+      // TODO: Navigate to Switch Location screen.
+    }
   }
 
   fun display(state: State) {
@@ -75,15 +75,6 @@ class HomePresenter(view: View) {
 
     loading.isVisible = state.loadingStatus == Loading && state.forecasts == null
     secondaryLoading.isVisible = state.loadingStatus == Loading && state.forecasts != null
-  }
-
-  fun handleBack(): Boolean {
-    if (switchLocationContainer.isVisible) {
-      switchLocationContainer.isVisible = false
-      return true
-    }
-
-    return false
   }
 
   private fun Float.format(): String = decimalFormat.format(this)

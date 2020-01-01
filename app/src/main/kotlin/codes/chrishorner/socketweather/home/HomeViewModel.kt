@@ -12,6 +12,7 @@ import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
@@ -19,10 +20,8 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combineTransform
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -34,12 +33,12 @@ import timber.log.Timber
 
 class HomeViewModel(
     private val api: WeatherApi,
-    savedSelectionUpdates: Flow<Set<LocationSelection>>,
     currentSelectionUpdates: Flow<LocationSelection>,
     deviceLocationUpdates: Flow<DeviceLocation>
 ) {
 
   private val scope = MainScope()
+  private val refreshChannel = BroadcastChannel<Unit>(1)
   private val statesChannel = ConflatedBroadcastChannel<State>()
   // Whether or not a subscription to device location updates should be maintained.
   private val locationUpdatesToggleChannel = ConflatedBroadcastChannel(false)
@@ -68,22 +67,24 @@ class HomeViewModel(
           }
         }
 
-    val states: Flow<State> =
-        combineTransform(locationUpdates, savedSelectionUpdates) { locationUpdate, savedSelections ->
-          when (locationUpdate) {
-            is LocationUpdate.Loading -> {
-              emit(State(locationUpdate.selection, savedSelections = savedSelections, loadingStatus = Loading))
-            }
+    val refreshEvents = refreshChannel.asFlow().onStart { emit(Unit) }
 
-            is LocationUpdate.Error -> {
-              emit(State(locationUpdate.selection, savedSelections = savedSelections, loadingStatus = LocationFailed))
-            }
-
-            is LocationUpdate.Loaded -> {
-              emitAll(loadForecasts(locationUpdate, savedSelections))
-            }
-          }
+    val states: Flow<State> = combineTransform(locationUpdates, refreshEvents) { locationUpdate, _ ->
+      when (locationUpdate) {
+        is LocationUpdate.Loading -> {
+          emit(State(locationUpdate.selection, loadingStatus = Loading))
         }
+
+        is LocationUpdate.Error -> {
+          emit(State(locationUpdate.selection, loadingStatus = LocationFailed))
+        }
+
+        is LocationUpdate.Loaded -> {
+          emit(State(locationUpdate.selection, currentLocation = locationUpdate.location, loadingStatus = Loading))
+          emit(loadForecasts(locationUpdate))
+        }
+      }
+    }
 
     states
         .scanReduce { previousState: State, newState: State ->
@@ -109,27 +110,22 @@ class HomeViewModel(
     scope.cancel()
   }
 
-  private fun loadForecasts(
-      locationUpdate: LocationUpdate.Loaded,
-      savedSelections: Set<LocationSelection>
-  ): Flow<State> = flow {
-
-    val loadingState = State(
-        currentSelection = locationUpdate.selection,
-        currentLocation = locationUpdate.location,
-        savedSelections = savedSelections,
-        loadingStatus = Loading
-    )
-
-    emit(loadingState)
-
+  private suspend fun loadForecasts(locationUpdate: LocationUpdate.Loaded): State {
     try {
       val forecasts = getForecasts(locationUpdate.location)
-      val successState = loadingState.copy(loadingStatus = Success, forecasts = forecasts)
-      emit(successState)
+      return State(
+          currentSelection = locationUpdate.selection,
+          currentLocation = locationUpdate.location,
+          forecasts = forecasts,
+          loadingStatus = Success
+      )
     } catch (e: Exception) {
       Timber.e(e, "Failed to get forecasts for %s", locationUpdate.location.name)
-      emit(loadingState.copy(loadingStatus = NetworkFailed))
+      return State(
+          currentSelection = locationUpdate.selection,
+          currentLocation = locationUpdate.location,
+          loadingStatus = NetworkFailed
+      )
     }
   }
 
@@ -146,7 +142,6 @@ class HomeViewModel(
   data class State(
       val currentSelection: LocationSelection,
       val currentLocation: Location? = null,
-      val savedSelections: Set<LocationSelection> = emptySet(),
       val forecasts: Forecasts? = null,
       val loadingStatus: LoadingStatus = Loading
   )

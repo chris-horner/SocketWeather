@@ -131,32 +131,4 @@
 
   </androidx.core.widget.NestedScrollView>
 
-  <FrameLayout
-      android:id="@+id/home_switchLocationContainer"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:padding="8dp"
-      android:background="@color/scrimNeutral"
-      android:clipToPadding="false"
-      android:visibility="gone"
-      >
-
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/home_locationCard"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        >
-
-      <androidx.recyclerview.widget.RecyclerView
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:paddingStart="8dp"
-          android:paddingEnd="8dp"
-          android:scrollbars="vertical"
-          />
-
-    </com.google.android.material.card.MaterialCardView>
-
-  </FrameLayout>
-
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

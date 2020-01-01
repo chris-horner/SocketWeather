@@ -22,7 +22,6 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
   override fun onCreateViewModel(context: Context): HomeViewModel {
     return HomeViewModel(
         NetworkComponents.get().api,
-        LocationChoices.get().observeSavedSelections(),
         LocationChoices.get().observeCurrentSelection(),
         getDeviceLocationUpdates(context)
     )
@@ -35,11 +34,6 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
   override fun onDetach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
     viewModel.enableLocationUpdates(false)
-  }
-
-  override fun handleBack(): Boolean {
-    if (getPresenter()?.handleBack() == true) return true
-    return super.handleBack()
   }
 
   override fun onDestroy(viewModel: HomeViewModel?) {

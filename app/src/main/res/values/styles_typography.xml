@@ -22,6 +22,7 @@
 
   <style name="TextAppearance.SocketWeather.Headline5" parent="TextAppearance.MaterialComponents.Headline5">
     <item name="fontFamily">@font/zilla_slab_medium</item>
+    <item name="android:letterSpacing">0.02</item>
   </style>
 
   <style name="TextAppearance.SocketWeather.Headline5.Secondary" parent="TextAppearance.SocketWeather.Headline5">

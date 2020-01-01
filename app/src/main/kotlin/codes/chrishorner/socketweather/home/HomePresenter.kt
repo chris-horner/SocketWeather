@@ -114,7 +114,7 @@ class HomePresenter(view: View) {
     toolbarSubtitle.isVisible = true
 
     if (state.loadingStatus == Loading) {
-      toolbarSubtitle.setText(R.string.home_refreshingNow)
+      toolbarSubtitle.setText(R.string.home_updatingNow)
     } else if (state.forecast != null) {
 
       val updateTime = state.forecast.updateTime
@@ -122,9 +122,9 @@ class HomePresenter(view: View) {
 
       if (Duration.between(updateTime, now).toMinutes() > 0) {
         val timeAgoText = DateUtils.getRelativeTimeSpanString(updateTime.toEpochMilli())
-        toolbarSubtitle.text = res.getString(R.string.home_lastRefreshed, timeAgoText)
+        toolbarSubtitle.text = res.getString(R.string.home_lastUpdated, timeAgoText)
       } else {
-        toolbarSubtitle.setText(R.string.home_justRefreshed)
+        toolbarSubtitle.setText(R.string.home_justUpdated)
       }
     }
   }

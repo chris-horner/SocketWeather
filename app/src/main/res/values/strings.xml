@@ -23,9 +23,9 @@
   <string name="home_networkError">Network request failed</string>
   <string name="home_locationError">Failed to find current location</string>
   <string name="home_retryButton">Retry</string>
-  <string name="home_refreshingNow">Refreshing…</string>
-  <string name="home_lastRefreshed">Refreshed %s</string>
-  <string name="home_justRefreshed">Refreshed just now</string>
+  <string name="home_updatingNow">Refreshing…</string>
+  <string name="home_lastUpdated">Updated %s</string>
+  <string name="home_justUpdated">Updated just now</string>
   <string name="home_dropdownContentDesc">Switch location dropdown arrow.</string>
 
 </resources>

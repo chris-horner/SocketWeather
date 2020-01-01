@@ -50,10 +50,10 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
         }
         .launchIn(viewScope)
 
-    // Update the refreshed time text every 60 seconds while the view is displayed.
+    // Update the refreshed time text every 10 seconds while the view is displayed.
     viewScope.launch {
       while (true) {
-        delay(60_000)
+        delay(10_000)
         presenter.updateRefreshTimeText()
       }
     }

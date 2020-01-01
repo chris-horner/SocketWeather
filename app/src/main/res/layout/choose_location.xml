@@ -28,6 +28,7 @@
       android:id="@+id/chooseLocation_title"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginBottom="16dp"
       android:paddingStart="32dp"
       android:paddingEnd="32dp"
       android:text="@string/chooseLocation_title"
@@ -39,8 +40,8 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginStart="32dp"
-      android:layout_marginTop="16dp"
       android:layout_marginEnd="32dp"
+      android:layout_marginBottom="8dp"
       android:gravity="start|center_vertical"
       android:minHeight="56dp"
       android:text="@string/chooseLocation_myLocationButton"
@@ -55,12 +56,17 @@
       android:layout_height="wrap_content"
       >
 
+    <!--
+    FrameLayout wrapper here is necessary to ensure TextInputLayout changes don't trigger
+    layout animations at undesirable times.
+    -->
+
     <com.google.android.material.textfield.TextInputLayout
         android:id="@+id/chooseLocation_searchInputLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:hint="@string/chooseLocation_searchHint"
         app:startIconDrawable="@drawable/ic_search_24dp"

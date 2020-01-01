@@ -53,7 +53,7 @@ class ChooseLocationViewModel(
         }
         .transformLatest { (query, state) ->
           emit(state)
-          if (state.loadingStatus == Searching) {
+          if (state.loadingStatus == Searching && query.length > 2) {
             delay(300)
             emit(search(query))
           }

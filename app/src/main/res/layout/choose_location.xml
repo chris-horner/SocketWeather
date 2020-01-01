@@ -6,6 +6,7 @@
     android:id="@+id/chooseLocation_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     android:orientation="vertical"
     >
 
@@ -80,89 +81,87 @@
 
   </FrameLayout>
 
-  <Space
-      android:id="@+id/chooseLocation_bottomSpace"
+  <FrameLayout
+      android:id="@+id/chooseLocation_resultsContainer"
       android:layout_width="match_parent"
       android:layout_height="0dp"
       android:layout_weight="3"
-      />
-
-  <LinearLayout
-      android:id="@+id/chooseLocation_loadingResults"
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      android:gravity="center"
-      android:orientation="vertical"
-      android:visibility="gone"
       >
 
-    <ProgressBar
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        />
+    <LinearLayout
+        android:id="@+id/chooseLocation_loadingResults"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone"
+        >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="@string/chooseLocation_searchLoading"
-        android:textAppearance="?attr/textAppearanceSubtitle1"
-        />
+      <ProgressBar
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          />
 
-  </LinearLayout>
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_marginTop="16dp"
+          android:text="@string/chooseLocation_searchLoading"
+          android:textAppearance="?attr/textAppearanceSubtitle1"
+          />
 
-  <FrameLayout
-      android:id="@+id/chooseLocation_error"
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      android:visibility="gone"
-      >
+    </LinearLayout>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:drawablePadding="16dp"
-        android:text="@string/chooseLocation_searchError"
-        android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
-        app:drawableTint="?attr/colorOnBackground"
-        app:drawableTopCompat="@drawable/ic_error_outline_48dp"
+    <FrameLayout
+        android:id="@+id/chooseLocation_error"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:drawablePadding="16dp"
+          android:text="@string/chooseLocation_searchError"
+          android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
+          app:drawableTint="?attr/colorOnBackground"
+          app:drawableTopCompat="@drawable/ic_error_outline_48dp"
+          />
+
+    </FrameLayout>
+
+    <FrameLayout
+        android:id="@+id/chooseLocation_empty"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        >
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:drawablePadding="16dp"
+          android:text="@string/chooseLocation_searchEmpty"
+          android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
+          app:drawableTint="?attr/colorOnBackground"
+          app:drawableTopCompat="@drawable/ic_terrain_48dp"
+          />
+
+    </FrameLayout>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/chooseLocation_recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:paddingTop="8dp"
+        android:clipToPadding="false"
+        android:scrollbars="vertical"
+        android:visibility="gone"
         />
 
   </FrameLayout>
-
-  <FrameLayout
-      android:id="@+id/chooseLocation_empty"
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      android:visibility="gone"
-      >
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:drawablePadding="16dp"
-        android:text="@string/chooseLocation_searchEmpty"
-        android:textAppearance="@style/TextAppearance.SocketWeather.Subtitle1"
-        app:drawableTint="?attr/colorOnBackground"
-        app:drawableTopCompat="@drawable/ic_terrain_48dp"
-        />
-
-  </FrameLayout>
-
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/chooseLocation_recycler"
-      android:layout_width="match_parent"
-      android:layout_height="0dp"
-      android:layout_weight="1"
-      android:paddingTop="8dp"
-      android:clipToPadding="false"
-      android:scrollbars="vertical"
-      android:visibility="gone"
-      />
 
 </LinearLayout>

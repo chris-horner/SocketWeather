@@ -8,11 +8,12 @@
   <string name="chooseLocation_title">Where\'s your weather?</string>
   <string name="chooseLocation_myLocationButton">Use my location</string>
   <string name="chooseLocation_searchHint">Search</string>
-  <string name="chooseLocation_submissionError">Failed to select location</string>
+  <string name="chooseLocation_submissionError">Something went wrong 😕</string>
   <string name="chooseLocation_searchLoading">Loading results…</string>
-  <string name="chooseLocation_searchError">Something went wrong</string>
+  <string name="chooseLocation_searchError">Something went wrong 😕</string>
   <string name="chooseLocation_searchEmpty">No locations found</string>
   <string name="chooseLocation_permissionError">Location permission required</string>
+  <string name="chooseLocation_submitting">Saving location…</string>
 
   <string name="home_findingLocation">Finding location…</string>
   <string name="home_about">About</string>

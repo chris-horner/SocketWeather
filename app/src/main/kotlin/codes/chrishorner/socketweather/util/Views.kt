@@ -1,16 +1,23 @@
 package codes.chrishorner.socketweather.util
 
+import android.content.Context
 import android.graphics.Rect
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
+import android.view.inputmethod.InputMethodManager
 import androidx.annotation.LayoutRes
 import androidx.core.view.updatePadding
 
 @Suppress("UNCHECKED_CAST")
 fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int, attach: Boolean = false): T =
     LayoutInflater.from(context).inflate(layout, this, attach) as T
+
+fun View.dismissKeyboard() {
+  val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+  imm.hideSoftInputFromWindow(windowToken, 0)
+}
 
 /**
  * Indicates that this view should update its own padding to match that of [WindowInsets].

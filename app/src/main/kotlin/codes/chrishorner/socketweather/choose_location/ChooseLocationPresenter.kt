@@ -20,13 +20,16 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.L
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Searching
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingDone
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
 import codes.chrishorner.socketweather.data.SearchResult
+import codes.chrishorner.socketweather.util.dismissKeyboard
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.flow.onEach
 import reactivecircus.flowbinding.android.view.clicks
 import reactivecircus.flowbinding.android.widget.textChanges
 import reactivecircus.flowbinding.appcompat.navigationClicks
@@ -35,6 +38,7 @@ class ChooseLocationPresenter(private val view: View) {
 
   private val container: ViewGroup = view.findViewById(R.id.chooseLocation_container)
   private val toolbar: Toolbar = view.findViewById(R.id.chooseLocation_toolbar)
+  private val topSpace: View = view.findViewById(R.id.chooseLocation_topSpace)
   private val titleView: View = view.findViewById(R.id.chooseLocation_title)
   private val followMeButton: View = view.findViewById(R.id.chooseLocation_followMeButton)
   private val inputView: EditText = view.findViewById(R.id.chooseLocation_searchInput)
@@ -42,7 +46,7 @@ class ChooseLocationPresenter(private val view: View) {
   private val loadingView: View = view.findViewById(R.id.chooseLocation_loadingResults)
   private val errorView: View = view.findViewById(R.id.chooseLocation_error)
   private val emptyView: View = view.findViewById(R.id.chooseLocation_empty)
-  private val topSpace: View = view.findViewById(R.id.chooseLocation_topSpace)
+  private val submissionView: View = view.findViewById(R.id.chooseLocation_submitting)
 
   private val adapter = ChooseLocationSearchAdapter()
 
@@ -55,8 +59,8 @@ class ChooseLocationPresenter(private val view: View) {
 
     events = merge(
         toolbar.navigationClicks().map { CloseClicked },
-        followMeButton.clicks().map { FollowMeClicked },
-        adapter.clicks().map { ResultSelected(it) },
+        followMeButton.clicks().onEach { view.dismissKeyboard() }.map { FollowMeClicked },
+        adapter.clicks().onEach { view.dismissKeyboard() }.map { ResultSelected(it) },
         inputView.textChanges().map { InputSearch(it.toString()) }
     )
 
@@ -83,6 +87,7 @@ class ChooseLocationPresenter(private val view: View) {
     errorView.isVisible = state.loadingStatus == SearchingError
     emptyView.isVisible = state.loadingStatus == SearchingDone && state.results.isEmpty()
     loadingView.isVisible = state.loadingStatus == Searching
+    submissionView.isVisible = state.loadingStatus == Submitting
 
     adapter.set(state.results)
   }

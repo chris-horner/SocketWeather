@@ -138,11 +138,7 @@ class HomeViewModel(
 
       // Determining the lowest temperature for the current time is a bit weird. There's
       // probably a better way to do this, but the API we're using is currently undocumented!
-      val lowTemp: Int = dateForecasts[0].temp_min ?: if (currentInfo.is_night) {
-        currentInfo.temp_now
-      } else {
-        currentInfo.temp_later
-      }
+      val lowTemp: Int = dateForecasts[0].temp_min ?: currentInfo.temp_now
 
       val forecast = Forecast(
           updateTime = Instant.now(clock),

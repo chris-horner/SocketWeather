@@ -43,6 +43,7 @@ class HomePresenter(view: View) {
   private val feelsLikeTemp: TextView = view.findViewById(R.id.home_feelsLikeTemp)
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
   private val lowTemp: TextView = view.findViewById(R.id.home_lowTemp)
+  private val description: TextView = view.findViewById(R.id.home_description)
 
   private val res: Resources = view.resources
   private val decimalFormat = DecimalFormat("0.#")
@@ -87,6 +88,11 @@ class HomePresenter(view: View) {
       feelsLikeTemp.text = res.getString(R.string.temperatureFormat, forecast.tempFeelsLike.format())
       highTemp.text = res.getString(R.string.temperatureFormat, forecast.highTemp.format())
       lowTemp.text = res.getString(R.string.temperatureFormat, forecast.lowTemp.format())
+
+      val todayForecast = forecast.dateForecasts[0]
+      val descriptionText = todayForecast.extended_text ?: todayForecast.short_text
+      description.text = descriptionText
+      description.isVisible = descriptionText.isNullOrBlank().not()
     }
 
     error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed

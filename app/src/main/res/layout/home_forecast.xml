@@ -76,4 +76,16 @@
       app:layout_constraintTop_toBottomOf="@id/home_highTemp"
       />
 
+  <TextView
+      android:id="@+id/home_description"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginTop="8dp"
+      android:textAppearance="?attr/textAppearanceBody1"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
+      app:layout_goneMarginTop="0dp"
+      />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -11,9 +11,11 @@ import codes.chrishorner.socketweather.data.getDeviceLocationUpdates
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
+import codes.chrishorner.socketweather.switch_location.SwitchLocationController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
 import codes.chrishorner.socketweather.util.inflate
+import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
@@ -48,7 +50,11 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
     presenter.events
         .onEach { event ->
           when (event) {
-            SwitchLocationClicked -> TODO("Display location switcher.")
+            SwitchLocationClicked -> router.pushController(
+                SwitchLocationController()
+                    .asTransaction()
+                    .pushChangeHandler(SimpleSwapChangeHandler(false))
+            )
             RefreshClicked -> viewModel.forceRefresh()
             AboutClicked -> router.pushController(AboutController().asTransaction())
           }

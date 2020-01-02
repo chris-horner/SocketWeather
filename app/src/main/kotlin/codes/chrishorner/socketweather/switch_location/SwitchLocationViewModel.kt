@@ -1,0 +1,3 @@
+package codes.chrishorner.socketweather.switch_location
+
+class SwitchLocationViewModel

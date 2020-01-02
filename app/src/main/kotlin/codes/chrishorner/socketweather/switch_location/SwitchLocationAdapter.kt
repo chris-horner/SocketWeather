@@ -2,7 +2,9 @@ package codes.chrishorner.socketweather.switch_location
 
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import codes.chrishorner.socketweather.R
@@ -34,7 +36,7 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
 
     private val title: TextView = view.findViewById(R.id.switchLocationItem_title)
     private val subtitle: TextView = view.findViewById(R.id.switchLocationItem_subtitle)
-    private val locationIcon: View = view.findViewById(R.id.switchLocationItem_locationIcon)
+    private val icon: ImageView = view.findViewById(R.id.switchLocationItem_icon)
     private val dropUpIcon: View = view.findViewById(R.id.switchLocationItem_dropUpIcon)
 
     private var item: LocationSelection? = null
@@ -51,13 +53,22 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
         is LocationSelection.FollowMe -> {
           title.setText(R.string.switchLocation_followMeTitle)
           subtitle.setText(R.string.switchLocation_followMeSubtitle)
-          locationIcon.isVisible = true
+          val iconDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_my_location_24dp)
+          icon.isVisible = true
+          icon.setImageDrawable(iconDrawable)
         }
 
         is LocationSelection.Static -> {
           title.text = selection.location.name
           subtitle.text = selection.location.state
-          locationIcon.isVisible = false
+
+          if (position == 0) {
+            val iconDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_check_circle_outline_24dp)
+            icon.isVisible = true
+            icon.setImageDrawable(iconDrawable)
+          } else {
+            icon.isVisible = false
+          }
         }
 
         is LocationSelection.None -> {

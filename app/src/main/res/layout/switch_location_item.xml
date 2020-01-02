@@ -5,27 +5,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:paddingStart="8dp"
-    android:paddingEnd="8dp"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
     android:background="?attr/selectableItemBackground"
     android:minHeight="?attr/listPreferredItemHeight"
     >
 
   <ImageView
-      android:id="@+id/switchLocationItem_dropUpIcon"
+      android:id="@+id/switchLocationItem_icon"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginStart="4dp"
       android:layout_gravity="center_vertical"
       android:importantForAccessibility="no"
-      app:srcCompat="@drawable/ic_arrow_drop_up_24dp"
+      app:srcCompat="@drawable/ic_my_location_24dp"
       />
 
   <LinearLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="40dp"
-      android:layout_marginEnd="40dp"
+      android:layout_marginStart="48dp"
+      android:layout_marginEnd="48dp"
       android:layout_gravity="center_vertical"
       android:orientation="vertical"
       >
@@ -49,12 +48,12 @@
   </LinearLayout>
 
   <ImageView
-      android:id="@+id/switchLocationItem_locationIcon"
+      android:id="@+id/switchLocationItem_dropUpIcon"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_gravity="end|center_vertical"
+      android:layout_gravity="center_vertical|end"
       android:importantForAccessibility="no"
-      app:srcCompat="@drawable/ic_my_location_24dp"
+      app:srcCompat="@drawable/ic_arrow_drop_up_24dp"
       />
 
 </FrameLayout>

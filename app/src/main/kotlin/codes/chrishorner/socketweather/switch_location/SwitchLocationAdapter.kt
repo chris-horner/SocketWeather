@@ -9,8 +9,15 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.switch_location.SwitchLocationAdapter.ViewHolder
 import codes.chrishorner.socketweather.util.inflate
+import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.asFlow
 
 class SwitchLocationAdapter(private val items: List<LocationSelection>) : RecyclerView.Adapter<ViewHolder>() {
+
+  private val clicksChannel = BroadcastChannel<LocationSelection>(1)
+
+  fun clicks(): Flow<LocationSelection> = clicksChannel.asFlow()
 
   override fun getItemCount(): Int = items.size
 
@@ -23,13 +30,21 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
     holder.bind(items[position])
   }
 
-  class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
+  inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private val title: TextView = view.findViewById(R.id.switchLocationItem_title)
     private val subtitle: TextView = view.findViewById(R.id.switchLocationItem_subtitle)
     private val icon: View = view.findViewById(R.id.switchLocationItem_locationIcon)
 
+    private var item: LocationSelection? = null
+
+    init {
+      view.setOnClickListener { clicksChannel.offer(requireNotNull(item)) }
+    }
+
     fun bind(selection: LocationSelection) {
+      item = selection
+
       when (selection) {
         is LocationSelection.FollowMe -> {
           title.setText(R.string.switchLocation_followMeTitle)

@@ -20,6 +20,7 @@ import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
+import codes.chrishorner.socketweather.util.dismissKeyboard
 import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
@@ -31,7 +32,7 @@ class ChooseLocationController(
 
   constructor(showFollowMe: Boolean, displayAsRoot: Boolean = false) : this(
       bundleOf(
-          "showFollowMe" to showFollowMe,
+          "showFollowMe" to showFollowMe, // TODO: Move this into the ViewModel.
           "displayAsRoot" to displayAsRoot
       )
   )
@@ -74,7 +75,10 @@ class ChooseLocationController(
             is InputSearch -> viewModel.inputSearchQuery(event.query)
             is FollowMeClicked -> processFollowMe(viewModel)
             is ResultSelected -> viewModel.selectResult(event.result)
-            is CloseClicked -> router.popCurrentController()
+            is CloseClicked -> {
+              view.dismissKeyboard()
+              router.popCurrentController()
+            }
           }
         }
         .launchIn(viewScope)

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_vertical"
+    android:orientation="horizontal"
+    >
+
+  <TextView
+      android:id="@+id/dateForecastItem_title"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_weight="1"
+      android:ellipsize="end"
+      android:lines="1"
+      android:textAppearance="?attr/textAppearanceSubtitle1"
+      />
+
+  <TextView
+      android:id="@+id/dateForecastItem_lowTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      />
+
+  <View
+      android:layout_width="32dp"
+      android:layout_height="4dp"
+      android:background="@drawable/bg_line"
+      />
+
+  <TextView
+      android:id="@+id/dateForecastItem_highTemp"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      />
+
+</LinearLayout>

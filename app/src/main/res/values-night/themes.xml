@@ -11,6 +11,7 @@
     <item name="colorOnSecondary">@color/black</item>
     <item name="colorSurface">@color/darkGrey</item>
     <item name="colorOnSurface">@color/white</item>
+    <item name="colorDivider">@color/color_on_background_20</item>
     <item name="android:windowLightStatusBar" tools:ignore="NewApi">false</item>
   </style>
 

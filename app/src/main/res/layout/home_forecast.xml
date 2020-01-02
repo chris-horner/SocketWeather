@@ -76,7 +76,7 @@
       app:layout_constraintTop_toBottomOf="@id/home_highTemp"
       />
 
-  <TextView
+  <com.google.android.material.textview.MaterialTextView
       android:id="@+id/home_description"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
@@ -86,6 +86,18 @@
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
       app:layout_goneMarginTop="0dp"
+      app:lineHeight="22sp"
+      />
+
+  <View
+      android:id="@+id/home_forecastDivider"
+      android:layout_width="0dp"
+      android:layout_height="4dp"
+      android:layout_marginTop="16dp"
+      android:background="@drawable/bg_line"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_description"
       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

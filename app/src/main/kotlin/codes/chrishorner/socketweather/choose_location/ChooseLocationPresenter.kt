@@ -1,12 +1,14 @@
 package codes.chrishorner.socketweather.choose_location
 
 import android.animation.LayoutTransition
+import android.animation.LayoutTransition.TransitionListener
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import android.widget.EditText
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.doOnLayout
 import androidx.core.view.isVisible
 import androidx.interpolator.view.animation.LinearOutSlowInInterpolator
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,7 +63,7 @@ class ChooseLocationPresenter(private val view: View) {
         toolbar.navigationClicks().map { CloseClicked },
         followMeButton.clicks().onEach { view.dismissKeyboard() }.map { FollowMeClicked },
         adapter.clicks().onEach { view.dismissKeyboard() }.map { ResultSelected(it) },
-        inputView.textChanges().map { InputSearch(it.toString()) }
+        inputView.textChanges().onEach { inputView.requestFocus() }.map { InputSearch(it.toString()) }
     )
 
     with(container.layoutTransition) {
@@ -74,6 +76,28 @@ class ChooseLocationPresenter(private val view: View) {
       setDuration(LayoutTransition.CHANGE_APPEARING, 250L)
       setDuration(LayoutTransition.APPEARING, 250L)
       setDuration(LayoutTransition.CHANGING, 250L)
+    }
+
+    // Hack around `TextInputLayout` losing focus when layout transition animations run 😢.
+    container.doOnLayout {
+      container.layoutTransition.addTransitionListener(object : TransitionListener {
+        override fun startTransition(
+            transition: LayoutTransition?,
+            container: ViewGroup?,
+            view: View?,
+            transitionType: Int
+        ) {
+          inputView.requestFocus()
+        }
+
+        override fun endTransition(
+            transition: LayoutTransition?,
+            container: ViewGroup?,
+            view: View?,
+            transitionType: Int
+        ) {
+        }
+      })
     }
   }
 

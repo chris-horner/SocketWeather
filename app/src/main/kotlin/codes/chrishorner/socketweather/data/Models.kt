@@ -65,7 +65,7 @@ data class DateForecast(
 )
 
 data class Rain(val amount: Amount, val chance: Int) {
-  data class Amount(val min: Int?, val max: Int?, val units: String)
+  data class Amount(val min: Float?, val max: Float?, val units: String)
 }
 
 data class CurrentInformation(

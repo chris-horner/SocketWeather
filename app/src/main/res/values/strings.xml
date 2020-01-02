@@ -28,4 +28,8 @@
   <string name="home_justUpdated">Updated just now</string>
   <string name="home_dropdownContentDesc">Switch location dropdown arrow.</string>
 
+  <string name="switchLocation_followMeTitle">Follow me</string>
+  <string name="switchLocation_followMeSubtitle">Forecast at your location</string>
+  <string name="switchLocation_add">Add another location</string>
+
 </resources>

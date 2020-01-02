@@ -2,6 +2,7 @@
 
 <FrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/switchLocation_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,13 +13,36 @@
       android:id="@+id/switchLocation_card"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_margin="8dp"
+      android:elevation="8dp"
       >
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/switchLocation_recycler"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        />
+        android:orientation="vertical"
+        >
+
+      <androidx.recyclerview.widget.RecyclerView
+          android:id="@+id/switchLocation_recycler"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="8dp"
+          android:paddingEnd="8dp"
+          android:scrollbars="vertical"
+          />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_vertical"
+          android:minHeight="?attr/listPreferredItemHeight"
+          android:text="@string/switchLocation_add"
+          android:textAppearance="?attr/textAppearanceButton"
+          app:drawableStartCompat="@drawable/ic_add_24dp"
+          />
+
+    </LinearLayout>
 
   </com.google.android.material.card.MaterialCardView>
 

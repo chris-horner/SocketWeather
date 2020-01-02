@@ -17,32 +17,43 @@
       android:elevation="8dp"
       >
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/switchLocation_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
         >
 
-      <androidx.recyclerview.widget.RecyclerView
-          android:id="@+id/switchLocation_recycler"
+      <LinearLayout
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:scrollbars="vertical"
-          />
+          android:orientation="vertical"
+          >
 
-      <TextView
-          android:id="@+id/switchLocation_addButton"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:background="?attr/selectableItemBackground"
-          android:gravity="center_vertical"
-          android:minHeight="?attr/listPreferredItemHeight"
-          android:text="@string/switchLocation_add"
-          android:textAppearance="?attr/textAppearanceButton"
-          app:drawableStartCompat="@drawable/ic_add_24dp"
-          />
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/switchLocation_recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:scrollbars="vertical"
+            />
 
-    </LinearLayout>
+        <TextView
+            android:id="@+id/switchLocation_addButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingStart="12dp"
+            android:paddingEnd="16dp"
+            android:background="?attr/selectableItemBackground"
+            android:drawablePadding="12dp"
+            android:gravity="center_vertical"
+            android:minHeight="?attr/listPreferredItemHeight"
+            android:text="@string/switchLocation_add"
+            android:textAppearance="?attr/textAppearanceButton"
+            app:drawableStartCompat="@drawable/ic_add_24dp"
+            />
+
+      </LinearLayout>
+
+    </androidx.core.widget.NestedScrollView>
 
   </com.google.android.material.card.MaterialCardView>
 

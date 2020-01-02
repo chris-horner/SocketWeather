@@ -27,14 +27,15 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
   }
 
   override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-    holder.bind(items[position])
+    holder.bind(items[position], position)
   }
 
   inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
     private val title: TextView = view.findViewById(R.id.switchLocationItem_title)
     private val subtitle: TextView = view.findViewById(R.id.switchLocationItem_subtitle)
-    private val icon: View = view.findViewById(R.id.switchLocationItem_locationIcon)
+    private val locationIcon: View = view.findViewById(R.id.switchLocationItem_locationIcon)
+    private val dropUpIcon: View = view.findViewById(R.id.switchLocationItem_dropUpIcon)
 
     private var item: LocationSelection? = null
 
@@ -42,20 +43,21 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
       view.setOnClickListener { clicksChannel.offer(requireNotNull(item)) }
     }
 
-    fun bind(selection: LocationSelection) {
+    fun bind(selection: LocationSelection, position: Int) {
       item = selection
+      dropUpIcon.isVisible = position == 0
 
       when (selection) {
         is LocationSelection.FollowMe -> {
           title.setText(R.string.switchLocation_followMeTitle)
           subtitle.setText(R.string.switchLocation_followMeSubtitle)
-          icon.isVisible = true
+          locationIcon.isVisible = true
         }
 
         is LocationSelection.Static -> {
           title.text = selection.location.name
           subtitle.text = selection.location.state
-          icon.isVisible = false
+          locationIcon.isVisible = false
         }
 
         is LocationSelection.None -> {

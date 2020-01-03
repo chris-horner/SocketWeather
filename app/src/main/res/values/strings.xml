@@ -6,7 +6,7 @@
   <string name="temperatureFormat">%s°</string>
 
   <string name="chooseLocation_title">Where\'s your weather?</string>
-  <string name="chooseLocation_myLocationButton">Use my location</string>
+  <string name="chooseLocation_myLocationButton">Follow me</string>
   <string name="chooseLocation_searchHint">Search</string>
   <string name="chooseLocation_submissionError">Something went wrong 😕</string>
   <string name="chooseLocation_searchLoading">Loading results…</string>

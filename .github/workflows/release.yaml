@@ -1,7 +1,8 @@
 name: Release
 
 on:
-  push:
+  pull_request:
+    types: [closed]
     branches:
       - 'release/**'
 
@@ -11,6 +12,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Check if PR was merged
+        if: github.event.pull_request.merged != true
+        run: exit 1
+
       - uses: actions/checkout@v1
 
       - name: Set up JDK 1.8

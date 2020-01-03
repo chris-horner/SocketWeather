@@ -33,3 +33,6 @@ jobs:
           socket_weather_alias: ${{ secrets.socket_weather_alias }}
           socket_weather_password: ${{ secrets.socket_weather_password }}
         run: bash ./gradlew publishReleaseBundle
+
+      - name: Update store listing
+        run: bash ./gradlew publishListing

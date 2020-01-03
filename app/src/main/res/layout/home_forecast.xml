@@ -37,7 +37,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginStart="8dp"
-      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.MediumTemp"
       app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
       app:layout_constraintStart_toEndOf="@id/home_feelsLikeTitle"
       tools:text="29.2°"
@@ -48,7 +48,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_marginTop="24dp"
-      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.MediumTemp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintTop_toTopOf="parent"
       tools:text="38°"
@@ -58,7 +58,7 @@
       android:id="@+id/home_lowTemp"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.MediumTemp"
       app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
       app:layout_constraintEnd_toEndOf="parent"
       tools:text="18°"
@@ -98,6 +98,17 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/home_description"
+      />
+
+  <codes.chrishorner.socketweather.home.DateForecastsView
+      android:id="@+id/home_dateForecasts"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:paddingTop="8dp"
+      android:paddingBottom="8dp"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_forecastDivider"
       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

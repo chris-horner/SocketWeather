@@ -27,6 +27,7 @@
   <string name="home_lastUpdated">Updated %s</string>
   <string name="home_justUpdated">Updated just now</string>
   <string name="home_dropdownContentDesc">Switch location dropdown arrow.</string>
+  <string name="home_dateForecastTomorrow">Tomorrow</string>
 
   <string name="switchLocation_followMeTitle">Follow me</string>
   <string name="switchLocation_followMeSubtitle">Forecast at your location</string>

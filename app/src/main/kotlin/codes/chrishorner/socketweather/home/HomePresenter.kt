@@ -1,6 +1,6 @@
 package codes.chrishorner.socketweather.home
 
-import android.content.res.Resources
+import android.content.Context
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
@@ -17,6 +17,7 @@ import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Location
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.NetworkFailed
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import codes.chrishorner.socketweather.home.HomeViewModel.State
+import codes.chrishorner.socketweather.util.formatAsDegrees
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -25,7 +26,6 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 import reactivecircus.flowbinding.android.view.clicks
 import reactivecircus.flowbinding.appcompat.itemClicks
-import java.text.DecimalFormat
 
 class HomePresenter(view: View) {
 
@@ -44,9 +44,9 @@ class HomePresenter(view: View) {
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
   private val lowTemp: TextView = view.findViewById(R.id.home_lowTemp)
   private val description: TextView = view.findViewById(R.id.home_description)
+  private val dateForecastsView: DateForecastsView = view.findViewById(R.id.home_dateForecasts)
 
-  private val res: Resources = view.resources
-  private val decimalFormat = DecimalFormat("0.#")
+  private val context: Context = view.context
 
   val events: Flow<Event>
 
@@ -75,7 +75,7 @@ class HomePresenter(view: View) {
   fun display(state: State) {
     toolbarTitle.text = when (state.currentSelection) {
       is LocationSelection.Static -> state.currentSelection.location.name
-      is LocationSelection.FollowMe -> state.currentLocation?.name ?: res.getString(R.string.home_findingLocation)
+      is LocationSelection.FollowMe -> state.currentLocation?.name ?: context.getString(R.string.home_findingLocation)
       is LocationSelection.None -> throw IllegalArgumentException("Cannot display LocationSelection.None")
     }
 
@@ -84,15 +84,16 @@ class HomePresenter(view: View) {
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
       loading.isVisible = false
       forecastContainer.isVisible = true
-      currentTemp.text = res.getString(R.string.temperatureFormat, forecast.currentTemp.format())
-      feelsLikeTemp.text = res.getString(R.string.temperatureFormat, forecast.tempFeelsLike.format())
-      highTemp.text = res.getString(R.string.temperatureFormat, forecast.highTemp.format())
-      lowTemp.text = res.getString(R.string.temperatureFormat, forecast.lowTemp.format())
+      currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
+      feelsLikeTemp.text = forecast.tempFeelsLike.formatAsDegrees(context)
+      highTemp.text = forecast.highTemp.formatAsDegrees(context)
+      lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
 
       val todayForecast = forecast.dateForecasts[0]
       val descriptionText = todayForecast.extended_text ?: todayForecast.short_text
       description.text = descriptionText
       description.isVisible = descriptionText.isNullOrBlank().not()
+      dateForecastsView.display(forecast.dateForecasts.drop(1))
     }
 
     error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed
@@ -128,7 +129,7 @@ class HomePresenter(view: View) {
 
       if (Duration.between(updateTime, now).toMinutes() > 0) {
         val timeAgoText = DateUtils.getRelativeTimeSpanString(updateTime.toEpochMilli())
-        toolbarSubtitle.text = res.getString(R.string.home_lastUpdated, timeAgoText)
+        toolbarSubtitle.text = context.getString(R.string.home_lastUpdated, timeAgoText)
       } else {
         toolbarSubtitle.setText(R.string.home_justUpdated)
       }
@@ -136,7 +137,4 @@ class HomePresenter(view: View) {
   }
 
   enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }
-
-  private fun Float.format(): String = decimalFormat.format(this)
-  private fun Int.format(): String = decimalFormat.format(this)
 }

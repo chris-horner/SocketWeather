@@ -4,7 +4,10 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
+    android:paddingTop="8dp"
+    android:paddingBottom="8dp"
     android:gravity="center_vertical"
+    android:minHeight="?attr/listPreferredItemHeightSmall"
     android:orientation="horizontal"
     >
 
@@ -12,6 +15,7 @@
       android:id="@+id/dateForecastItem_title"
       android:layout_width="0dp"
       android:layout_height="wrap_content"
+      android:layout_marginEnd="8dp"
       android:layout_weight="1"
       android:ellipsize="end"
       android:lines="1"
@@ -20,7 +24,7 @@
 
   <TextView
       android:id="@+id/dateForecastItem_lowTemp"
-      android:layout_width="wrap_content"
+      android:layout_width="32sp"
       android:layout_height="wrap_content"
       android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
       />
@@ -28,13 +32,16 @@
   <View
       android:layout_width="32dp"
       android:layout_height="4dp"
+      android:layout_marginStart="8dp"
+      android:layout_marginEnd="8dp"
       android:background="@drawable/bg_line"
       />
 
   <TextView
       android:id="@+id/dateForecastItem_highTemp"
-      android:layout_width="wrap_content"
+      android:layout_width="36sp"
       android:layout_height="wrap_content"
+      android:gravity="end"
       android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
       />
 

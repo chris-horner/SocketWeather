@@ -1,4 +1,4 @@
-name: Play publish
+name: CI
 
 on:
   push:

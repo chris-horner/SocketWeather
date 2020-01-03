@@ -3,5 +3,6 @@
 <resources>
 
   <attr name="colorDivider" format="color" />
+  <attr name="colorScrim" format="color" />
 
 </resources>

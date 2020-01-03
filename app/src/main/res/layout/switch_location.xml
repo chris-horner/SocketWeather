@@ -36,6 +36,12 @@
             android:scrollbars="vertical"
             />
 
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?android:attr/listDivider"
+            />
+
         <TextView
             android:id="@+id/switchLocation_addButton"
             android:layout_width="match_parent"

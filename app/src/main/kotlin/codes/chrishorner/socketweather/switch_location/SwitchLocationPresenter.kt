@@ -24,6 +24,7 @@ class SwitchLocationPresenter(view: View, selections: List<LocationSelection>) {
     val adapter = SwitchLocationAdapter(selections)
     recycler.adapter = adapter
     recycler.layoutManager = LinearLayoutManager(view.context)
+    recycler.addItemDecoration(SwitchLocationDecorator(view.context))
 
     val container: View = view.findViewById(R.id.switchLocation_container)
     val addButton: View = view.findViewById(R.id.switchLocation_addButton)

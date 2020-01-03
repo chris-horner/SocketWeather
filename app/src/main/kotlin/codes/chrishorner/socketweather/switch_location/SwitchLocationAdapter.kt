@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.switch_location
 
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
@@ -49,26 +50,30 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
       item = selection
       dropUpIcon.isVisible = position == 0
 
+      val iconDrawable: Drawable? = when {
+        position == 0 -> AppCompatResources.getDrawable(itemView.context, R.drawable.ic_check_circle_outline_24dp)
+        selection is LocationSelection.FollowMe ->
+          AppCompatResources.getDrawable(itemView.context, R.drawable.ic_my_location_24dp)
+        else -> null
+      }
+
+      if (iconDrawable != null) {
+        icon.isVisible = true
+        icon.setImageDrawable(iconDrawable)
+      } else {
+        icon.isVisible = false
+      }
+
       when (selection) {
         is LocationSelection.FollowMe -> {
           title.setText(R.string.switchLocation_followMeTitle)
           subtitle.setText(R.string.switchLocation_followMeSubtitle)
-          val iconDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_my_location_24dp)
-          icon.isVisible = true
           icon.setImageDrawable(iconDrawable)
         }
 
         is LocationSelection.Static -> {
           title.text = selection.location.name
           subtitle.text = selection.location.state
-
-          if (position == 0) {
-            val iconDrawable = AppCompatResources.getDrawable(itemView.context, R.drawable.ic_check_circle_outline_24dp)
-            icon.isVisible = true
-            icon.setImageDrawable(iconDrawable)
-          } else {
-            icon.isVisible = false
-          }
         }
 
         is LocationSelection.None -> {

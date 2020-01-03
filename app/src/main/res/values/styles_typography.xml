@@ -57,7 +57,7 @@
 
   <style name="TextAppearance.SocketWeather.Caption" parent="TextAppearance.MaterialComponents.Caption">
     <item name="fontFamily">@font/rubik_regular</item>
-    <item name="android:textSize">10sp</item>
+    <item name="android:textSize">12sp</item>
   </style>
 
   <style name="TextAppearance.SocketWeather.Overline" parent="TextAppearance.MaterialComponents.Overline">

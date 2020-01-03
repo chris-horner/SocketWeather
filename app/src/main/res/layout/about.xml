@@ -1,9 +1,120 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<FrameLayout
+<androidx.coordinatorlayout.widget.CoordinatorLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     >
 
-</FrameLayout>
+  <com.google.android.material.appbar.AppBarLayout
+      android:id="@+id/about_appBar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:background="?android:attr/windowBackground"
+      app:liftOnScroll="true"
+      >
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/about_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:navigationIcon="@drawable/ic_arrow_back_24dp"
+        app:title="@string/about_title"
+        />
+
+  </com.google.android.material.appbar.AppBarLayout>
+
+  <androidx.core.widget.NestedScrollView
+      android:id="@+id/about_scroller"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:fillViewport="true"
+      app:layout_behavior="@string/appbar_scrolling_view_behavior"
+      >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:orientation="vertical"
+        >
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:text="@string/appName"
+          android:textAppearance="?attr/textAppearanceHeadline5"
+          />
+
+      <TextView
+          android:id="@+id/about_versionName"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:textAppearance="?attr/textAppearanceSubtitle2"
+          />
+
+      <com.google.android.material.textview.MaterialTextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:padding="16dp"
+          android:text="@string/about_body"
+          android:textAppearance="@style/TextAppearance.SocketWeather.Body1"
+          app:lineHeight="22sp"
+          />
+
+      <TextView
+          android:id="@+id/about_bomButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:background="?attr/selectableItemBackground"
+          android:drawablePadding="16dp"
+          android:gravity="center_vertical"
+          android:minHeight="?attr/listPreferredItemHeight"
+          android:text="@string/about_bomWebsite"
+          android:textAppearance="?attr/textAppearanceButton"
+          app:drawableStartCompat="@drawable/ic_sunny_24dp"
+          />
+
+      <TextView
+          android:id="@+id/about_sourceButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:background="?attr/selectableItemBackground"
+          android:drawablePadding="16dp"
+          android:gravity="center_vertical"
+          android:minHeight="?attr/listPreferredItemHeight"
+          android:text="@string/about_source"
+          android:textAppearance="?attr/textAppearanceButton"
+          app:drawableStartCompat="@drawable/ic_github_24dp"
+          />
+
+      <TextView
+          android:id="@+id/about_websiteButton"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingStart="16dp"
+          android:paddingEnd="16dp"
+          android:background="?attr/selectableItemBackground"
+          android:drawablePadding="16dp"
+          android:gravity="center_vertical"
+          android:minHeight="?attr/listPreferredItemHeight"
+          android:text="@string/about_chrisWebsite"
+          android:textAppearance="?attr/textAppearanceButton"
+          app:drawableStartCompat="@drawable/ic_web_24dp"
+          />
+
+    </LinearLayout>
+
+  </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

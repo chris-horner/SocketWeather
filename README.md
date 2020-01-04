@@ -3,7 +3,7 @@
 <img src="app/src/main/res/mipmap-xxxhdpi/ic_launcher_round.png" title="Launcher icon" align="left" width="72" height="72">
 
 Inspired by [Shifty Jelly's](https://blog.shiftyjelly.com/) retired
-[Pocket Weather](https://blog.shiftyjelly.com/2018/08/31/everything-that-begins-must-also-end/). This app makes use of
+[Pocket Weather](https://blog.shiftyjelly.com/2018/08/31/everything-that-begins-must-also-end/), this app makes use of
 a completely undocumented API from Australia's [Bureau of Meteorology](https://weather.bom.gov.au). It might break
 at a moment's notice, but while it's up we can enjoy a simple weather app. It's available on [Google Play](https://play.google.com/store/apps/details?id=codes.chrishorner.socketweather).
 
@@ -13,7 +13,7 @@ This app is still in the early stages of development. The code, UI, and feature 
 
 ## FAQs
 
-### What the API are you hitting?
+### What API are you hitting?
 
 I stumbled upon https://api.weather.bom.gov.au/v1. All requests and responses have been modelled after poking and prodding that endpoint.
 

@@ -32,6 +32,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scanReduce
 import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.supervisorScope
 import org.threeten.bp.Clock
 import org.threeten.bp.Instant
 import timber.log.Timber
@@ -122,7 +123,7 @@ class HomeViewModel(
     scope.cancel()
   }
 
-  private suspend fun loadForecast(locationUpdate: LocationUpdate.Loaded): State = coroutineScope {
+  private suspend fun loadForecast(locationUpdate: LocationUpdate.Loaded): State = supervisorScope {
     try {
       val geohash: String = locationUpdate.location.geohash
       // Request observations and date forecasts simultaneously.
@@ -154,7 +155,7 @@ class HomeViewModel(
           dateForecasts = dateForecasts
       )
 
-      return@coroutineScope State(
+      return@supervisorScope State(
           currentSelection = locationUpdate.selection,
           currentLocation = locationUpdate.location,
           forecast = forecast,
@@ -162,7 +163,7 @@ class HomeViewModel(
       )
     } catch (e: Exception) {
       Timber.e(e, "Failed to get forecasts for %s", locationUpdate.location.name)
-      return@coroutineScope State(
+      return@supervisorScope State(
           currentSelection = locationUpdate.selection,
           currentLocation = locationUpdate.location,
           loadingStatus = NetworkFailed

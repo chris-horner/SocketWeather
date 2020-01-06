@@ -82,7 +82,6 @@ class HomePresenter(view: View) {
     val forecast: Forecast? = state.forecast
 
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
-      loading.isVisible = false
       forecastContainer.isVisible = true
       currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
       feelsLikeTemp.text = forecast.tempFeelsLike.formatAsDegrees(context)
@@ -94,6 +93,8 @@ class HomePresenter(view: View) {
       description.text = descriptionText
       description.isVisible = descriptionText.isNullOrBlank().not()
       dateForecastsView.display(forecast.dateForecasts.drop(1))
+    } else {
+      forecastContainer.isVisible = false
     }
 
     error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed

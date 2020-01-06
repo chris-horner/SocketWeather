@@ -4,7 +4,7 @@ apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 0
 def versionMinor = 5
-def versionPatch = 1
+def versionPatch = 2
 
 android {
   buildToolsVersion versions.android_build_tools

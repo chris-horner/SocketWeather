@@ -1,1 +1,2 @@
-Initial release of Socket Weather.
+Fixed a crash when reloading forecast.
+Fixed loading message displaying over forecasts.

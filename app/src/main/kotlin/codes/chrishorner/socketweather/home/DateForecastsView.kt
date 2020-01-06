@@ -3,11 +3,13 @@ package codes.chrishorner.socketweather.home
 import android.content.Context
 import android.util.AttributeSet
 import android.view.View
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.util.formatAsDegrees
+import codes.chrishorner.socketweather.util.getWeatherIconFor
 import codes.chrishorner.socketweather.util.inflate
 import org.threeten.bp.LocalDate
 import org.threeten.bp.ZoneId
@@ -31,6 +33,7 @@ class DateForecastsView(context: Context, attrs: AttributeSet) : LinearLayout(co
     for (forecast in forecasts) {
       val view: View = inflate(R.layout.date_forecast_item)
       val title: TextView = view.findViewById(R.id.dateForecastItem_title)
+      val icon: ImageView = view.findViewById(R.id.dateForecastItem_icon)
       val highTemp: TextView = view.findViewById(R.id.dateForecastItem_highTemp)
       val lowTemp: TextView = view.findViewById(R.id.dateForecastItem_lowTemp)
 
@@ -43,6 +46,7 @@ class DateForecastsView(context: Context, attrs: AttributeSet) : LinearLayout(co
       }
 
       title.text = titleText
+      icon.setImageDrawable(context.getWeatherIconFor(forecast.icon_descriptor, false))
       highTemp.text = forecast.temp_max.formatAsDegrees(context)
       lowTemp.text = forecast.temp_min?.formatAsDegrees(context) ?: "--"
       addView(view)

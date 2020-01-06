@@ -1,2 +1,3 @@
 Fixed a crash when reloading forecast.
 Fixed loading message displaying over forecasts.
+Added icons for weather conditions.

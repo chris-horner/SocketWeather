@@ -3,6 +3,7 @@ package codes.chrishorner.socketweather.home
 import android.content.Context
 import android.text.format.DateUtils
 import android.view.View
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -18,6 +19,7 @@ import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.NetworkF
 import codes.chrishorner.socketweather.home.HomeViewModel.LoadingStatus.Success
 import codes.chrishorner.socketweather.home.HomeViewModel.State
 import codes.chrishorner.socketweather.util.formatAsDegrees
+import codes.chrishorner.socketweather.util.getWeatherIconFor
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -39,6 +41,7 @@ class HomePresenter(view: View) {
   private val error: View = view.findViewById(R.id.home_error)
   private val errorMessage: TextView = view.findViewById(R.id.home_errorMessage)
   private val retryButton: View = view.findViewById(R.id.home_retryButton)
+  private val currentIcon: ImageView = view.findViewById(R.id.home_currentIcon)
   private val currentTemp: TextView = view.findViewById(R.id.home_currentTemp)
   private val feelsLikeTemp: TextView = view.findViewById(R.id.home_feelsLikeTemp)
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
@@ -83,6 +86,7 @@ class HomePresenter(view: View) {
 
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
       forecastContainer.isVisible = true
+      currentIcon.setImageDrawable(context.getWeatherIconFor(forecast.iconDescriptor, forecast.night))
       currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
       feelsLikeTemp.text = forecast.tempFeelsLike.formatAsDegrees(context)
       highTemp.text = forecast.highTemp.formatAsDegrees(context)

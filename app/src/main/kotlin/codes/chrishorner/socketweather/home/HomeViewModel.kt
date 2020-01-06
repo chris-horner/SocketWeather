@@ -16,7 +16,6 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
@@ -148,6 +147,8 @@ class HomeViewModel(
       val forecast = Forecast(
           updateTime = Instant.now(clock),
           location = locationUpdate.location,
+          iconDescriptor = dateForecasts[0].icon_descriptor,
+          night = currentInfo.is_night,
           currentTemp = observations.temp,
           tempFeelsLike = observations.temp_feels_like,
           highTemp = dateForecasts[0].temp_max,

@@ -64,8 +64,9 @@
     <item name="fontFamily">@font/zilla_slab_medium</item>
   </style>
 
-  <style name="TextAppearance.SocketWeather.LargeTemp" parent="TextAppearance.MaterialComponents.Headline1">
+  <style name="TextAppearance.SocketWeather.LargeTemp" parent="TextAppearance.MaterialComponents.Headline2">
     <item name="fontFamily">@font/roboto_slab_regular</item>
+    <item name="android:textSize">64sp</item>
     <item name="android:textColor">?android:attr/textColorPrimary</item>
   </style>
 

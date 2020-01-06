@@ -12,6 +12,8 @@ sealed class LocationSelection {
 data class Forecast(
     val updateTime: Instant,
     val location: Location,
+    val iconDescriptor: String,
+    val night: Boolean,
     val currentTemp: Float,
     val tempFeelsLike: Float,
     val highTemp: Int,

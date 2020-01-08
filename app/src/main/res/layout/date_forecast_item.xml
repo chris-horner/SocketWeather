@@ -22,6 +22,17 @@
       android:textAppearance="?attr/textAppearanceSubtitle1"
       />
 
+  <TextView
+      android:id="@+id/dateForecastItem_rainChance"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginEnd="8dp"
+      android:gravity="center_vertical"
+      android:lines="1"
+      android:textAppearance="?attr/textAppearanceSubtitle2"
+      android:visibility="gone"
+      />
+
   <ImageView
       android:id="@+id/dateForecastItem_icon"
       android:layout_width="wrap_content"

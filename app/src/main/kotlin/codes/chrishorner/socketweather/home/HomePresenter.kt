@@ -85,6 +85,7 @@ class HomePresenter(view: View) {
     val forecast: Forecast? = state.forecast
 
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
+      // TODO: Consider moving all this formatting somewhere more appropriate.
       forecastContainer.isVisible = true
       currentIcon.setImageDrawable(context.getWeatherIconFor(forecast.iconDescriptor, forecast.night))
       currentTemp.text = forecast.currentTemp.formatAsDegrees(context)

@@ -4,6 +4,7 @@
 
   <string name="appName">Socket Weather</string>
   <string name="temperatureFormat">%s°</string>
+  <string name="percentFormat">%d%%</string>
 
   <string name="chooseLocation_title">Where\'s your weather?</string>
   <string name="chooseLocation_myLocationButton">Follow me</string>

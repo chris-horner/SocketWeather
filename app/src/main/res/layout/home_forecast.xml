@@ -19,6 +19,7 @@
       android:layout_width="72dp"
       android:layout_height="72dp"
       android:contentDescription="@string/home_currentIconDesc"
+      android:tint="?attr/colorOnBackground"
       app:layout_constraintBottom_toBottomOf="@id/home_currentTemp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"

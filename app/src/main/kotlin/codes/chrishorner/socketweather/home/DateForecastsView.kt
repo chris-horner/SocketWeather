@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.util.formatAsDegrees
@@ -43,6 +44,12 @@ class DateForecastsView(context: Context, attrs: AttributeSet) : LinearLayout(co
         resources.getString(R.string.home_dateForecastTomorrow)
       } else {
         date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+      }
+
+      if (forecast.rain.chance > 0 && forecast.rain.amount.max ?: 0f >= 1f) {
+        val rainChance: TextView = view.findViewById(R.id.dateForecastItem_rainChance)
+        rainChance.isVisible = true
+        rainChance.text = context.getString(R.string.percentFormat, forecast.rain.chance)
       }
 
       title.text = titleText

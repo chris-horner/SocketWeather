@@ -119,4 +119,5 @@ dependencies {
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-okhttp-logger:${versions.debugdrawer}"
   testImplementation "org.threeten:threetenbp:${versions.threetenbp}"
   testImplementation "junit:junit:${versions.junit}"
+  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
 }

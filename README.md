@@ -24,11 +24,3 @@ Not here. The codebase actually unironically used something similar to [FragNums
 ### What's with all the weird `Flow` stuff?
 
 This app was used as a means to learn how to use Kotlin's [Flow](https://kotlinlang.org/docs/reference/coroutines/flow.html) and coroutines. It's quite possible that there are much better ways to achieve certain things. Feel free to submit a PR with any improvements.
-
-### Couldn't you architect this better?
-
-Sure, but that will come. The initial priority was getting something out quickly.
-
-### Where are your tests?
-
-Right now the app's codebase is in a pretty volatile state. I don't want to have to additionally maintain tests. Once I've got more of an idea of what the app should be I'll be adding them.

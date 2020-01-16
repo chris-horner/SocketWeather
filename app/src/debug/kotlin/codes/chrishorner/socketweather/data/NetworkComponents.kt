@@ -12,7 +12,7 @@ import retrofit2.create
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 
-class NetworkComponents private constructor(app: Application) {
+class NetworkComponents(app: Application, locationChoices: LocationChoices) {
 
   val api: WeatherApi
   val debugRetrofitConfig: DebugRetrofitConfig
@@ -28,7 +28,7 @@ class NetworkComponents private constructor(app: Application) {
     debugRetrofitConfig.doOnEndpointChange { _, _ ->
       // Allow endpoint changes to be written to disk synchronously.
       StrictMode.allowThreadDiskWrites()
-      LocationChoices.get().clear()
+      locationChoices.clear()
     }
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
@@ -50,18 +50,6 @@ class NetworkComponents private constructor(app: Application) {
           .let { MockWeatherApi(it) }
     } else {
       retrofit.create()
-    }
-  }
-
-  companion object {
-    private var instance: NetworkComponents? = null
-
-    fun init(app: Application) {
-      instance = NetworkComponents(app)
-    }
-
-    fun get(): NetworkComponents {
-      return requireNotNull(instance) { "NetworkComponents.init(app) must be called first." }
     }
   }
 }

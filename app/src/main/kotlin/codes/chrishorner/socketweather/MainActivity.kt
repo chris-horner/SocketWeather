@@ -31,17 +31,29 @@ class MainActivity : AppCompatActivity() {
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      if (LocationChoices.get().getCurrentSelection() == LocationSelection.None) {
+      val locationChoices: LocationChoices = getLocationChoices()
+
+      if (locationChoices.getCurrentSelection() == LocationSelection.None) {
         router.setRoot(
             ChooseLocationController(
                 displayAsRoot = true,
-                showFollowMe = !LocationChoices.get().hasFollowMeSaved()
+                showFollowMe = !locationChoices.hasFollowMeSaved()
             ).asTransaction()
         )
       } else {
         router.setRoot(HomeController().asTransaction())
       }
     }
+  }
+
+  override fun onStart() {
+    super.onStart()
+    getDeviceLocator().enable()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    getDeviceLocator().disable()
   }
 
   override fun onBackPressed() {

@@ -5,9 +5,9 @@ import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutController
-import codes.chrishorner.socketweather.data.LocationChoices
-import codes.chrishorner.socketweather.data.NetworkComponents
-import codes.chrishorner.socketweather.data.getDeviceLocationUpdates
+import codes.chrishorner.socketweather.getDeviceLocator
+import codes.chrishorner.socketweather.getLocationChoices
+import codes.chrishorner.socketweather.getNetworkComponents
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
@@ -36,15 +36,15 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
   override fun onCreateViewModel(context: Context): HomeViewModel {
     return HomeViewModel(
-        NetworkComponents.get().api,
+        context.getNetworkComponents().api,
         Clock.systemDefaultZone(),
-        LocationChoices.get().observeCurrentSelection(),
-        getDeviceLocationUpdates(context)
+        context.getLocationChoices().observeCurrentSelection(),
+        context.getDeviceLocator().observeDeviceLocation()
     )
   }
 
   override fun onAttach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
-    viewModel.enableLocationUpdates(true)
+
     viewModel.observeStates().onEach { presenter.display(it) }.launchIn(viewScope)
 
     presenter.events
@@ -78,10 +78,6 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
         .filter { it.toMinutes() > 1 }
         .onEach { viewModel.forceRefresh() }
         .launchIn(viewScope)
-  }
-
-  override fun onDetach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
-    viewModel.enableLocationUpdates(false)
   }
 
   override fun onDestroy(viewModel: HomeViewModel?) {

@@ -4,8 +4,6 @@ import android.app.Application
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
-import codes.chrishorner.socketweather.data.LocationChoices
-import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import com.jakewharton.threetenabp.AndroidThreeTen
 import timber.log.Timber
@@ -33,8 +31,8 @@ class SocketWeatherApp : Application() {
     // needed for the whole app to do its thing.
     allowMainThreadDiskOperations {
       AndroidThreeTen.init(this)
-      NetworkComponents.init(this)
-      LocationChoices.init(this)
+      getNetworkComponents()
+      getLocationChoices()
     }
   }
 }

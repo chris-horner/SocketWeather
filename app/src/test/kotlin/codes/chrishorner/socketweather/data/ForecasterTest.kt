@@ -38,9 +38,8 @@ class ForecasterTest {
     val locationSelection = LocationSelection.Static(testApi.location1)
     val selections = flowOf(locationSelection)
     val deviceLocations = emptyFlow<DeviceLocation>()
-    val refreshRequests = flowOf(Unit)
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations, refreshRequests)
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -59,9 +58,8 @@ class ForecasterTest {
 
     val selections = flowOf(LocationSelection.FollowMe)
     val deviceLocationChannel = ConflatedBroadcastChannel(DeviceLocation(1.0, 1.0))
-    val refreshRequests = flowOf(Unit)
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocationChannel.asFlow(), refreshRequests)
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocationChannel.asFlow())
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -88,9 +86,8 @@ class ForecasterTest {
 
     val selections = flowOf(LocationSelection.Static(testApi.location1))
     val deviceLocations = emptyFlow<DeviceLocation>()
-    val refreshRequestChannel = ConflatedBroadcastChannel(Unit)
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations, refreshRequestChannel.asFlow())
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -99,9 +96,9 @@ class ForecasterTest {
     assert(states[0].loadingStatus == Loading && states[0].forecast == null)
     assert(states[1].loadingStatus == Success && states[1].forecast != null)
 
-    refreshRequestChannel.send(Unit)
+    forecaster.refresh()
 
-    // After a refresh request we should again transition from
+    // After a refresh we should again transition from
     // Loading -> Success
     // However along with `Loading` it should contain a non-null Forecast.
     assert(states[2].loadingStatus == Loading && states[2].forecast != null)
@@ -114,9 +111,8 @@ class ForecasterTest {
 
     val selectionChannel = ConflatedBroadcastChannel(LocationSelection.Static(testApi.location1))
     val deviceLocations = emptyFlow<DeviceLocation>()
-    val refreshRequests = flowOf(Unit)
 
-    val forecaster = Forecaster(fixedClock, testApi, selectionChannel.asFlow(), deviceLocations, refreshRequests)
+    val forecaster = Forecaster(fixedClock, testApi, selectionChannel.asFlow(), deviceLocations)
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -139,12 +135,11 @@ class ForecasterTest {
   @Test fun `device location errors produce error states`() = runBlockingTest {
 
     val selections = flowOf(LocationSelection.FollowMe)
-    val refreshRequestChannel = ConflatedBroadcastChannel(Unit)
 
     var failDeviceLocation = true
     val deviceLocations = flow { if (failDeviceLocation) throw RuntimeException() else emit(DeviceLocation(1.0, 1.0)) }
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations, refreshRequestChannel.asFlow())
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -154,9 +149,9 @@ class ForecasterTest {
     assert(states[1].loadingStatus == LocationFailed)
 
     failDeviceLocation = false
-    refreshRequestChannel.send(Unit)
+    forecaster.refresh()
 
-    // Now that DeviceLocation should succeed, after requesting a refresh our states should be
+    // Now that DeviceLocation should succeed, after a refresh our states should be
     // Loading location -> Loading forecast -> Success
     assert(states[2].loadingStatus == Loading)
     assert(states[3].loadingStatus == Loading)
@@ -169,11 +164,10 @@ class ForecasterTest {
 
     val selections = flowOf(LocationSelection.Static(testApi.location1))
     val deviceLocations = emptyFlow<DeviceLocation>()
-    val refreshRequestChannel = ConflatedBroadcastChannel(Unit)
 
     testApi.failRequests(true)
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations, refreshRequestChannel.asFlow())
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
     val states = mutableListOf<ForecastState>()
     val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
 
@@ -183,9 +177,9 @@ class ForecasterTest {
     assert(states[1].loadingStatus == NetworkFailed)
 
     testApi.failRequests(false)
-    refreshRequestChannel.send(Unit)
+    forecaster.refresh()
 
-    // With network requests passing, a refresh request should transition us from
+    // With network requests passing, a refresh should transition us from
     // Loading -> Success
     assert(states[2].loadingStatus == Loading)
     assert(states[3].loadingStatus == Success)

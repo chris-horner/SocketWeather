@@ -15,8 +15,8 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
-import codes.chrishorner.socketweather.data.LocationChoices
-import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.getLocationChoices
+import codes.chrishorner.socketweather.getNetworkComponents
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
@@ -42,8 +42,8 @@ class ChooseLocationController(
   override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
       args.getBoolean("displayAsRoot"),
       args.getBoolean("showFollowMe"),
-      NetworkComponents.get().api,
-      LocationChoices.get()
+      context.getNetworkComponents().api,
+      context.getLocationChoices()
   )
 
   override fun onCreatePresenter(view: View): ChooseLocationPresenter = ChooseLocationPresenter(view)

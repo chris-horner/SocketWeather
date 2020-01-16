@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
@@ -46,15 +45,10 @@ class HomeViewModel(
   private val scope = MainScope()
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
   private val statesChannel = ConflatedBroadcastChannel<State>()
-  // Whether or not a subscription to device location updates should be maintained.
-  // This allows location updates to be disabled when the UI is not displayed.
-  private val locationUpdatesToggleChannel = ConflatedBroadcastChannel(false)
 
   init {
 
-    val followMeUpdates: Flow<Location> = locationUpdatesToggleChannel.asFlow()
-        .flatMapLatest { enabled -> if (enabled) deviceLocationUpdates else emptyFlow() }
-        .distinctUntilChanged()
+    val followMeUpdates: Flow<Location> = deviceLocationUpdates
         .mapLatest { api.searchForLocation("${it.latitude},${it.longitude}") }
         .map { api.getLocation(it[0].geohash) }
         .distinctUntilChanged()
@@ -106,10 +100,6 @@ class HomeViewModel(
         }
 
     states.onEach { statesChannel.offer(it) }.launchIn(scope)
-  }
-
-  fun enableLocationUpdates(enable: Boolean) {
-    locationUpdatesToggleChannel.offer(enable)
   }
 
   fun observeStates(): Flow<State> = statesChannel.asFlow()

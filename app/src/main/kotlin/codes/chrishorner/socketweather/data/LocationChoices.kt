@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.withContext
 import java.io.File
 
-class LocationChoices private constructor(app: Application) {
+class LocationChoices(app: Application) {
 
   private val savedSelectionsChannel = ConflatedBroadcastChannel<Set<LocationSelection>>()
   private val currentSelectionChannel = ConflatedBroadcastChannel<LocationSelection>()
@@ -63,17 +63,5 @@ class LocationChoices private constructor(app: Application) {
   fun clear() {
     savedSelections.delete()
     currentSelection.delete()
-  }
-
-  companion object {
-    private var instance: LocationChoices? = null
-
-    fun init(app: Application) {
-      instance = LocationChoices(app)
-    }
-
-    fun get(): LocationChoices {
-      return requireNotNull(instance) { "LocationChoices.init(app) must be called first." }
-    }
   }
 }

@@ -19,7 +19,7 @@ object BuildTypeConfig {
     // Temporarily allow disk operations on main thread to allow debug drawer
     // modules to do their thing.
     allowMainThreadDiskOperations {
-      val networkComponents: NetworkComponents = NetworkComponents.get()
+      val networkComponents: NetworkComponents = activity.getNetworkComponents()
       drawerBuilder
           .addSectionTitle("Network")
           .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))

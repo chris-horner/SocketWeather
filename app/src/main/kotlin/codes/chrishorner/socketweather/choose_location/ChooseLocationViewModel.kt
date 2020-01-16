@@ -80,6 +80,7 @@ class ChooseLocationViewModel(
         locationChoices.saveAndSelect(LocationSelection.Static(location))
         eventsChannel.offer(SubmissionSuccess)
       } catch (e: Exception) {
+        Timber.e(e, "Failed to select location.")
         eventsChannel.offer(SubmissionError)
       }
 

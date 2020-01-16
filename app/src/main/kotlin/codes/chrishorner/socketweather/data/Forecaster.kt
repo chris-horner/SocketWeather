@@ -7,6 +7,7 @@ import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BroadcastChannel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.broadcastIn
@@ -29,18 +30,22 @@ class Forecaster(
     clock: Clock,
     api: WeatherApi,
     locationSelections: Flow<LocationSelection>,
-    deviceLocations: Flow<DeviceLocation>,
-    refreshRequests: Flow<Unit>
+    deviceLocations: Flow<DeviceLocation>
 ) {
 
-  private val channel: BroadcastChannel<ForecastState>
+  private val stateChannel: BroadcastChannel<ForecastState>
+  private val refreshChannel = ConflatedBroadcastChannel(Unit)
 
   init {
-    val flow = observeForecastStates(clock, api, locationSelections, deviceLocations, refreshRequests)
-    channel = flow.broadcastIn(MainScope())
+    val flow = observeForecastStates(clock, api, locationSelections, deviceLocations, refreshChannel.asFlow())
+    stateChannel = flow.broadcastIn(MainScope())
   }
 
-  fun observeForecasts(): Flow<ForecastState> = channel.asFlow()
+  fun observeForecasts(): Flow<ForecastState> = stateChannel.asFlow()
+
+  fun refresh() {
+    refreshChannel.offer(Unit)
+  }
 }
 
 private fun observeForecastStates(

@@ -93,7 +93,14 @@ object ControllerLeakListener : ControllerChangeListener {
     val objectWatcher = AppWatcher.objectWatcher
     val fromView: View? = from?.view
 
-    if (handler.removesFromViewOnPush() && fromView != null) objectWatcher.watch(fromView)
-    if (!isPush && from != null && from.isDestroyed) objectWatcher.watch(from)
+    if (handler.removesFromViewOnPush() && fromView != null) objectWatcher.watch(
+        fromView,
+        "View should be cleared when navigated away from"
+    )
+
+    if (!isPush && from != null && from.isDestroyed) objectWatcher.watch(
+        from,
+        "Controller should be destroyed and cleared"
+    )
   }
 }

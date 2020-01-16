@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutController
 import codes.chrishorner.socketweather.getDeviceLocator
+import codes.chrishorner.socketweather.getForecaster
 import codes.chrishorner.socketweather.getLocationChoices
 import codes.chrishorner.socketweather.getNetworkComponents
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
@@ -34,14 +35,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
   override fun onCreatePresenter(view: View): HomePresenter = HomePresenter(view)
 
-  override fun onCreateViewModel(context: Context): HomeViewModel {
-    return HomeViewModel(
-        context.getNetworkComponents().api,
-        Clock.systemDefaultZone(),
-        context.getLocationChoices().observeCurrentSelection(),
-        context.getDeviceLocator().observeDeviceLocation()
-    )
-  }
+  override fun onCreateViewModel(context: Context): HomeViewModel = HomeViewModel(context.getForecaster())
 
   override fun onAttach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
 
@@ -70,7 +64,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
       }
     }
 
-    // TODO: Move this logic into some kind of repository.
+    // TODO: Move this logic into Forecaster
     // Refresh if we're displaying a forecast more than 1 minute old.
     viewModel.observeStates()
         .mapNotNull { it.forecast }
@@ -78,9 +72,5 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
         .filter { it.toMinutes() > 1 }
         .onEach { viewModel.forceRefresh() }
         .launchIn(viewScope)
-  }
-
-  override fun onDestroy(viewModel: HomeViewModel?) {
-    viewModel?.destroy()
   }
 }

@@ -33,8 +33,6 @@ class LocationChoices(app: Application) {
     currentSelectionChannel.offer(locationSelection ?: LocationSelection.None)
   }
 
-  fun observeSavedSelections(): Flow<Set<LocationSelection>> = savedSelectionsChannel.asFlow()
-
   fun observeCurrentSelection(): Flow<LocationSelection> = currentSelectionChannel.asFlow()
 
   fun getSavedSelections(): Set<LocationSelection> = savedSelectionsChannel.value
@@ -55,7 +53,7 @@ class LocationChoices(app: Application) {
 
   suspend fun select(selection: LocationSelection) {
     withContext(Dispatchers.IO) {
-      savedSelections.writeValue(selection)
+      currentSelection.writeValue(selection)
       currentSelectionChannel.offer(selection)
     }
   }

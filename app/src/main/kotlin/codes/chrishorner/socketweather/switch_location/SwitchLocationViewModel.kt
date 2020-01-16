@@ -16,9 +16,9 @@ class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
 
   fun observeCloseEvents(): Flow<Unit> = closeEvents.asFlow()
 
-  fun select(locationSelection: LocationSelection) {
+  fun select(selection: LocationSelection) {
     scope.launch {
-      locationChoices.saveAndSelect(locationSelection)
+      locationChoices.select(selection)
       closeEvents.send(Unit)
     }
   }

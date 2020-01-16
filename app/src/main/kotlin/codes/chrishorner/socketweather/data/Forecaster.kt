@@ -13,11 +13,14 @@ import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.broadcastIn
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapLatest
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.scanReduce
 import kotlinx.coroutines.flow.transformLatest
@@ -33,12 +36,12 @@ class Forecaster(
     deviceLocations: Flow<DeviceLocation>
 ) {
 
-  private val stateChannel: BroadcastChannel<ForecastState>
+  private val stateChannel = ConflatedBroadcastChannel<ForecastState>()
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
 
   init {
     val flow = observeForecastStates(clock, api, locationSelections, deviceLocations, refreshChannel.asFlow())
-    stateChannel = flow.broadcastIn(MainScope())
+    flow.onEach { stateChannel.send(it) }.launchIn(MainScope())
   }
 
   fun observeForecasts(): Flow<ForecastState> = stateChannel.asFlow()

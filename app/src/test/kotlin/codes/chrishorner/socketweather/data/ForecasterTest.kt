@@ -7,11 +7,9 @@ import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.Rule
 import org.junit.Test
@@ -180,6 +178,28 @@ class ForecasterTest {
     // When refreshing, we should transition from `Loading` -> `Success`.
     assert(states[1].loadingStatus == Loading)
     assert(states[2].loadingStatus == Success)
+
+    states.dispose()
+  }
+
+  @Test fun `refresh requests for same location keep forecast`() = runBlockingTest {
+
+    val selections = flowOf(LocationSelection.FollowMe)
+    val deviceLocationChannel = ConflatedBroadcastChannel(DeviceLocation(1.0, 1.0))
+
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocationChannel.asFlow())
+    val states = forecaster.observeForecasts().test(this)
+
+    // Initially we should be displaying `Success` with location1's forecast.
+    assertThat(states[0].loadingStatus).isEqualTo(Success)
+
+    // Request a refresh.
+    forecaster.refresh()
+
+    // The next state emitted should have a status of `Loading` and a non-null forecast,
+    // since our location hasn't changed.
+    assertThat(states[1].loadingStatus).isEqualTo(Loading)
+    assertThat(states[1].forecast).isNotNull()
 
     states.dispose()
   }

@@ -1,19 +1,17 @@
 package codes.chrishorner.socketweather.data
 
+import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Loading
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.LocationFailed
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.NetworkFailed
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.broadcastIn
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flowOf
@@ -39,12 +37,28 @@ class Forecaster(
   private val stateChannel = ConflatedBroadcastChannel<ForecastState>()
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
 
-  init {
-    val flow = observeForecastStates(clock, api, locationSelections, deviceLocations, refreshChannel.asFlow())
-    flow.onEach { stateChannel.send(it) }.launchIn(MainScope())
-  }
+  private val stateFlow: Flow<ForecastState> = observeForecastStates(
+      clock,
+      api,
+      locationSelections,
+      deviceLocations,
+      refreshChannel.asFlow()
+  )
 
-  fun observeForecasts(): Flow<ForecastState> = stateChannel.asFlow()
+  private var subscribed = false
+
+  @MainThread
+  fun observeForecasts(): Flow<ForecastState> {
+    // Remove these shenanigans once Flows are able to be multicast.
+    val flow = stateChannel.asFlow()
+
+    if (!subscribed) {
+      stateFlow.onEach { stateChannel.send(it) }.launchIn(MainScope())
+      subscribed = true
+    }
+
+    return flow
+  }
 
   fun refresh() {
     refreshChannel.offer(Unit)

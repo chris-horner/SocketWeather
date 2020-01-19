@@ -4,6 +4,7 @@ import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Loading
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.LocationFailed
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.NetworkFailed
 import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.collect
@@ -40,18 +41,13 @@ class ForecasterTest {
     val deviceLocations = emptyFlow<DeviceLocation>()
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // The first state emitted should be `Loading`.
-    assert(states[0].loadingStatus == Loading)
-    assert(states[0].forecast == null)
+    // The emitted emitted state should be `Success` with a non-null forecast.
+    assertThat(states[0].loadingStatus).isEqualTo(Success)
+    assertThat(states[0].forecast).isNotNull()
 
-    // The second state emitted should be `Success` with a non-null Forecast.
-    assert(states[1].loadingStatus == Success)
-    assert(states[1].forecast != null)
-
-    job.cancel()
+    states.dispose()
   }
 
   @Test fun `FollowMe location updates produce new forecasts`() = runBlockingTest {
@@ -60,26 +56,27 @@ class ForecasterTest {
     val deviceLocationChannel = ConflatedBroadcastChannel(DeviceLocation(1.0, 1.0))
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocationChannel.asFlow())
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // The first sequence of updates should be
-    // Loading -> Loading -> Success
-    // Determining the location -> Retrieving the forecast -> Success
-    assert(states[0].loadingStatus == Loading && states[0].location == null)
-    assert(states[1].loadingStatus == Loading && states[1].location == testApi.location1)
-    assert(states[2].loadingStatus == Success && states[2].forecast != null)
+    // Initially we should be displaying `Success` with location1's forecast.
+    assertThat(states[0].loadingStatus).isEqualTo(Success)
+    assertThat(states[0].location).isEqualTo(testApi.location1)
+    assertThat(states[0].forecast).isNotNull()
 
     // Next we pretend to be the device providing an updated location.
     deviceLocationChannel.send(DeviceLocation(2.0, 2.0))
 
-    // The second sequence of updates should be
-    // Loading -> Success
-    // Retrieving the forecast -> Success
-    assert(states[3].loadingStatus == Loading && states[3].location == testApi.location2)
-    assert(states[4].loadingStatus == Success && states[4].forecast != null)
+    // This should kick us into a `Loading` status for location2.
+    assertThat(states[1].loadingStatus).isEqualTo(Loading)
+    assertThat(states[1].location).isEqualTo(testApi.location2)
+    assertThat(states[1].forecast).isNull()
 
-    job.cancel()
+    // Once the forecast is loaded, we should be displaying `Success` again.
+    assertThat(states[2].loadingStatus).isEqualTo(Success)
+    assertThat(states[2].location).isEqualTo(testApi.location2)
+    assertThat(states[2].forecast).isNotNull()
+
+    states.dispose()
   }
 
   @Test fun `refresh requests produce new forecasts`() = runBlockingTest {
@@ -88,23 +85,24 @@ class ForecasterTest {
     val deviceLocations = emptyFlow<DeviceLocation>()
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // Initially transition from
-    // Loading -> Success
-    assert(states[0].loadingStatus == Loading && states[0].forecast == null)
-    assert(states[1].loadingStatus == Success && states[1].forecast != null)
+    // Initially display `Success` with a non-null forecast.
+    assertThat(states[0].loadingStatus).isEqualTo(Success)
+    assertThat(states[0].forecast).isNotNull()
 
+    // Next we request a refresh.
     forecaster.refresh()
 
-    // After a refresh we should again transition from
-    // Loading -> Success
-    // However along with `Loading` it should contain a non-null Forecast.
-    assert(states[2].loadingStatus == Loading && states[2].forecast != null)
-    assert(states[3].loadingStatus == Success && states[3].forecast != null)
+    // When refreshing, we should transition from `Loading` -> `Success`.
+    assertThat(states[1].loadingStatus).isEqualTo(Loading)
+    assertThat(states[2].loadingStatus).isEqualTo(Success)
 
-    job.cancel()
+    // Also when refreshing, we should never have a null forecast since the location hasn't changed.
+    assertThat(states[1].forecast).isNotNull()
+    assertThat(states[2].forecast).isNotNull()
+
+    states.dispose()
   }
 
   @Test fun `selecting different locations produces new forecasts`() = runBlockingTest {
@@ -113,51 +111,52 @@ class ForecasterTest {
     val deviceLocations = emptyFlow<DeviceLocation>()
 
     val forecaster = Forecaster(fixedClock, testApi, selectionChannel.asFlow(), deviceLocations)
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // Initially transition from
-    // Loading -> Success
-    assert(states[0].loadingStatus == Loading)
-    assert(states[1].loadingStatus == Success && states[1].location == testApi.location1)
+    // Initially we should be displaying `Success` with location1's forecast.
+    assertThat(states[0].loadingStatus).isEqualTo(Success)
+    assertThat(states[0].location).isEqualTo(testApi.location1)
+    assertThat(states[0].forecast).isNotNull()
 
+    // Next we pretend to be the user selecting a different location.
     selectionChannel.send(LocationSelection.Static(testApi.location2))
 
-    // After selecting a different location, we should against transition from
-    // Loading -> Success
-    // Additionally, we verify that `Loading` shouldn't contain a cached Forecast.
-    assert(states[2].loadingStatus == Loading && states[2].forecast == null)
-    assert(states[3].loadingStatus == Success && states[3].location == testApi.location2)
+    // When loading the new location, we should transition from `Loading` -> `Success`.
+    assertThat(states[1].loadingStatus).isEqualTo(Loading)
+    assertThat(states[2].loadingStatus).isEqualTo(Success)
 
-    job.cancel()
+    // Also when loading the new location, the forecast should be reset to null since we're changing locations.
+    assertThat(states[1].forecast).isNull()
+    assertThat(states[2].forecast).isNotNull()
+
+    states.dispose()
   }
 
   @Test fun `device location errors produce error states`() = runBlockingTest {
 
     val selections = flowOf(LocationSelection.FollowMe)
 
+    // Initially configure device location updates to fail.
     var failDeviceLocation = true
     val deviceLocations = flow { if (failDeviceLocation) throw RuntimeException() else emit(DeviceLocation(1.0, 1.0)) }
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // Because our DeviceLocation stream fails, we should transition from
-    // Loading -> LocationFailed
-    assert(states[0].loadingStatus == Loading)
-    assert(states[1].loadingStatus == LocationFailed)
+    // Our first state should be failure.
+    assertThat(states[0].loadingStatus).isEqualTo(LocationFailed)
 
+    // Next, reconfigure location updates to succeed and request a refresh.
     failDeviceLocation = false
     forecaster.refresh()
 
-    // Now that DeviceLocation should succeed, after a refresh our states should be
-    // Loading location -> Loading forecast -> Success
-    assert(states[2].loadingStatus == Loading)
-    assert(states[3].loadingStatus == Loading)
-    assert(states[4].loadingStatus == Success)
+    // When refreshing, we should transition from `Loading` -> `Loading` -> `Success`.
+    // This is because we first load the location, then load the forecast, then display success.
+    assertThat(states[1].loadingStatus).isEqualTo(Loading)
+    assertThat(states[2].loadingStatus).isEqualTo(Loading)
+    assertThat(states[3].loadingStatus).isEqualTo(Success)
 
-    job.cancel()
+    states.dispose()
   }
 
   @Test fun `network errors produce error states`() = runBlockingTest {
@@ -165,25 +164,23 @@ class ForecasterTest {
     val selections = flowOf(LocationSelection.Static(testApi.location1))
     val deviceLocations = emptyFlow<DeviceLocation>()
 
+    // Initially configure network requests to fail.
     testApi.failRequests(true)
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
-    val states = mutableListOf<ForecastState>()
-    val job = launch { forecaster.observeForecasts().collect { states.add(it) } }
+    val states = forecaster.observeForecasts().test(this)
 
-    // With network requests failing, our states should transition from
-    // Loading -> NetworkFailed
-    assert(states[0].loadingStatus == Loading)
-    assert(states[1].loadingStatus == NetworkFailed)
+    // With network requests failing, our initial state should be `NetworkFailed`.
+    assertThat(states[0].loadingStatus).isEqualTo(NetworkFailed)
 
+    // Next, reconfigure network requests to succeed and request a refresh.
     testApi.failRequests(false)
     forecaster.refresh()
 
-    // With network requests passing, a refresh should transition us from
-    // Loading -> Success
-    assert(states[2].loadingStatus == Loading)
-    assert(states[3].loadingStatus == Success)
+    // When refreshing, we should transition from `Loading` -> `Success`.
+    assert(states[1].loadingStatus == Loading)
+    assert(states[2].loadingStatus == Success)
 
-    job.cancel()
+    states.dispose()
   }
 }

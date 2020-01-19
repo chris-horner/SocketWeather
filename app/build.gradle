@@ -87,6 +87,7 @@ play {
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
+  kotlinOptions.freeCompilerArgs += ["-Xuse-experimental=kotlin.Experimental"]
   kotlinOptions.freeCompilerArgs += ["-Xuse-experimental=kotlinx.coroutines.ExperimentalCoroutinesApi"]
   kotlinOptions.freeCompilerArgs += ["-Xuse-experimental=kotlinx.coroutines.FlowPreview"]
 }
@@ -120,4 +121,5 @@ dependencies {
   testImplementation "org.threeten:threetenbp:${versions.threetenbp}"
   testImplementation "junit:junit:${versions.junit}"
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
+  testImplementation "com.google.truth:truth:${versions.truth}"
 }

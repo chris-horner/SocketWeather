@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.data
 
+import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.JsonAdapter
 import org.junit.Test
 import org.threeten.bp.ZoneId
@@ -12,6 +13,7 @@ class JsonParsingTest {
     val json = adapter.toJson(LocationSelection.FollowMe)
     val deserialised: LocationSelection? = adapter.fromJson(json)
     assert(deserialised is LocationSelection.FollowMe)
+    assertThat(deserialised).isEqualTo(LocationSelection.FollowMe)
   }
 
   @Test fun `Static LocationSelection serialises and deserialises`() {
@@ -28,12 +30,12 @@ class JsonParsingTest {
     val selectedLocation = LocationSelection.Static(location)
     val json = adapter.toJson(selectedLocation)
     val deserialised: LocationSelection? = adapter.fromJson(json)
-    assert(deserialised == selectedLocation)
+    assertThat(deserialised).isEqualTo(selectedLocation)
   }
 
   @Test fun `None LocationSelection serialises and deserialises`() {
     val json = adapter.toJson(LocationSelection.None)
     val deserialised: LocationSelection? = adapter.fromJson(json)
-    assert(deserialised is LocationSelection.None)
+    assertThat(deserialised).isEqualTo(LocationSelection.None)
   }
 }

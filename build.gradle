@@ -22,7 +22,8 @@ buildscript {
       'play_publisher'         : '2.6.1',
       'threetenbp'             : '1.4.0',
       'flowbinding'            : '0.8.0',
-      'junit'                  : '4.12'
+      'junit'                  : '4.12',
+      'truth'                  : '1.0'
   ]
 
   repositories {

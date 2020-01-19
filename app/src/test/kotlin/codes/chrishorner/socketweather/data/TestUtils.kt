@@ -1,6 +1,10 @@
 package codes.chrishorner.socketweather.data
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.TestCoroutineDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.setMain
@@ -26,3 +30,15 @@ class MainDispatcherRule(private val dispatcher: TestCoroutineDispatcher = TestC
     dispatcher.cleanupTestCoroutines()
   }
 }
+
+class TestCollector<T>(scope: CoroutineScope, flow: Flow<T>) {
+
+  private val collectedValues = mutableListOf<T>()
+  private val job = scope.launch { flow.collect { collectedValues.add(it) } }
+
+  operator fun get(index: Int) = collectedValues[index]
+
+  fun dispose() = job.cancel()
+}
+
+fun <T> Flow<T>.test(scope: CoroutineScope) = TestCollector(scope, this)

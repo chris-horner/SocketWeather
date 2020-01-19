@@ -135,7 +135,9 @@ private fun observeForecastStates(
   // check if we're presenting the same location. If we are, we can reuse our
   // previously calculated forecasts.
   return forecastStates.scanReduce { previousState, newState ->
-    val reuseForecast = newState.location == null || newState.location == previousState.location
+    val reuseForecast = newState.location == null
+        || previousState.location == null
+        || newState.location == previousState.location
 
     if (reuseForecast && newState.forecast == null) {
       newState.copy(forecast = previousState.forecast)

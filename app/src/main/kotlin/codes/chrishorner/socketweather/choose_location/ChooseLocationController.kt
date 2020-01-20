@@ -46,7 +46,7 @@ class ChooseLocationController(
       context.getLocationChoices()
   )
 
-  override fun onCreatePresenter(view: View): ChooseLocationPresenter = ChooseLocationPresenter(view)
+  override fun onCreatePresenter(view: View, viewModel: ChooseLocationViewModel) = ChooseLocationPresenter(view)
 
   override fun onAttach(
       view: View,

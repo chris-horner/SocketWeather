@@ -20,7 +20,7 @@ class AboutController : ScopedController<AboutViewModel, AboutPresenter>() {
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.about)
 
-  override fun onCreatePresenter(view: View) = AboutPresenter(view)
+  override fun onCreatePresenter(view: View, viewModel: AboutViewModel) = AboutPresenter(view)
 
   override fun onAttach(view: View, presenter: AboutPresenter, viewModel: AboutViewModel, viewScope: CoroutineScope) {
 

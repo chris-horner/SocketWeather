@@ -16,6 +16,9 @@ import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 
+/**
+ * Assumes the item at position 0 is the current `LocationSelection`.
+ */
 class SwitchLocationAdapter(private val items: List<LocationSelection>) : RecyclerView.Adapter<ViewHolder>() {
 
   private val clicksChannel = BroadcastChannel<LocationSelection>(1)

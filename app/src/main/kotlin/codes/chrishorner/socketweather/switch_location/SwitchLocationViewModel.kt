@@ -14,6 +14,15 @@ class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
   private val closeEvents = BroadcastChannel<Unit>(1)
   private val scope = MainScope()
 
+  /**
+   * Create a list where the current selection is at the beginning.
+   */
+  fun getOrderedSelections(): List<LocationSelection> {
+    val selections: Set<LocationSelection> = locationChoices.getSavedSelections()
+    val currentSelection: LocationSelection = locationChoices.getCurrentSelection()
+    return selections.sortedByDescending { it == currentSelection }
+  }
+
   fun observeCloseEvents(): Flow<Unit> = closeEvents.asFlow()
 
   fun select(selection: LocationSelection) {

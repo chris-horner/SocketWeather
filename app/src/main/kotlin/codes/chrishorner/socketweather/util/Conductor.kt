@@ -25,15 +25,16 @@ abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Contr
 
   final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
     val view = onCreateView(container)
-    presenter = onCreatePresenter(view)
+    val vm: VM = viewModel ?: onCreateViewModel(view.context.applicationContext).also { viewModel = it }
+    presenter = onCreatePresenter(view, vm)
     return view
   }
 
   final override fun onAttach(view: View) {
-    val vmToAttach: VM = viewModel ?: onCreateViewModel(view.context).also { viewModel = it }
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     viewScope = scope
     val presenterToAttach = requireNotNull(presenter) { "presenter shouldn't be null in onAttach()." }
+    val vmToAttach = requireNotNull(viewModel) { "viewModel shouldn't be null in onAttach()." }
     onAttach(view, presenterToAttach, vmToAttach, scope)
   }
 
@@ -61,7 +62,7 @@ abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Contr
   protected fun getViewModel(): VM? = viewModel
 
   abstract fun onCreateView(container: ViewGroup): View
-  abstract fun onCreatePresenter(view: View): P
+  abstract fun onCreatePresenter(view: View, viewModel: VM): P
   abstract fun onCreateViewModel(context: Context): VM
   open fun onAttach(view: View, presenter: P, viewModel: VM, viewScope: CoroutineScope) {}
   open fun onDetach(view: View, presenter: P, viewModel: VM, viewScope: CoroutineScope) {}

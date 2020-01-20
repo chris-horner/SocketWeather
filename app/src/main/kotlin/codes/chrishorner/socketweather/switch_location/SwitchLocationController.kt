@@ -25,14 +25,8 @@ class SwitchLocationController : ScopedController<SwitchLocationViewModel, Switc
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.switch_location)
 
-  override fun onCreatePresenter(view: View): SwitchLocationPresenter {
-    // TODO: Move this logic into a ViewModel.
-    val locationChoices: LocationChoices = view.context.getLocationChoices()
-    val selections: Set<LocationSelection> = locationChoices.getSavedSelections()
-    val currentSelection: LocationSelection = locationChoices.getCurrentSelection()
-    // Create a list where the current selection is at the beginning.
-    val orderedSelections = selections.sortedByDescending { it == currentSelection }
-    return SwitchLocationPresenter(view, orderedSelections)
+  override fun onCreatePresenter(view: View, viewModel: SwitchLocationViewModel): SwitchLocationPresenter {
+    return SwitchLocationPresenter(view, viewModel.getOrderedSelections())
   }
 
   override fun onAttach(

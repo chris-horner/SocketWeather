@@ -36,7 +36,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.home)
 
-  override fun onCreatePresenter(view: View): HomePresenter = HomePresenter(view)
+  override fun onCreatePresenter(view: View, viewModel: HomeViewModel) = HomePresenter(view)
 
   override fun onCreateViewModel(context: Context): HomeViewModel = HomeViewModel(context.getForecaster())
 

@@ -17,6 +17,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
@@ -38,6 +39,7 @@ class DeviceLocator(private val app: Application) {
     return enabledChannel.asFlow()
         .flatMapLatest { enabled -> if (enabled) getDeviceLocationUpdates(app) else emptyFlow() }
         .distinctUntilChanged()
+        .conflate()
   }
 }
 

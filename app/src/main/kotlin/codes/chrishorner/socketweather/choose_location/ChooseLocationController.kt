@@ -30,18 +30,12 @@ class ChooseLocationController(
     args: Bundle
 ) : ScopedController<ChooseLocationViewModel, ChooseLocationPresenter>(args) {
 
-  constructor(showFollowMe: Boolean, displayAsRoot: Boolean = false) : this(
-      bundleOf(
-          "showFollowMe" to showFollowMe, // TODO: Move this into the ViewModel.
-          "displayAsRoot" to displayAsRoot
-      )
-  )
+  constructor(displayAsRoot: Boolean = false) : this(bundleOf("displayAsRoot" to displayAsRoot))
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.choose_location)
 
   override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
       args.getBoolean("displayAsRoot"),
-      args.getBoolean("showFollowMe"),
       context.getNetworkComponents().api,
       context.getLocationChoices()
   )

@@ -34,12 +34,7 @@ class MainActivity : AppCompatActivity() {
       val locationChoices: LocationChoices = getLocationChoices()
 
       if (locationChoices.getCurrentSelection() == LocationSelection.None) {
-        router.setRoot(
-            ChooseLocationController(
-                displayAsRoot = true,
-                showFollowMe = !locationChoices.hasFollowMeSaved()
-            ).asTransaction()
-        )
+        router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
       } else {
         router.setRoot(HomeController().asTransaction())
       }

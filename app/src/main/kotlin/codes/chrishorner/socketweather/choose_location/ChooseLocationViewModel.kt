@@ -31,13 +31,12 @@ import timber.log.Timber
 
 class ChooseLocationViewModel(
     displayAsRoot: Boolean,
-    showFollowMe: Boolean,
     private val api: WeatherApi,
     private val locationChoices: LocationChoices
 ) {
 
   private val scope = MainScope()
-  private val idleState = State(displayAsRoot, showFollowMe)
+  private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved())
   private val statesChannel = ConflatedBroadcastChannel(idleState)
   private val searchQueryChannel = ConflatedBroadcastChannel<String>()
   private val eventsChannel = BroadcastChannel<Event>(1)

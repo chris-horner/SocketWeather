@@ -41,10 +41,7 @@ class SwitchLocationController : ScopedController<SwitchLocationViewModel, Switc
           when (event) {
             is LocationClicked -> viewModel.select(event.selection)
             DismissClicked -> router.popCurrentController()
-            AddLocationClicked -> {
-              // TODO: Remove displayFollowMe argument.
-              navigateToChooseLocation(!view.context.getLocationChoices().hasFollowMeSaved())
-            }
+            AddLocationClicked -> navigateToChooseLocation()
           }
         }
         .launchIn(viewScope)
@@ -54,8 +51,8 @@ class SwitchLocationController : ScopedController<SwitchLocationViewModel, Switc
         .launchIn(viewScope)
   }
 
-  private fun navigateToChooseLocation(displayFollowMe: Boolean) {
-    val chooseController = ChooseLocationController(displayFollowMe, displayAsRoot = false)
+  private fun navigateToChooseLocation() {
+    val chooseController = ChooseLocationController(displayAsRoot = false)
     val backstack: MutableList<RouterTransaction> = router.backstack
     backstack.removeAt(backstack.size - 1)
     backstack.add(chooseController.asTransaction())

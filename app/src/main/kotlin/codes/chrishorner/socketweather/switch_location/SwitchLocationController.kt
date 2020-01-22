@@ -5,8 +5,6 @@ import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.choose_location.ChooseLocationController
-import codes.chrishorner.socketweather.data.LocationChoices
-import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.getLocationChoices
 import codes.chrishorner.socketweather.switch_location.SwitchLocationPresenter.Event.AddLocationClicked
 import codes.chrishorner.socketweather.switch_location.SwitchLocationPresenter.Event.DismissClicked

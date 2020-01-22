@@ -5,10 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutController
-import codes.chrishorner.socketweather.getDeviceLocator
 import codes.chrishorner.socketweather.getForecaster
-import codes.chrishorner.socketweather.getLocationChoices
-import codes.chrishorner.socketweather.getNetworkComponents
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
@@ -19,16 +16,13 @@ import codes.chrishorner.socketweather.util.inflate
 import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
-import org.threeten.bp.Clock
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 

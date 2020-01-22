@@ -21,17 +21,18 @@
   </style>
 
   <style name="Theme.SocketWeather" parent="Base.Theme.SocketWeather">
-    <item name="colorPrimary">@color/light_blue_100</item>
-    <item name="colorPrimaryVariant">@color/light_blue_300</item>
+    <item name="colorPrimary">@color/primaryBlue</item>
+    <item name="colorPrimaryVariant">@color/primaryBlueVariant</item>
     <item name="colorOnPrimary">@color/black</item>
-    <item name="colorSecondary">@color/amber_A400</item>
-    <item name="colorSecondaryVariant">@color/amber_A700</item>
+    <item name="colorSecondary">@color/accentOrange</item>
+    <item name="colorSecondaryVariant">@color/accentOrangeVariant</item>
     <item name="colorOnSecondary">@color/black</item>
-    <item name="colorSurface">@color/light_blue_10</item>
+    <item name="colorSurface">@color/white</item>
     <item name="colorOnSurface">@color/black</item>
+    <item name="colorHint">@color/primaryBlueVariant</item>
     <item name="colorDivider">@color/color_on_background_12</item>
     <item name="colorScrim">@color/scrimLight</item>
-    <item name="android:windowBackground">@color/light_blue_50</item>
+    <item name="android:windowBackground">@color/backgroundBlue</item>
     <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
   </style>
 

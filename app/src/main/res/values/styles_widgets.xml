@@ -5,7 +5,7 @@
   <style name="Widget.SocketWeather.TextInputLayout.OutlinedBox"
       parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox">
 
-    <item name="hintTextColor">?attr/colorPrimaryVariant</item>
+    <item name="hintTextColor">?attr/colorHint</item>
 
   </style>
 

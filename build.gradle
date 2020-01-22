@@ -11,19 +11,19 @@ buildscript {
       'androidx_core'          : '1.1.0',
       'constraintlayout'       : '2.0.0-beta4',
       'conductor'              : '3.0.0-rc2',
-      'threetenabp'            : '1.2.1',
-      'debugdrawer'            : '0.9.7-SNAPSHOT',
+      'threetenabp'            : '1.2.2',
+      'debugdrawer'            : '0.9.7',
       'timber'                 : '4.7.1',
       'leakcanary'             : '2.1',
       'moshi'                  : '1.9.2',
-      'okhttp'                 : '4.3.0',
+      'okhttp'                 : '4.3.1',
       'retrofit'               : '2.7.1',
       'play_services_location' : '17.0.0',
       'play_publisher'         : '2.6.1',
-      'threetenbp'             : '1.4.0',
+      'threetenbp'             : '1.4.1',
       'flowbinding'            : '0.8.0',
-      'junit'                  : '4.12',
-      'truth'                  : '1.0'
+      'junit'                  : '4.13',
+      'truth'                  : '1.0.1'
   ]
 
   repositories {
@@ -43,7 +43,6 @@ allprojects {
   repositories {
     google()
     jcenter()
-    maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
   }
 }
 

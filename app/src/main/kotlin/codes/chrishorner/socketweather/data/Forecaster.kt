@@ -158,24 +158,31 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
     "Invalid dateForecasts. First element must contain a valid 'now' field."
   }
 
+  val todayForecast: DateForecast = dateForecasts[0]
+
   // Determining the lowest temperature for the current time is a bit weird. There's
   // probably a better way to do this, but the API we're using is currently undocumented!
-  val lowTemp = dateForecasts[0].temp_min ?: if (currentInfo.now_label == "Max") {
+  val lowTemp = todayForecast.temp_min ?: if (currentInfo.now_label == "Max") {
     currentInfo.temp_later
   } else {
     currentInfo.temp_now
   }
 
+  // Returned `DateForecasts` always include today as the first element in the list.
+  // To get just the upcoming DateForecasts, we create a copy without the first element.
+  val upcomingForecasts: List<DateForecast> = dateForecasts.drop(1)
+
   return@supervisorScope Forecast(
       updateTime = Instant.now(clock),
       location = location,
-      iconDescriptor = dateForecasts[0].icon_descriptor,
+      iconDescriptor = todayForecast.icon_descriptor,
       night = currentInfo.is_night,
       currentTemp = observations.temp,
       tempFeelsLike = observations.temp_feels_like,
-      highTemp = dateForecasts[0].temp_max,
+      highTemp = todayForecast.temp_max,
       lowTemp = lowTemp,
-      dateForecasts = dateForecasts
+      todayForecast = todayForecast,
+      upcomingForecasts = upcomingForecasts
   )
 }
 

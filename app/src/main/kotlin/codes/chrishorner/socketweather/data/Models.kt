@@ -27,7 +27,8 @@ data class Forecast(
     val tempFeelsLike: Float,
     val highTemp: Int,
     val lowTemp: Int,
-    val dateForecasts: List<DateForecast>
+    val todayForecast: DateForecast,
+    val upcomingForecasts: List<DateForecast>
 )
 
 data class DeviceLocation(val latitude: Double, val longitude: Double)

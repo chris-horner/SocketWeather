@@ -93,11 +93,10 @@ class HomePresenter(view: View) {
       highTemp.text = forecast.highTemp.formatAsDegrees(context)
       lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
 
-      val todayForecast = forecast.dateForecasts[0]
-      val descriptionText = todayForecast.extended_text ?: todayForecast.short_text
+      val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
       description.text = descriptionText
       description.isVisible = descriptionText.isNullOrBlank().not()
-      dateForecastsView.display(forecast.dateForecasts.drop(1))
+      dateForecastsView.display(forecast.upcomingForecasts)
     } else {
       forecastContainer.isVisible = false
     }

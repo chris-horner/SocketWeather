@@ -10,6 +10,7 @@ import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
+import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -44,11 +45,11 @@ class DeviceLocator(private val app: Application) {
 }
 
 private val request = LocationRequest()
-    .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
+    .setPriority(PRIORITY_HIGH_ACCURACY)
     .setFastestInterval(1000)
     .setMaxWaitTime(3000)
     .setInterval(2000)
-    .setSmallestDisplacement(100f)
+    .setSmallestDisplacement(50f)
 
 private var cachedLocation: DeviceLocation? = null
 

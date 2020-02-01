@@ -105,7 +105,7 @@
       />
 
   <View
-      android:id="@+id/home_forecastDivider"
+      android:id="@+id/home_timeForecastDivider"
       android:layout_width="0dp"
       android:layout_height="4dp"
       android:layout_marginTop="16dp"
@@ -113,6 +113,34 @@
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toBottomOf="@id/home_description"
+      />
+
+  <HorizontalScrollView
+      android:id="@+id/home_timeForecastScroller"
+      android:layout_width="0dp"
+      android:layout_height="280dp"
+      android:fillViewport="true"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_timeForecastDivider"
+      >
+
+    <codes.chrishorner.socketweather.home.TimeForecastView
+        android:layout_width="wrap_content"
+        android:layout_height="280dp"
+        />
+
+  </HorizontalScrollView>
+
+  <View
+      android:id="@+id/home_dateForecastDivider"
+      android:layout_width="0dp"
+      android:layout_height="4dp"
+      android:layout_marginTop="16dp"
+      android:background="@drawable/bg_line"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_timeForecastScroller"
       />
 
   <codes.chrishorner.socketweather.home.DateForecastsView
@@ -123,7 +151,7 @@
       android:paddingBottom="8dp"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/home_forecastDivider"
+      app:layout_constraintTop_toBottomOf="@id/home_dateForecastDivider"
       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -124,6 +124,7 @@ private fun observeForecastStates(
           val forecast = loadForecast(api, clock, locatingState.location)
           emit(ForecastState(locatingState.selection, locatingState.location, forecast, loadingStatus = Success))
         } catch (e: Exception) {
+          Timber.e(e, "Failed to load forecast.")
           emit(ForecastState(locatingState.selection, locatingState.location, loadingStatus = NetworkFailed))
         }
       }
@@ -148,11 +149,15 @@ private fun observeForecastStates(
 }
 
 private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Location): Forecast = supervisorScope {
-  // Request observations and date forecasts simultaneously.
-  val observationsRequest = async { api.getObservations(location.geohash) }
-  val dateForecastsRequest = async { api.getDateForecasts(location.geohash) }
+  // Request observations, date, and hourly forecasts simultaneously.
+  // For whatever reason for _some_ requests require that the `geohash` passed in is the
+  // first 6 characters. Super annoying, but that's the price of an undocumentated API.
+  val observationsRequest = async { api.getObservations(location.geohash.take(6)) }
+  val dateForecastsRequest = async { api.getDateForecasts(location.geohash.take(6)) }
+  val hourlyForecastsRequest = async { api.getThreeHourlyForecasts(location.geohash.take(6)) }
   val observations: CurrentObservations = observationsRequest.await()
   val dateForecasts: List<DateForecast> = dateForecastsRequest.await()
+  val hourlyForecasts: List<ThreeHourlyForecast> = hourlyForecastsRequest.await()
 
   val currentInfo: CurrentInformation = requireNotNull(dateForecasts.getOrNull(0)?.now) {
     "Invalid dateForecasts. First element must contain a valid 'now' field."
@@ -182,6 +187,7 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
       highTemp = todayForecast.temp_max,
       lowTemp = lowTemp,
       todayForecast = todayForecast,
+      hourlyForecasts = hourlyForecasts,
       upcomingForecasts = upcomingForecasts
   )
 }

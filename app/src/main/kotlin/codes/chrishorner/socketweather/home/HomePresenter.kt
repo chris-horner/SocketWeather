@@ -47,6 +47,7 @@ class HomePresenter(view: View) {
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
   private val lowTemp: TextView = view.findViewById(R.id.home_lowTemp)
   private val description: TextView = view.findViewById(R.id.home_description)
+  private val timeForecastsView: TimeForecastView = view.findViewById(R.id.home_timeForecasts)
   private val dateForecastsView: DateForecastsView = view.findViewById(R.id.home_dateForecasts)
 
   private val context: Context = view.context
@@ -96,6 +97,7 @@ class HomePresenter(view: View) {
       val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
       description.text = descriptionText
       description.isVisible = descriptionText.isNullOrBlank().not()
+      timeForecastsView.display(forecast.hourlyForecasts)
       dateForecastsView.display(forecast.upcomingForecasts)
     } else {
       forecastContainer.isVisible = false

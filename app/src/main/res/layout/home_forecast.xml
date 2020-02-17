@@ -118,7 +118,7 @@
   <HorizontalScrollView
       android:id="@+id/home_timeForecastScroller"
       android:layout_width="0dp"
-      android:layout_height="280dp"
+      android:layout_height="wrap_content"
       android:fillViewport="true"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
@@ -126,8 +126,9 @@
       >
 
     <codes.chrishorner.socketweather.home.TimeForecastView
+        android:id="@+id/home_timeForecasts"
         android:layout_width="wrap_content"
-        android:layout_height="280dp"
+        android:layout_height="176dp"
         />
 
   </HorizontalScrollView>
@@ -136,7 +137,6 @@
       android:id="@+id/home_dateForecastDivider"
       android:layout_width="0dp"
       android:layout_height="4dp"
-      android:layout_marginTop="16dp"
       android:background="@drawable/bg_line"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"

@@ -4,7 +4,6 @@ import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.drawable.Drawable
-import android.text.format.DateFormat
 import android.util.AttributeSet
 import android.view.View
 import androidx.core.content.res.getColorOrThrow
@@ -38,14 +37,14 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   private var minTemp = 0
   private var maxTemp = 0
 
-  private val columnWidth = dpToPx(48)
+  private val columnWidth = dpToPx(56)
   private val timeTextBaselineInset = dpToPx(8)
   private val iconSize = dpToPx(24)
-  private val iconTemperatureGap = dpToPx(4)
+  private val iconTemperatureGap = dpToPx(2)
   private val timeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
   private val temperatureTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-  private val verticalPadding = dpToPx(24)
-  private val timeFormatter: DateTimeFormatter
+  private val verticalPadding = dpToPx(16)
+  private val timeFormatter = DateTimeFormatter.ofPattern("h a")
 
   init {
     val textAttributes = intArrayOf(android.R.attr.textSize, android.R.attr.textColor, R.attr.fontFamily)
@@ -62,12 +61,6 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
       temperatureTextPaint.color = getColorOrThrow(1)
       temperatureTextPaint.typeface = getFontOrThrow(2)
       temperatureTextPaint.textAlign = Paint.Align.CENTER
-    }
-
-    timeFormatter = if (DateFormat.is24HourFormat(context)) {
-      DateTimeFormatter.ofPattern("HH")
-    } else {
-      DateTimeFormatter.ofPattern("ha")
     }
   }
 

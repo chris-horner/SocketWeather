@@ -11,6 +11,7 @@ import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.content.res.getFontOrThrow
 import androidx.core.content.withStyledAttributes
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.util.dpToPx
 import codes.chrishorner.socketweather.util.getThemeColour
@@ -31,6 +32,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
 
   private var forecasts: List<ThreeHourlyForecast> = emptyList()
   private var timeTexts: List<String> = emptyList()
+  private var rainChanceTexts: List<String> = emptyList()
   private var icons: List<Drawable> = emptyList()
 
   private var scale = MIN_SCALE_OF_DEGREES
@@ -38,22 +40,22 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   private var maxTemp = 0
 
   private val columnWidth = dpToPx(56)
-  private val timeTextBaselineInset = dpToPx(8)
+  private val timeTextBaselineInset = dpToPx(16)
   private val iconSize = dpToPx(24)
   private val iconTemperatureGap = dpToPx(2)
-  private val timeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
   private val temperatureTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-  private val verticalPadding = dpToPx(16)
+  private val secondaryTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+  private val verticalPadding = dpToPx(8)
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
 
   init {
     val textAttributes = intArrayOf(android.R.attr.textSize, android.R.attr.textColor, R.attr.fontFamily)
 
     context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Caption, textAttributes) {
-      timeTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
-      timeTextPaint.color = getColorOrThrow(1)
-      timeTextPaint.typeface = getFontOrThrow(2)
-      timeTextPaint.textAlign = Paint.Align.CENTER
+      secondaryTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
+      secondaryTextPaint.color = getColorOrThrow(1)
+      secondaryTextPaint.typeface = getFontOrThrow(2)
+      secondaryTextPaint.textAlign = Paint.Align.CENTER
     }
 
     context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Body2, textAttributes) {
@@ -69,6 +71,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
 
     this.forecasts = forecasts
     timeTexts = forecasts.map { timeFormatter.format(it.time.atZone(ZoneId.systemDefault())) }
+    rainChanceTexts = forecasts.map { it.rain.getPercentageString() }
     icons = forecasts
         .map { context.getWeatherIconFor(it.icon_descriptor, it.is_night).mutate() }
         .onEach { it.setTint(context.getThemeColour(android.R.attr.textColorPrimary)) }
@@ -97,17 +100,23 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   override fun onDraw(canvas: Canvas) {
 
     val graphHeight =
-        height - (verticalPadding * 2) - timeTextPaint.textHeight().toInt() - iconSize - temperatureTextPaint.textHeight().toInt() - iconTemperatureGap
+        height - (verticalPadding * 2) - (secondaryTextPaint.textHeight().toInt() * 2) - iconSize - temperatureTextPaint.textHeight().toInt() - iconTemperatureGap
 
     for (index in forecasts.indices) {
+      val forecast = forecasts[index]
       val columnX = index * columnWidth
-
       val textX = columnX + (columnWidth / 2f)
+
+      if (rainChanceTexts[index].isNotEmpty()) {
+        val chanceTextY = height - (secondaryTextPaint.textHeight() * 2) - dpToPx(4)
+        canvas.drawText(rainChanceTexts[index], textX, chanceTextY, secondaryTextPaint)
+      }
+
       val timeTextY = (height - timeTextBaselineInset).toFloat()
-      canvas.drawText(timeTexts[index], textX, timeTextY, timeTextPaint)
+      canvas.drawText(timeTexts[index], textX, timeTextY, secondaryTextPaint)
 
       val iconX = columnX + ((columnWidth - iconSize) / 2)
-      val normalisedY = (forecasts[index].temp - minTemp) / scale.toFloat()
+      val normalisedY = (forecast.temp - minTemp) / scale.toFloat()
       val positionY = (verticalPadding + graphHeight) - (graphHeight * normalisedY).toInt()
       val iconY = positionY - (iconSize / 2)
       val icon = icons[index]
@@ -115,7 +124,11 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
       icon.draw(canvas)
 
       val temperatureTextY = iconY + iconSize + iconTemperatureGap + temperatureTextPaint.textHeight()
-      canvas.drawText(forecasts[index].temp.toString(), textX, temperatureTextY, temperatureTextPaint)
+      canvas.drawText(forecast.temp.toString(), textX, temperatureTextY, temperatureTextPaint)
     }
+  }
+
+  private fun Rain.getPercentageString(): String {
+    return if (chance > 0 && amount.min != null && amount.min > 0) "$chance%" else ""
   }
 }

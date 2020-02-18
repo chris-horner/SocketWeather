@@ -108,7 +108,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
       val textX = columnX + (columnWidth / 2f)
 
       if (rainChanceTexts[index].isNotEmpty()) {
-        val chanceTextY = height - (secondaryTextPaint.textHeight() * 2) - dpToPx(4)
+        val chanceTextY = height - (secondaryTextPaint.textHeight() * 2) - dpToPx(6)
         canvas.drawText(rainChanceTexts[index], textX, chanceTextY, secondaryTextPaint)
       }
 

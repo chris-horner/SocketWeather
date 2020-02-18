@@ -3,7 +3,6 @@ package codes.chrishorner.socketweather.home
 import android.content.Context
 import android.text.format.DateUtils
 import android.view.View
-import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
@@ -18,8 +17,6 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
-import codes.chrishorner.socketweather.util.formatAsDegrees
-import codes.chrishorner.socketweather.util.getWeatherIconFor
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -41,14 +38,9 @@ class HomePresenter(view: View) {
   private val error: View = view.findViewById(R.id.home_error)
   private val errorMessage: TextView = view.findViewById(R.id.home_errorMessage)
   private val retryButton: View = view.findViewById(R.id.home_retryButton)
-  private val currentIcon: ImageView = view.findViewById(R.id.home_currentIcon)
-  private val currentTemp: TextView = view.findViewById(R.id.home_currentTemp)
-  private val feelsLikeTemp: TextView = view.findViewById(R.id.home_feelsLikeTemp)
-  private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
-  private val lowTemp: TextView = view.findViewById(R.id.home_lowTemp)
-  private val description: TextView = view.findViewById(R.id.home_description)
   private val timeForecastsView: TimeForecastView = view.findViewById(R.id.home_timeForecasts)
   private val dateForecastsView: DateForecastsView = view.findViewById(R.id.home_dateForecasts)
+  private val observationsPresenter = ObservationsPresenter(view.findViewById(R.id.home_observations))
 
   private val context: Context = view.context
 
@@ -86,17 +78,8 @@ class HomePresenter(view: View) {
     val forecast: Forecast? = state.forecast
 
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
-      // TODO: Consider moving all this formatting somewhere more appropriate.
       forecastContainer.isVisible = true
-      currentIcon.setImageDrawable(context.getWeatherIconFor(forecast.iconDescriptor, forecast.night))
-      currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
-      feelsLikeTemp.text = forecast.tempFeelsLike.formatAsDegrees(context)
-      highTemp.text = forecast.highTemp.formatAsDegrees(context)
-      lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
-
-      val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
-      description.text = descriptionText
-      description.isVisible = descriptionText.isNullOrBlank().not()
+      observationsPresenter.display(forecast)
       timeForecastsView.display(forecast.hourlyForecasts)
       dateForecastsView.display(forecast.upcomingForecasts)
     } else {

@@ -80,8 +80,8 @@ class HomePresenter(view: View) {
     if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
       forecastContainer.isVisible = true
       observationsPresenter.display(forecast)
-      timeForecastsView.display(forecast.hourlyForecasts)
-      dateForecastsView.display(forecast.upcomingForecasts)
+      timeForecastsView.display(forecast)
+      dateForecastsView.display(forecast)
     } else {
       forecastContainer.isVisible = false
     }

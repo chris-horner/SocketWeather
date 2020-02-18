@@ -11,13 +11,13 @@ import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.content.res.getFontOrThrow
 import androidx.core.content.withStyledAttributes
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.util.dpToPx
 import codes.chrishorner.socketweather.util.getThemeColour
 import codes.chrishorner.socketweather.util.getWeatherIconFor
 import codes.chrishorner.socketweather.util.textHeight
-import org.threeten.bp.ZoneId
 import org.threeten.bp.format.DateTimeFormatter
 import kotlin.math.abs
 
@@ -66,11 +66,11 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     }
   }
 
-  fun display(forecasts: List<ThreeHourlyForecast>) {
-    if (forecasts == this.forecasts || forecasts.isEmpty()) return
+  fun display(forecast: Forecast) {
+    if (forecast.hourlyForecasts == this.forecasts || forecast.hourlyForecasts.isEmpty()) return
 
-    this.forecasts = forecasts
-    timeTexts = forecasts.map { timeFormatter.format(it.time.atZone(ZoneId.systemDefault())) }
+    this.forecasts = forecast.hourlyForecasts
+    timeTexts = forecasts.map { timeFormatter.format(it.time.atZone(forecast.location.timezone)) }
     rainChanceTexts = forecasts.map { it.rain.getPercentageString() }
     icons = forecasts
         .map { context.getWeatherIconFor(it.icon_descriptor, it.is_night).mutate() }

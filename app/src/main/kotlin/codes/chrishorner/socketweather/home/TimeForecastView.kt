@@ -34,7 +34,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   private var timeTexts: List<String> = emptyList()
   private var rainChanceTexts: List<String> = emptyList()
   private var icons: List<Drawable> = emptyList()
-
+  private var displayRainChance = false
   private var scale = MIN_SCALE_OF_DEGREES
   private var minTemp = 0
   private var maxTemp = 0
@@ -72,6 +72,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     this.forecasts = forecast.hourlyForecasts
     timeTexts = forecasts.map { timeFormatter.format(it.time.atZone(forecast.location.timezone)) }
     rainChanceTexts = forecasts.map { it.rain.getPercentageString() }
+    displayRainChance = rainChanceTexts.any { it.isNotEmpty() }
     icons = forecasts
         .map { context.getWeatherIconFor(it.icon_descriptor, it.is_night).mutate() }
         .onEach { it.setTint(context.getThemeColour(android.R.attr.textColorPrimary)) }
@@ -99,25 +100,21 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
 
   override fun onDraw(canvas: Canvas) {
 
+    val rainChanceHeight = if (displayRainChance) secondaryTextPaint.textHeight().toInt() else 0
     val graphHeight =
-        height - (verticalPadding * 2) - (secondaryTextPaint.textHeight().toInt() * 2) - iconSize - temperatureTextPaint.textHeight().toInt() - iconTemperatureGap
+        height - (verticalPadding * 2) - rainChanceHeight - secondaryTextPaint.textHeight().toInt() - iconSize - temperatureTextPaint.textHeight().toInt() - iconTemperatureGap
 
     for (index in forecasts.indices) {
       val forecast = forecasts[index]
       val columnX = index * columnWidth
       val textX = columnX + (columnWidth / 2f)
 
-      if (rainChanceTexts[index].isNotEmpty()) {
-        val chanceTextY = height - (secondaryTextPaint.textHeight() * 2) - dpToPx(6)
-        canvas.drawText(rainChanceTexts[index], textX, chanceTextY, secondaryTextPaint)
-      }
-
       val timeTextY = (height - timeTextBaselineInset).toFloat()
       canvas.drawText(timeTexts[index], textX, timeTextY, secondaryTextPaint)
 
       val iconX = columnX + ((columnWidth - iconSize) / 2)
       val normalisedY = (forecast.temp - minTemp) / scale.toFloat()
-      val positionY = (verticalPadding + graphHeight) - (graphHeight * normalisedY).toInt()
+      val positionY = (verticalPadding + graphHeight + rainChanceHeight) - (graphHeight * normalisedY).toInt()
       val iconY = positionY - (iconSize / 2)
       val icon = icons[index]
       icon.setBounds(iconX, iconY, iconX + iconSize, iconY + iconSize)
@@ -125,6 +122,11 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
 
       val temperatureTextY = iconY + iconSize + iconTemperatureGap + temperatureTextPaint.textHeight()
       canvas.drawText(forecast.temp.toString(), textX, temperatureTextY, temperatureTextPaint)
+
+      if (rainChanceTexts[index].isNotEmpty()) {
+        val chanceTextY = iconY.toFloat() - dpToPx(6)
+        canvas.drawText(rainChanceTexts[index], textX, chanceTextY, secondaryTextPaint)
+      }
     }
   }
 

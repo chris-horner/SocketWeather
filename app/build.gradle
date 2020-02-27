@@ -61,6 +61,10 @@ android {
     targetCompatibility JavaVersion.VERSION_1_8
   }
 
+  kotlinOptions {
+    jvmTarget = JavaVersion.VERSION_1_8
+  }
+
   lintOptions {
     // It's fine for external libs to optionally link against invalid packages.
     disable 'InvalidPackage'

@@ -24,7 +24,7 @@ data class Forecast(
     val iconDescriptor: String,
     val night: Boolean,
     val currentTemp: Float,
-    val tempFeelsLike: Float,
+    val tempFeelsLike: Float?,
     val highTemp: Int,
     val lowTemp: Int,
     val todayForecast: DateForecast,
@@ -60,7 +60,7 @@ data class Location(
 
 data class CurrentObservations(
     val temp: Float,
-    val temp_feels_like: Float,
+    val temp_feels_like: Float?,
     val station: Station
 )
 

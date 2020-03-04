@@ -23,7 +23,7 @@ class ObservationsPresenter(view: View) {
   fun display(forecast: Forecast) {
     currentIcon.setImageDrawable(context.getWeatherIconFor(forecast.iconDescriptor, forecast.night))
     currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
-    feelsLikeTemp.text = forecast.tempFeelsLike.formatAsDegrees(context)
+    feelsLikeTemp.text = forecast.tempFeelsLike?.formatAsDegrees(context) ?: "--"
     highTemp.text = forecast.highTemp.formatAsDegrees(context)
     lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
 

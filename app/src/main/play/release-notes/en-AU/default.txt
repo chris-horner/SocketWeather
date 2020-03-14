@@ -1,3 +1,4 @@
-Fixed a crash when reloading forecast.
-Fixed loading message displaying over forecasts.
-Added icons for weather conditions.
+Added a graph that shows temperature (and chance of rain) over time.
+Fixed a bug where forecast would disappear when refreshing.
+Tweaked colours.
+Fixed a couple of crashes.

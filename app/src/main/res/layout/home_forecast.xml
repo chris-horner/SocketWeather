@@ -26,7 +26,7 @@
     <codes.chrishorner.socketweather.home.TimeForecastView
         android:id="@+id/home_timeForecasts"
         android:layout_width="wrap_content"
-        android:layout_height="176dp"
+        android:layout_height="208dp"
         />
 
   </HorizontalScrollView>

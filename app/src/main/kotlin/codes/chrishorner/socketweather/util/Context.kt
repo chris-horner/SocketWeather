@@ -1,10 +1,13 @@
 package codes.chrishorner.socketweather.util
 
 import android.content.Context
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import androidx.annotation.AttrRes
 import androidx.annotation.ColorInt
+import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
+import androidx.appcompat.content.res.AppCompatResources
 
 @StyleRes fun Context.resolveAttr(@AttrRes attrId: Int): Int {
   val typedValue = TypedValue()
@@ -20,4 +23,10 @@ import androidx.annotation.StyleRes
       else typedValue.data
 
   return getColor(colourRes)
+}
+
+fun Context.requireDrawable(@DrawableRes resId: Int): Drawable {
+  return requireNotNull(AppCompatResources.getDrawable(this, resId)) {
+    "Required Drawable is null."
+  }
 }

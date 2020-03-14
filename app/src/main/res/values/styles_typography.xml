@@ -61,7 +61,9 @@
   </style>
 
   <style name="TextAppearance.SocketWeather.Overline" parent="TextAppearance.MaterialComponents.Overline">
-    <item name="fontFamily">@font/zilla_slab_medium</item>
+    <item name="fontFamily">@font/rubik_regular</item>
+    <item name="android:textColor">?android:attr/textColorSecondary</item>
+    <item name="android:textSize">15sp</item>
   </style>
 
   <style name="TextAppearance.SocketWeather.LargeTemp" parent="TextAppearance.MaterialComponents.Headline2">
@@ -77,6 +79,10 @@
   <style name="TextAppearance.SocketWeather.SmallTemp" parent="TextAppearance.MaterialComponents.Body1">
     <item name="fontFamily">@font/roboto_slab_medium</item>
     <item name="android:textSize">18sp</item>
+  </style>
+
+  <style name="TextAppearance.SocketWeather.TinyTemp" parent="TextAppearance.MaterialComponents.Body2">
+    <item name="fontFamily">@font/roboto_slab_regular</item>
   </style>
 
 </resources>

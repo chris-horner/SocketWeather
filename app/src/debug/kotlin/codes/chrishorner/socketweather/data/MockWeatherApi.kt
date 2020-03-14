@@ -158,16 +158,16 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               is_night = false
           ),
           ThreeHourlyForecast(
-              rain = Rain(Amount(0f, null, "mm"), chance = 0),
+              rain = Rain(Amount(2f, 5f, "mm"), chance = 90),
               temp = 15,
-              icon_descriptor = "mostly_sunny",
+              icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(3)),
               is_night = true
           ),
           ThreeHourlyForecast(
-              rain = Rain(Amount(0f, null, "mm"), chance = 0),
+              rain = Rain(Amount(3f, 6f, "mm"), chance = 50),
               temp = 15,
-              icon_descriptor = "mostly_sunny",
+              icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(6)),
               is_night = true
           ),
@@ -200,9 +200,9 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               is_night = false
           ),
           ThreeHourlyForecast(
-              rain = Rain(Amount(0f, null, "mm"), chance = 0),
+              rain = Rain(Amount(1f, 2f, "mm"), chance = 60),
               temp = 28,
-              icon_descriptor = "hazy",
+              icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(21)),
               is_night = false
           ),

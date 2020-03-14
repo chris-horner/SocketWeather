@@ -6,6 +6,7 @@ import android.graphics.Paint
 import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
 import androidx.core.content.res.getFontOrThrow
@@ -15,11 +16,15 @@ import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.util.dpToPx
-import codes.chrishorner.socketweather.util.getThemeColour
+import codes.chrishorner.socketweather.util.formatAsDegrees
 import codes.chrishorner.socketweather.util.getWeatherIconFor
+import codes.chrishorner.socketweather.util.requireDrawable
 import codes.chrishorner.socketweather.util.textHeight
 import org.threeten.bp.format.DateTimeFormatter
+import java.util.Locale
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.sqrt
 
 /**
  * The minimum number of degrees to show on the graph. This means that if the temperature
@@ -33,54 +38,71 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   private var forecasts: List<ThreeHourlyForecast> = emptyList()
   private var timeTexts: List<String> = emptyList()
   private var rainChanceTexts: List<String> = emptyList()
-  private var icons: List<Drawable> = emptyList()
+  private var temperatureTexts: List<String> = emptyList()
   private var displayRainChance = false
   private var scale = MIN_SCALE_OF_DEGREES
   private var minTemp = 0
   private var maxTemp = 0
 
-  private val columnWidth = dpToPx(56)
-  private val timeTextBaselineInset = dpToPx(16)
-  private val iconSize = dpToPx(24)
-  private val iconTemperatureGap = dpToPx(2)
-  private val temperatureTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-  private val secondaryTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+  private val columnWidth = dpToPx(64)
+  private val temperatureGap = dpToPx(12)
+  private val dotRadius = dpToPx(3f)
+  private val graphTimeGap = dpToPx(8)
   private val verticalPadding = dpToPx(8)
+  private val linePointGap = dpToPx(12)
+  private val temperatureTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+  private val timeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+  private val rainTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
+  private val linePaint = Paint(Paint.ANTI_ALIAS_FLAG)
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
+  private val rainIcon = context.requireDrawable(R.drawable.ic_water)
 
   init {
     val textAttributes = intArrayOf(android.R.attr.textSize, android.R.attr.textColor, R.attr.fontFamily)
 
-    context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Caption, textAttributes) {
-      secondaryTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
-      secondaryTextPaint.color = getColorOrThrow(1)
-      secondaryTextPaint.typeface = getFontOrThrow(2)
-      secondaryTextPaint.textAlign = Paint.Align.CENTER
+    context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Overline, textAttributes) {
+      timeTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
+      timeTextPaint.color = getColorOrThrow(1)
+      timeTextPaint.typeface = getFontOrThrow(2)
+      timeTextPaint.textAlign = Paint.Align.CENTER
     }
 
-    context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Body2, textAttributes) {
+    context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Overline, textAttributes) {
+      rainTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
+      rainTextPaint.color = getColorOrThrow(1)
+      rainTextPaint.typeface = getFontOrThrow(2)
+    }
+
+    context.withStyledAttributes(R.style.TextAppearance_SocketWeather_SmallTemp, textAttributes) {
       temperatureTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
       temperatureTextPaint.color = getColorOrThrow(1)
       temperatureTextPaint.typeface = getFontOrThrow(2)
       temperatureTextPaint.textAlign = Paint.Align.CENTER
     }
+
+    linePaint.color = AppCompatResources.getColorStateList(context, R.color.color_on_background_08).defaultColor
+    linePaint.style = Paint.Style.STROKE
+    linePaint.strokeWidth = dpToPx(3f)
+    linePaint.strokeCap = Paint.Cap.ROUND
   }
 
   fun display(forecast: Forecast) {
     if (forecast.hourlyForecasts == this.forecasts || forecast.hourlyForecasts.isEmpty()) return
 
     this.forecasts = forecast.hourlyForecasts
-    timeTexts = forecasts.map { timeFormatter.format(it.time.atZone(forecast.location.timezone)) }
+    timeTexts = forecasts.map {
+      timeFormatter.format(it.time.atZone(forecast.location.timezone)).toUpperCase(Locale.getDefault())
+    }
+    temperatureTexts = forecasts.map { it.temp.formatAsDegrees(context) }
     rainChanceTexts = forecasts.map { it.rain.getPercentageString() }
     displayRainChance = rainChanceTexts.any { it.isNotEmpty() }
-    icons = forecasts
-        .map { context.getWeatherIconFor(it.icon_descriptor, it.is_night).mutate() }
-        .onEach { it.setTint(context.getThemeColour(android.R.attr.textColorPrimary)) }
 
     minTemp = forecasts.map { it.temp }.min()!!
     maxTemp = forecasts.map { it.temp }.max()!!
     scale = abs(maxTemp - minTemp)
 
+    // Check the scale at which the temperature is changing. If it's lower than our minimum,
+    // then force the min and max temperatures to adhere to MIN_SCALE_OF_DEGREES.
     if (scale < MIN_SCALE_OF_DEGREES) {
       val tempDelta = (MIN_SCALE_OF_DEGREES - scale) / 2
       minTemp -= tempDelta
@@ -89,44 +111,100 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     }
 
     requestLayout()
+    invalidate()
   }
 
   override fun onMeasure(widthSpec: Int, heightSpec: Int) {
     val width = forecasts.size * columnWidth
     val height = MeasureSpec.getSize(heightSpec)
-
     setMeasuredDimension(width, height)
   }
 
   override fun onDraw(canvas: Canvas) {
 
-    val rainChanceHeight = if (displayRainChance) secondaryTextPaint.textHeight().toInt() else 0
+    // NOTE: If we ever want to animate components of the graph, it might be a good
+    // idea to move these calculations into `display()` rather than recalculate
+    // them every `onDraw()`.
+
+    // Start by working out whether or not we'll be displaying rain chance at the
+    // top of the graph, and how much space that will take.
+
+    val rainTextHeight: Float
+    val rainTotalHeight: Int
+
+    if (displayRainChance) {
+      rainTextHeight = abs(rainTextPaint.fontMetrics.ascent)
+      rainTotalHeight = max(rainTextHeight.toInt(), rainIcon.intrinsicHeight)
+    } else {
+      rainTextHeight = 0f
+      rainTotalHeight = 0
+    }
+
+    // Next calculate some values that will be constant over the graph.
+
+    val timeTextHeight = timeTextPaint.textHeight()
+    val temperatureTextHeight = temperatureTextPaint.textHeight()
     val graphHeight =
-        height - (verticalPadding * 2) - rainChanceHeight - secondaryTextPaint.textHeight().toInt() - iconSize - temperatureTextPaint.textHeight().toInt() - iconTemperatureGap
+        height - timeTextHeight - rainTotalHeight - temperatureTextHeight - (dotRadius * 2) - temperatureGap - (verticalPadding * 2)
+    val graphBottom = height - verticalPadding - timeTextHeight - graphTimeGap
+    val timeTextBaseline = height - verticalPadding.toFloat()
+    val rainTextBaseline = verticalPadding + ((rainTextHeight - rainTextHeight) / 2) + rainTextHeight + dpToPx(1)
+    val rainIconTop = verticalPadding + ((rainTotalHeight - rainIcon.intrinsicHeight) / 2)
+
+    // For each forecast, render a point on the graph, a temperature, a line,
+    // and potentially the chance of rain.
+
+    var previousX = -1f
+    var previousY = -1f
 
     for (index in forecasts.indices) {
       val forecast = forecasts[index]
+      val rainChanceText = rainChanceTexts[index]
+
       val columnX = index * columnWidth
-      val textX = columnX + (columnWidth / 2f)
-
-      val timeTextY = (height - timeTextBaselineInset).toFloat()
-      canvas.drawText(timeTexts[index], textX, timeTextY, secondaryTextPaint)
-
-      val iconX = columnX + ((columnWidth - iconSize) / 2)
+      val positionX = columnX + (columnWidth / 2f)
       val normalisedY = (forecast.temp - minTemp) / scale.toFloat()
-      val positionY = (verticalPadding + graphHeight + rainChanceHeight) - (graphHeight * normalisedY).toInt()
-      val iconY = positionY - (iconSize / 2)
-      val icon = icons[index]
-      icon.setBounds(iconX, iconY, iconX + iconSize, iconY + iconSize)
-      icon.draw(canvas)
+      val positionY = graphBottom - (graphHeight * normalisedY)
+      val temperatureTextBaseline = positionY - temperatureGap
 
-      val temperatureTextY = iconY + iconSize + iconTemperatureGap + temperatureTextPaint.textHeight()
-      canvas.drawText(forecast.temp.toString(), textX, temperatureTextY, temperatureTextPaint)
-
-      if (rainChanceTexts[index].isNotEmpty()) {
-        val chanceTextY = iconY.toFloat() - dpToPx(6)
-        canvas.drawText(rainChanceTexts[index], textX, chanceTextY, secondaryTextPaint)
+      if (rainChanceText.isNotEmpty()) {
+        val rainWidth = rainIcon.intrinsicWidth + rainTextPaint.measureText(rainChanceText).toInt()
+        val rainX = positionX.toInt() - (rainWidth / 2)
+        rainIcon.setBounds(rainX, rainIconTop, rainX + rainIcon.intrinsicWidth, rainIconTop + rainIcon.intrinsicHeight)
+        rainIcon.draw(canvas)
+        canvas.drawText(rainChanceText, rainIcon.bounds.right.toFloat(), rainTextBaseline, rainTextPaint)
       }
+
+      if (previousX > 0f && previousY > 0f) {
+        val slope = (positionY - previousY) / (positionX - previousX)
+        val startX: Float
+        val startY: Float
+        val endX: Float
+        val endY: Float
+
+        if (slope == 0f) {
+          startX = previousX + linePointGap
+          startY = previousY
+          endX = positionX - linePointGap
+          endY = previousY
+        } else {
+          val dx = linePointGap / sqrt(1 + (slope * slope))
+          val dy = slope * dx
+          startX = previousX + dx
+          startY = previousY + dy
+          endX = positionX - dx
+          endY = positionY - dy
+        }
+
+        canvas.drawLine(startX, startY, endX, endY, linePaint)
+      }
+
+      canvas.drawCircle(positionX, positionY, dotRadius, temperatureTextPaint)
+      canvas.drawText(temperatureTexts[index], positionX, temperatureTextBaseline, temperatureTextPaint)
+      canvas.drawText(timeTexts[index], positionX, timeTextBaseline, timeTextPaint)
+
+      previousX = positionX
+      previousY = positionY
     }
   }
 

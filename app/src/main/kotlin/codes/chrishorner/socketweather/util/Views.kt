@@ -19,7 +19,9 @@ fun View.dismissKeyboard() {
   imm.hideSoftInputFromWindow(windowToken, 0)
 }
 
-fun View.dpToPx(dp: Int): Int = (dp * resources.displayMetrics.density).toInt()
+fun View.dpToPx(dp: Int): Int = dpToPx(dp.toFloat()).toInt()
+
+fun View.dpToPx(dp: Float): Float = dp * resources.displayMetrics.density
 
 /**
  * Indicates that this view should update its own padding to match that of [WindowInsets].

@@ -33,6 +33,13 @@ import kotlin.math.sqrt
  */
 private const val MIN_SCALE_OF_DEGREES = 8
 
+/**
+ * Renders the list of [ThreeHourlyForecast] from a [Forecast] as a line graph showing
+ * the change in temperature.
+ *
+ * Times are displayed relative to the timezone of the forecasts location, rather than
+ * the user's timezone.
+ */
 class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, attrs) {
 
   private var forecasts: List<ThreeHourlyForecast> = emptyList()
@@ -48,7 +55,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   private val temperatureGap = dpToPx(12)
   private val dotRadius = dpToPx(3f)
   private val graphTimeGap = dpToPx(8)
-  private val verticalPadding = dpToPx(8)
+  private val verticalPadding = dpToPx(16)
   private val linePointGap = dpToPx(12)
   private val temperatureTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
   private val timeTextPaint = Paint(Paint.ANTI_ALIAS_FLAG)
@@ -167,6 +174,8 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
       val positionY = graphBottom - (graphHeight * normalisedY)
       val temperatureTextBaseline = positionY - temperatureGap
 
+      // Render chance of rain.
+
       if (rainChanceText.isNotEmpty()) {
         val rainWidth = rainIcon.intrinsicWidth + rainTextPaint.measureText(rainChanceText).toInt()
         val rainX = positionX.toInt() - (rainWidth / 2)
@@ -174,6 +183,9 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
         rainIcon.draw(canvas)
         canvas.drawText(rainChanceText, rainIcon.bounds.right.toFloat(), rainTextBaseline, rainTextPaint)
       }
+
+      // Render line between this point and the previous point, adding a little
+      // bit of padding so the lines aren't visibly connected for _style_.
 
       if (previousX > 0f && previousY > 0f) {
         val slope = (positionY - previousY) / (positionX - previousX)
@@ -199,6 +211,8 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
         canvas.drawLine(startX, startY, endX, endY, linePaint)
       }
 
+      // Draw remaining components.
+
       canvas.drawCircle(positionX, positionY, dotRadius, temperatureTextPaint)
       canvas.drawText(temperatureTexts[index], positionX, temperatureTextBaseline, temperatureTextPaint)
       canvas.drawText(timeTexts[index], positionX, timeTextBaseline, timeTextPaint)
@@ -209,6 +223,6 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
   }
 
   private fun Rain.getPercentageString(): String {
-    return if (chance > 0 && amount.min != null && amount.min > 0) "$chance%" else ""
+    return if (chance > 0 && amount.max ?: 0f > 0.1f) "$chance%" else ""
   }
 }

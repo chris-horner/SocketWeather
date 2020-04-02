@@ -6,14 +6,21 @@
     android:id="@+id/switchLocation_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="?attr/colorScrim"
     >
+
+  <View
+      android:id="@+id/switchLocation_scrim"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:background="?attr/colorScrim"
+      />
 
   <com.google.android.material.card.MaterialCardView
       android:id="@+id/switchLocation_card"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_margin="8dp"
+      android:transitionGroup="true"
       app:cardElevation="8dp"
       >
 

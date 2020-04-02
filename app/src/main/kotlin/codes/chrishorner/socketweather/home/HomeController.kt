@@ -9,6 +9,7 @@ import codes.chrishorner.socketweather.getForecaster
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
+import codes.chrishorner.socketweather.switch_location.SwitchLocationChangeHandler
 import codes.chrishorner.socketweather.switch_location.SwitchLocationController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
@@ -44,7 +45,8 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
             SwitchLocationClicked -> router.pushController(
                 SwitchLocationController()
                     .asTransaction()
-                    .pushChangeHandler(SimpleSwapChangeHandler(false))
+                    .pushChangeHandler(SwitchLocationChangeHandler())
+                    .popChangeHandler(SwitchLocationChangeHandler())
             )
             RefreshClicked -> viewModel.forceRefresh()
             AboutClicked -> router.pushController(AboutController().asTransaction())

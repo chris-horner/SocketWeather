@@ -23,7 +23,7 @@ abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Contr
   private var presenter: P? = null
   private var viewModel: VM? = null
 
-  final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup, savedInstanceState: Bundle?): View {
+  final override fun onCreateView(inflater: LayoutInflater, container: ViewGroup): View {
     val view = onCreateView(container)
     val vm: VM = viewModel ?: onCreateViewModel(view.context.applicationContext).also { viewModel = it }
     presenter = onCreatePresenter(view, vm)

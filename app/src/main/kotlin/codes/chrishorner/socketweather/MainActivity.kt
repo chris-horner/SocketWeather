@@ -10,8 +10,8 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ControllerLeakListener
 import codes.chrishorner.socketweather.util.asTransaction
+import com.bluelinelabs.conductor.Conductor
 import com.bluelinelabs.conductor.Router
-import com.bluelinelabs.conductor.attachRouter
 
 class MainActivity : AppCompatActivity() {
 
@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         View.SYSTEM_UI_FLAG_LAYOUT_STABLE
 
     val rootContainer: ViewGroup = BuildTypeConfig.getRootContainerFor(this)
-    router = attachRouter(rootContainer, savedInstanceState)
+    router = Conductor.attachRouter(this, rootContainer, savedInstanceState)
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {

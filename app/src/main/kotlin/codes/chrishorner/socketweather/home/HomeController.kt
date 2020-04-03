@@ -14,7 +14,6 @@ import codes.chrishorner.socketweather.switch_location.SwitchLocationController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction
 import codes.chrishorner.socketweather.util.inflate
-import com.bluelinelabs.conductor.changehandler.SimpleSwapChangeHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter

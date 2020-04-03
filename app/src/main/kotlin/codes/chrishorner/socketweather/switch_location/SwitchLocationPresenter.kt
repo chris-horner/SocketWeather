@@ -19,7 +19,6 @@ class SwitchLocationPresenter(view: View, selections: List<LocationSelection>) {
   val events: Flow<Event>
 
   init {
-    view.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
     val recycler: RecyclerView = view.findViewById(R.id.switchLocation_recycler)
     val adapter = SwitchLocationAdapter(selections)
     recycler.adapter = adapter
@@ -28,6 +27,9 @@ class SwitchLocationPresenter(view: View, selections: List<LocationSelection>) {
 
     val container: View = view.findViewById(R.id.switchLocation_container)
     val addButton: View = view.findViewById(R.id.switchLocation_addButton)
+    val cardContainer: View = view.findViewById(R.id.switchLocation_cardContainer)
+
+    cardContainer.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
 
     events = merge(
         container.clicks().map { DismissClicked },

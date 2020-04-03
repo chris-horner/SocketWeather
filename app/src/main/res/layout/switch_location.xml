@@ -15,59 +15,67 @@
       android:background="?attr/colorScrim"
       />
 
-  <com.google.android.material.card.MaterialCardView
-      android:id="@+id/switchLocation_card"
+  <FrameLayout
+      android:id="@+id/switchLocation_cardContainer"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_margin="8dp"
-      android:transitionGroup="true"
-      app:cardElevation="8dp"
+      android:layout_height="match_parent"
       >
 
-    <androidx.core.widget.NestedScrollView
-        android:id="@+id/switchLocation_scroller"
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/switchLocation_card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="8dp"
+        android:transitionGroup="true"
+        app:cardElevation="8dp"
         >
 
-      <LinearLayout
+      <androidx.core.widget.NestedScrollView
+          android:id="@+id/switchLocation_scroller"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:orientation="vertical"
           >
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/switchLocation_recycler"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:scrollbars="vertical"
-            />
+            android:orientation="vertical"
+            >
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="?android:attr/listDivider"
-            />
+          <androidx.recyclerview.widget.RecyclerView
+              android:id="@+id/switchLocation_recycler"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:scrollbars="vertical"
+              />
 
-        <TextView
-            android:id="@+id/switchLocation_addButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:paddingStart="20dp"
-            android:paddingEnd="16dp"
-            android:background="?attr/selectableItemBackground"
-            android:drawablePadding="20dp"
-            android:gravity="center_vertical"
-            android:minHeight="?attr/listPreferredItemHeight"
-            android:text="@string/switchLocation_add"
-            android:textAppearance="?attr/textAppearanceButton"
-            app:drawableStartCompat="@drawable/ic_add_24dp"
-            />
+          <View
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:background="?android:attr/listDivider"
+              />
 
-      </LinearLayout>
+          <TextView
+              android:id="@+id/switchLocation_addButton"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:paddingStart="20dp"
+              android:paddingEnd="16dp"
+              android:background="?attr/selectableItemBackground"
+              android:drawablePadding="20dp"
+              android:gravity="center_vertical"
+              android:minHeight="?attr/listPreferredItemHeight"
+              android:text="@string/switchLocation_add"
+              android:textAppearance="?attr/textAppearanceButton"
+              app:drawableStartCompat="@drawable/ic_add_24dp"
+              />
 
-    </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
 
-  </com.google.android.material.card.MaterialCardView>
+      </androidx.core.widget.NestedScrollView>
+
+    </com.google.android.material.card.MaterialCardView>
+
+  </FrameLayout>
 
 </FrameLayout>

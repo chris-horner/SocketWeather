@@ -45,7 +45,6 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
                 SwitchLocationController()
                     .asTransaction()
                     .pushChangeHandler(SwitchLocationChangeHandler())
-                    .popChangeHandler(SwitchLocationChangeHandler())
             )
             RefreshClicked -> viewModel.forceRefresh()
             AboutClicked -> router.pushController(AboutController().asTransaction())

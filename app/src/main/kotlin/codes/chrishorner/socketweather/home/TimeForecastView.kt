@@ -3,13 +3,11 @@ package codes.chrishorner.socketweather.home
 import android.content.Context
 import android.graphics.Canvas
 import android.graphics.Paint
-import android.graphics.drawable.Drawable
 import android.util.AttributeSet
 import android.view.View
 import androidx.appcompat.content.res.AppCompatResources
 import androidx.core.content.res.getColorOrThrow
 import androidx.core.content.res.getDimensionPixelSizeOrThrow
-import androidx.core.content.res.getFontOrThrow
 import androidx.core.content.withStyledAttributes
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecast
@@ -17,7 +15,7 @@ import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.util.dpToPx
 import codes.chrishorner.socketweather.util.formatAsDegrees
-import codes.chrishorner.socketweather.util.getWeatherIconFor
+import codes.chrishorner.socketweather.util.getCompatFontOrThrow
 import codes.chrishorner.socketweather.util.requireDrawable
 import codes.chrishorner.socketweather.util.textHeight
 import org.threeten.bp.format.DateTimeFormatter
@@ -70,20 +68,20 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Overline, textAttributes) {
       timeTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
       timeTextPaint.color = getColorOrThrow(1)
-      timeTextPaint.typeface = getFontOrThrow(2)
+      timeTextPaint.typeface = getCompatFontOrThrow(context, 2)
       timeTextPaint.textAlign = Paint.Align.CENTER
     }
 
     context.withStyledAttributes(R.style.TextAppearance_SocketWeather_Overline, textAttributes) {
       rainTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
       rainTextPaint.color = getColorOrThrow(1)
-      rainTextPaint.typeface = getFontOrThrow(2)
+      rainTextPaint.typeface = getCompatFontOrThrow(context, 2)
     }
 
     context.withStyledAttributes(R.style.TextAppearance_SocketWeather_SmallTemp, textAttributes) {
       temperatureTextPaint.textSize = getDimensionPixelSizeOrThrow(0).toFloat()
       temperatureTextPaint.color = getColorOrThrow(1)
-      temperatureTextPaint.typeface = getFontOrThrow(2)
+      temperatureTextPaint.typeface = getCompatFontOrThrow(context, 2)
       temperatureTextPaint.textAlign = Paint.Align.CENTER
     }
 

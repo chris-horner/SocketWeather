@@ -1,4 +1,3 @@
-Added a graph that shows temperature (and chance of rain) over time.
-Fixed a bug where forecast would disappear when refreshing.
-Tweaked colours.
-Fixed a couple of crashes.
+Fixed crash on devices running versions of Android older than Oreo
+Tweaked appearance of hourly graph
+Tweaked behaviour of location switcher

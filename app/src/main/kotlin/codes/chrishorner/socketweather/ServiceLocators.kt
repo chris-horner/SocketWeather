@@ -33,7 +33,7 @@ private var networkComponents: NetworkComponents? = null
 @MainThread
 fun Context.getNetworkComponents(): NetworkComponents {
   networkComponents?.let { return it }
-  return NetworkComponents(app, getLocationChoices())
+  return NetworkComponents(app, getLocationChoices()).also { networkComponents = it }
 }
 
 private var forecaster: Forecaster? = null

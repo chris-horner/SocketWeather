@@ -23,19 +23,25 @@ import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import timber.log.Timber
 
-class DeviceLocator(private val app: Application) {
+interface DeviceLocator {
+  fun enable()
+  fun disable()
+  fun observeDeviceLocation(): Flow<DeviceLocation>
+}
+
+class RealDeviceLocator(private val app: Application) : DeviceLocator {
 
   private val enabledChannel = ConflatedBroadcastChannel(false)
 
-  fun enable() {
+  override fun enable() {
     enabledChannel.offer(true)
   }
 
-  fun disable() {
+  override fun disable() {
     enabledChannel.offer(false)
   }
 
-  fun observeDeviceLocation(): Flow<DeviceLocation> {
+  override fun observeDeviceLocation(): Flow<DeviceLocation> {
     return enabledChannel.asFlow()
         .flatMapLatest { enabled -> if (enabled) getDeviceLocationUpdates(app) else emptyFlow() }
         .distinctUntilChanged()

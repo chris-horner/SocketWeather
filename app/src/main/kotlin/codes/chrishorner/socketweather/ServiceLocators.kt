@@ -1,24 +1,15 @@
 package codes.chrishorner.socketweather
 
-import android.app.Application
 import android.content.Context
 import androidx.annotation.MainThread
-import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.util.app
 import org.threeten.bp.Clock
 
 // This file contains caches and functions to access singletons.
 // Basically a bunch of cheap service locators.
-
-private var deviceLocator: DeviceLocator? = null
-
-@MainThread
-fun Context.getDeviceLocator(): DeviceLocator {
-  deviceLocator?.let { return it }
-  return DeviceLocator(app).also { deviceLocator = it }
-}
 
 private var locationChoices: LocationChoices? = null
 
@@ -49,6 +40,3 @@ fun Context.getForecaster(): Forecaster {
       getDeviceLocator().observeDeviceLocation()
   ).also { forecaster = it }
 }
-
-private val Context.app: Application
-  get() = applicationContext as Application

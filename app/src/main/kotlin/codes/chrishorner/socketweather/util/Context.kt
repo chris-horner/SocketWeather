@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.util
 
+import android.app.Application
 import android.content.Context
 import android.graphics.drawable.Drawable
 import android.util.TypedValue
@@ -8,6 +9,9 @@ import androidx.annotation.ColorInt
 import androidx.annotation.DrawableRes
 import androidx.annotation.StyleRes
 import androidx.appcompat.content.res.AppCompatResources
+
+val Context.app: Application
+  get() = applicationContext as Application
 
 @StyleRes fun Context.resolveAttr(@AttrRes attrId: Int): Int {
   val typedValue = TypedValue()

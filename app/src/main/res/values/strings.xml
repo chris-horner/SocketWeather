@@ -30,6 +30,16 @@
   <string name="home_dateForecastTomorrow">Tomorrow</string>
   <string name="home_currentIconDesc">Icon for current conditions.</string>
 
+  <string name="home_error_retryButton">Try again</string>
+  <string name="home_error_unknownLocation_title">Where are you?</string>
+  <string name="home_error_unknownLocation_message">Sorry mate, this app provides forecasts for Australia only!</string>
+  <string name="home_error_data_title">Something\'s wrong</string>
+  <string name="home_error_data_message">Looks like the Bureau of Meteorology is returning some unexpected data.</string>
+  <string name="home_error_network_title">Network issues?</string>
+  <string name="home_error_network_message">Looks like the Bureau of Meteorology is unreachable at the moment.</string>
+  <string name="home_error_location_title">Can\'t locate you</string>
+  <string name="home_error_location_message">Try double checking your location settings and permissions.</string>
+
   <string name="switchLocation_followMeTitle">Follow me</string>
   <string name="switchLocation_followMeSubtitle">Forecast at your location</string>
   <string name="switchLocation_add">Add another location</string>

@@ -1,3 +1,2 @@
-Fixed crash on devices running versions of Android older than Oreo
-Tweaked appearance of hourly graph
-Tweaked behaviour of location switcher
+Fixed issues with network request management.
+Fixed issues with parsing BOMs eccentric data.

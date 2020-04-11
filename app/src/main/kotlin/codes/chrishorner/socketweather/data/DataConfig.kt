@@ -8,9 +8,11 @@ import com.squareup.moshi.JsonReader.Token
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
+import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
+import java.lang.reflect.Type
 
 object DataConfig {
 
@@ -20,6 +22,7 @@ object DataConfig {
       .add(InstantAdapter)
       .add(ZoneIdAdapter)
       .add(LocationSelectionAdapter)
+      .add(SkipBadElementsListAdapterFactory)
       .add(KotlinJsonAdapterFactory())
       .build()
 
@@ -65,6 +68,55 @@ object DataConfig {
       }
 
       return selection ?: throw JsonDataException("Failed to deserialize SelectedLocation.")
+    }
+  }
+
+  /**
+   * BOM sometimes sends down completely invalid objects in lists. This factory creates
+   * adapters that skip invalid elements.
+   */
+  private object SkipBadElementsListAdapterFactory : JsonAdapter.Factory {
+
+    override fun create(type: Type, annotations: MutableSet<out Annotation>, moshi: Moshi): JsonAdapter<*>? {
+      if (annotations.isNotEmpty() || Types.getRawType(type) != List::class.java) {
+        return null
+      }
+
+      val elementType = Types.collectionElementType(type, List::class.java)
+      val elementAdapter = moshi.adapter<Any>(elementType)
+      return SkipBadElementsListAdapter(elementAdapter)
+    }
+
+    private class SkipBadElementsListAdapter(
+        private val elementAdapter: JsonAdapter<Any>
+    ) : JsonAdapter<List<Any>>() {
+
+      override fun fromJson(reader: JsonReader): List<Any> {
+        val result = mutableListOf<Any>()
+        reader.beginArray()
+        while (reader.hasNext()) {
+          try {
+            val peeked = reader.peekJson()
+            result += elementAdapter.fromJson(peeked)!!
+          } catch (ignored: JsonDataException) {
+            // Skip bad element.
+          }
+          reader.skipValue()
+        }
+        reader.endArray()
+        return result
+      }
+
+      override fun toJson(writer: JsonWriter, value: List<Any>?) {
+        if (value == null) {
+          throw NullPointerException("value was null! Wrap in .nullSafe() to write nullable values.")
+        }
+        writer.beginArray()
+        for (i in value.indices) {
+          elementAdapter.toJson(writer, value[i])
+        }
+        writer.endArray()
+      }
     }
   }
 }

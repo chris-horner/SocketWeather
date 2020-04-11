@@ -58,7 +58,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
     val currentObservations = CurrentObservations(
         temp = 17f,
         temp_feels_like = 15.8f,
-        station = Station(name = "Melbourne (Olympic Park)", distance = 2849)
+        station = Station(name = "Melbourne (Olympic Park)")
     )
 
     fun generateDateForecasts(): List<DateForecast> {

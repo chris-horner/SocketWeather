@@ -64,7 +64,7 @@ data class CurrentObservations(
     val station: Station
 )
 
-data class Station(val name: String, val distance: Int)
+data class Station(val name: String)
 
 data class DateForecast(
     val date: Instant,

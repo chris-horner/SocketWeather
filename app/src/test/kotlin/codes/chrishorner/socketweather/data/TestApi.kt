@@ -50,7 +50,7 @@ class TestApi(clock: Clock) : WeatherApi {
 
   override suspend fun getObservations(geohash: String): CurrentObservations {
     if (failRequests) throw IOException("TestApi failure.")
-    return CurrentObservations(21f, 20f, Station("PlayStation", 5))
+    return CurrentObservations(21f, 20f, Station("PlayStation"))
   }
 
   override suspend fun getDateForecasts(geohash: String): List<DateForecast> {

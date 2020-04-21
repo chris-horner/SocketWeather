@@ -8,16 +8,16 @@ import codes.chrishorner.socketweather.util.addTransition
 import codes.chrishorner.socketweather.util.transitionSet
 import com.bluelinelabs.conductor.changehandler.TransitionChangeHandler
 import com.google.android.material.transition.MaterialFade
-import com.google.android.material.transition.Scale
+import com.google.android.material.transition.ScaleProvider
 
 class SwitchLocationChangeHandler : TransitionChangeHandler() {
 
   override fun getTransition(container: ViewGroup, from: View?, to: View?, isPush: Boolean) = transitionSet {
 
-    val cardScale = Scale()
-    cardScale.incomingStartScale = 0.98f
-    val cardFadeAndScale = MaterialFade.create(container.context, isPush)
-    cardFadeAndScale.secondaryTransition = cardScale
+    val cardFadeAndScale = MaterialFade.create(isPush)
+    cardFadeAndScale.secondaryAnimatorProvider = ScaleProvider(isPush).apply {
+      incomingStartScale = 0.98f
+    }
 
     addTransition(cardFadeAndScale) {
       addTarget(R.id.switchLocation_card)

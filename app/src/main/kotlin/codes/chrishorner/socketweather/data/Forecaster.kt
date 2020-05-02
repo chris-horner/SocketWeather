@@ -3,6 +3,7 @@ package codes.chrishorner.socketweather.data
 import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.Forecaster.State
 import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
+import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -124,9 +125,11 @@ private fun createStateFlow(
           val forecast = loadForecast(api, clock, locationState.location)
           cachedForecast = forecast
           emit(State.Loaded(locationState.selection, forecast))
+        } catch (e: JsonDataException) {
+          Timber.e(e, "API returned unexpected data.")
+          emit(State.Error(locationState.selection, ErrorType.DATA))
         } catch (e: Exception) {
           Timber.e(e, "Failed to load forecast.")
-          //TODO: Differentiate between network and data errors.
           emit(State.Error(locationState.selection, ErrorType.NETWORK))
         }
       }

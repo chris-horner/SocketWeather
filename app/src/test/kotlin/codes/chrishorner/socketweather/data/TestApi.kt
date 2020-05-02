@@ -16,8 +16,10 @@ class TestApi(clock: Clock) : WeatherApi {
   private val startingInstant = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC)
   private var failRequests = false
 
-  val location1 = Location("1", "1", "Fakezroy", "VIC", 1.0, 1.0, ZoneId.of("Australia/Melbourne"))
-  val location2 = Location("2", "2", "Mockswood", "VIC", 2.0, 2.0, ZoneId.of("Australia/Melbourne"))
+  val deviceLocation1 = DeviceLocation(-37.798336, 144.978468)
+  val deviceLocation2 = DeviceLocation(-37.829855, 144.886371)
+  val location1 = Location("1", "1", "Fakezroy", "VIC", deviceLocation1.latitude, deviceLocation1.longitude, ZoneId.of("Australia/Melbourne"))
+  val location2 = Location("2", "2", "Mockswood", "VIC", deviceLocation2.latitude, deviceLocation2.longitude, ZoneId.of("Australia/Melbourne"))
   private val locations = listOf(location1, location2)
 
   fun failRequests(fail: Boolean) {

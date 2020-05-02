@@ -3,37 +3,6 @@ package codes.chrishorner.socketweather.data
 import org.threeten.bp.Instant
 import org.threeten.bp.ZoneId
 
-data class ForecastState(
-    val selection: LocationSelection,
-    val location: Location? = null,
-    val forecast: Forecast? = null,
-    val loadingStatus: LoadingStatus
-) {
-  enum class LoadingStatus { Loading, LocationFailed, NetworkFailed, Success }
-}
-
-sealed class LocationSelection {
-  object FollowMe : LocationSelection()
-  data class Static(val location: Location) : LocationSelection()
-  object None : LocationSelection()
-}
-
-data class Forecast(
-    val updateTime: Instant,
-    val location: Location,
-    val iconDescriptor: String,
-    val night: Boolean,
-    val currentTemp: Float,
-    val tempFeelsLike: Float?,
-    val highTemp: Int,
-    val lowTemp: Int,
-    val todayForecast: DateForecast,
-    val hourlyForecasts: List<ThreeHourlyForecast>,
-    val upcomingForecasts: List<DateForecast>
-)
-
-data class DeviceLocation(val latitude: Double, val longitude: Double)
-
 /**
  * A representation of the wrapped payloads the BOM API returns. Any Envelope objects
  * returned by the API will be unwrapped by [EnvelopeConverter].

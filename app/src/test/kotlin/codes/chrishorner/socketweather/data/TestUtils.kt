@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.data
 
+import com.google.common.truth.Subject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -42,3 +43,7 @@ class TestCollector<T>(scope: CoroutineScope, flow: Flow<T>) {
 }
 
 fun <T> Flow<T>.test(scope: CoroutineScope) = TestCollector(scope, this)
+
+inline fun <reified T> Subject.isInstanceOf() {
+  isInstanceOf(T::class.java)
+}

@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutController
+import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.getForecaster
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
@@ -17,9 +18,10 @@ import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
@@ -62,7 +64,8 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
     // Refresh if we're displaying a forecast more than 1 minute old.
     viewModel.observeStates()
-        .mapNotNull { it.forecast }
+        .filterIsInstance< Forecaster.State.Loaded>()
+        .mapLatest { it.forecast }
         .map { Duration.between(it.updateTime, Instant.now()) }
         .filter { it.toMinutes() > 1 }
         .take(1)

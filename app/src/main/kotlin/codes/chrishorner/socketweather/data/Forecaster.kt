@@ -1,32 +1,26 @@
 package codes.chrishorner.socketweather.data
 
 import androidx.annotation.MainThread
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Loading
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.LocationFailed
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.NetworkFailed
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
+import codes.chrishorner.socketweather.data.Forecaster.State
+import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.scanReduce
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.supervisorScope
 import org.threeten.bp.Clock
 import org.threeten.bp.Instant
 import timber.log.Timber
 
+/**
+ * A singleton that holds the current state of the [Forecast] for the whole application.
+ */
 class Forecaster(
     clock: Clock,
     api: WeatherApi,
@@ -34,10 +28,20 @@ class Forecaster(
     deviceLocations: Flow<DeviceLocation>
 ) {
 
-  private val stateChannel = ConflatedBroadcastChannel<ForecastState>()
+  sealed class State(open val selection: LocationSelection) {
+    data class FindingLocation(override val selection: LocationSelection) : State(selection)
+    data class LoadingForecast(override val selection: LocationSelection, val location: Location) : State(selection)
+    data class Loaded(override val selection: LocationSelection, val forecast: Forecast) : State(selection)
+    data class Refreshing(override val selection: LocationSelection, val previousForecast: Forecast) : State(selection)
+    data class Error(override val selection: LocationSelection, val type: ErrorType) : State(selection)
+
+    enum class ErrorType { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
+  }
+
+  private val stateChannel = ConflatedBroadcastChannel<State>()
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
 
-  private val stateFlow: Flow<ForecastState> = observeForecastStates(
+  private val stateFlow: Flow<State> = createStateFlow(
       clock,
       api,
       locationSelections,
@@ -48,7 +52,7 @@ class Forecaster(
   private var subscribed = false
 
   @MainThread
-  fun observeForecasts(): Flow<ForecastState> {
+  fun observeState(): Flow<State> {
     // Remove these shenanigans once Flows are able to be multicast.
     val flow = stateChannel.asFlow()
 
@@ -65,87 +69,69 @@ class Forecaster(
   }
 }
 
-private fun observeForecastStates(
+private fun createStateFlow(
     clock: Clock,
     api: WeatherApi,
     locationSelections: Flow<LocationSelection>,
     deviceLocations: Flow<DeviceLocation>,
     refreshRequests: Flow<Unit>
-): Flow<ForecastState> {
+): Flow<State> {
   // Emit a LocationSelection whenever a new selection is made, or whenever a
   // new refresh request comes through.
   val selectionTriggers: Flow<LocationSelection> =
       combine(locationSelections, refreshRequests) { selection, _ -> selection }
 
-  // Whenever a device location is emitted, query the API to get the Location for
-  // that particular lat/long.
-  val followMeUpdates: Flow<Location> = deviceLocations
-      .mapLatest { api.searchForLocation("${it.latitude},${it.longitude}") }
-      .map { api.getLocation(it[0].geohash) }
-      .distinctUntilChanged()
+  val locationResolutions = resolveLocations(selectionTriggers, deviceLocations, api)
 
-  // Every time a new LocationSelection is made, produce a stream of LocatingStates.
-  // This means that if the user selects a static location, we emit a single Located
-  // state. If they select FollowMe, we first emit Searching and then subsequent
-  // Located states every time we receive a new DeviceLocation.
-  val locatingStates: Flow<LocatingState> = selectionTriggers.flatMapLatest { selection ->
-    when (selection) {
-      is LocationSelection.Static -> flowOf(LocatingState.Located(selection, selection.location))
-      LocationSelection.None -> flowOf(LocatingState.Error(selection))
-      LocationSelection.FollowMe -> followMeUpdates
-          .map<Location, LocatingState> { LocatingState.Located(selection, it) }
-          .catch {
-            Timber.e(it, "Location updates failed.")
-            emit(LocatingState.Error(selection))
-          }
-          .onStart { emit(LocatingState.Searching) }
-    }
-  }
+  var cachedForecast: Forecast? = null
 
-  // As LocatingStates change, transform them into corresponding streams of
-  // ForecastState. Searching for a location means the LoadingStatus of
-  // ForecastState will be Loading. Error will be LocationFailed. Located means new
-  // network requests will be kicked off in order to get the forecast for the newly
-  // located location.
-  val forecastStates: Flow<ForecastState> = locatingStates.transformLatest { locatingState ->
-    when (locatingState) {
-      is LocatingState.Searching -> {
-        emit(ForecastState(locatingState.selection, loadingStatus = Loading))
+  return locationResolutions.transformLatest { locationState ->
+
+    val lastKnownForecast: Forecast? = cachedForecast
+
+    when (locationState) {
+      is LocationResolution.Searching -> {
+        if (lastKnownForecast != null) {
+          emit(State.Refreshing(locationState.selection, lastKnownForecast))
+        } else {
+          emit(State.FindingLocation(locationState.selection))
+        }
       }
 
-      is LocatingState.Error -> {
-        emit(ForecastState(locatingState.selection, loadingStatus = LocationFailed))
+      is LocationResolution.DeviceLocationError -> {
+        cachedForecast = null
+        emit(State.Error(locationState.selection, type = ErrorType.LOCATION))
       }
 
-      is LocatingState.Located -> {
-        emit(ForecastState(locatingState.selection, locatingState.location, loadingStatus = Loading))
+      is LocationResolution.NetworkError -> {
+        cachedForecast = null
+        emit(State.Error(locationState.selection, type = ErrorType.NETWORK))
+      }
+
+      is LocationResolution.NotInAustralia -> {
+        cachedForecast = null
+        emit(State.Error(locationState.selection, type = ErrorType.NOT_AUSTRALIA))
+      }
+
+      is LocationResolution.Resolved -> {
+        if (lastKnownForecast != null) {
+          emit(State.Refreshing(locationState.selection, lastKnownForecast))
+        } else {
+          emit(State.LoadingForecast(locationState.selection, locationState.location))
+        }
 
         try {
-          val forecast = loadForecast(api, clock, locatingState.location)
-          emit(ForecastState(locatingState.selection, locatingState.location, forecast, loadingStatus = Success))
+          val forecast = loadForecast(api, clock, locationState.location)
+          cachedForecast = forecast
+          emit(State.Loaded(locationState.selection, forecast))
         } catch (e: Exception) {
           Timber.e(e, "Failed to load forecast.")
-          emit(ForecastState(locatingState.selection, locatingState.location, loadingStatus = NetworkFailed))
+          //TODO: Differentiate between network and data errors.
+          emit(State.Error(locationState.selection, ErrorType.NETWORK))
         }
       }
     }
-  }
-
-  // Finally, as we emit forecast states, check what state we're changing from and to.
-  // If we're changing from one state to another and would lose our forecast information,
-  // check if we're presenting the same location. If we are, we can reuse our
-  // previously calculated forecasts.
-  return forecastStates.scanReduce { previousState, newState ->
-    val reuseForecast = newState.location == null
-        || previousState.location == null
-        || newState.location == previousState.location
-
-    if (reuseForecast && newState.forecast == null) {
-      newState.copy(forecast = previousState.forecast)
-    } else {
-      newState
-    }
-  }
+  }.distinctUntilChanged()
 }
 
 private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Location): Forecast = supervisorScope {
@@ -190,10 +176,4 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
       hourlyForecasts = hourlyForecasts,
       upcomingForecasts = upcomingForecasts
   )
-}
-
-private sealed class LocatingState(open val selection: LocationSelection) {
-  object Searching : LocatingState(LocationSelection.FollowMe)
-  data class Error(override val selection: LocationSelection) : LocatingState(selection)
-  data class Located(override val selection: LocationSelection, val location: Location) : LocatingState(selection)
 }

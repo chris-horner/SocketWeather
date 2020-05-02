@@ -8,15 +8,14 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecast
-import codes.chrishorner.socketweather.data.ForecastState
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Loading
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.LocationFailed
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.NetworkFailed
-import codes.chrishorner.socketweather.data.ForecastState.LoadingStatus.Success
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
+import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.Loading
+import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.LocationFailed
+import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.NetworkFailed
+import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.Success
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -46,7 +45,7 @@ class HomePresenter(view: View) {
 
   val events: Flow<Event>
 
-  private var currentState: ForecastState? = null
+  private var currentState: HomeViewModel.State? = null
 
   init {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
@@ -68,7 +67,7 @@ class HomePresenter(view: View) {
     )
   }
 
-  fun display(state: ForecastState) {
+  fun display(state: HomeViewModel.State) {
     toolbarTitle.text = when (state.selection) {
       is LocationSelection.Static -> state.selection.location.name
       is LocationSelection.FollowMe -> state.location?.name ?: context.getString(R.string.home_findingLocation)

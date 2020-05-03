@@ -35,31 +35,26 @@ fun View.updatePaddingWithInsets(
     right: Boolean = false,
     bottom: Boolean = false
 ) {
+  // Create a snapshot of padding.
+  val initialPadding = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
-  doOnApplyWindowInsets { insets, padding ->
+  doOnApplyWindowInsets { insets ->
     updatePadding(
-        left = if (left) padding.left + insets.systemWindowInsetLeft else padding.left,
-        top = if (top) padding.top + insets.systemWindowInsetTop else padding.top,
-        right = if (right) padding.right + insets.systemWindowInsetRight else padding.right,
-        bottom = if (bottom) padding.bottom + insets.systemWindowInsetBottom else padding.bottom
+        left = if (left) initialPadding.left + insets.systemWindowInsetLeft else initialPadding.left,
+        top = if (top) initialPadding.top + insets.systemWindowInsetTop else initialPadding.top,
+        right = if (right) initialPadding.right + insets.systemWindowInsetRight else initialPadding.right,
+        bottom = if (bottom) initialPadding.bottom + insets.systemWindowInsetBottom else initialPadding.bottom
     )
   }
 }
 
-private inline fun View.doOnApplyWindowInsets(crossinline block: (insets: WindowInsets, padding: Rect) -> Unit) {
-  // Create a snapshot of padding.
-  val initialPadding = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
-
-  // Set an actual OnApplyWindowInsetsListener which proxies to the given lambda, also passing in the original padding.
+inline fun View.doOnApplyWindowInsets(crossinline block: (insets: WindowInsets) -> Unit) {
+  // Set an actual OnApplyWindowInsetsListener which proxies to the given lambda.
   setOnApplyWindowInsetsListener { _, insets ->
-    block(insets, initialPadding)
+    block(insets)
     return@setOnApplyWindowInsetsListener insets
   }
 
-  requestApplyInsetsWhenAttached()
-}
-
-private fun View.requestApplyInsetsWhenAttached() {
   if (isAttachedToWindow) {
     // We're already attached, just request as normal.
     requestApplyInsets()

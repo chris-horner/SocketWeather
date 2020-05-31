@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.data
 
 import codes.chrishorner.socketweather.data.Rain.Amount
+import com.squareup.moshi.JsonDataException
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
@@ -12,22 +13,36 @@ import java.io.IOException
 
 class TestApi(clock: Clock) : WeatherApi {
 
+  enum class ResponseMode { SUCCESS, NETWORK_ERROR, DATA_ERROR }
+
   private val firstDayInstant = LocalDate.now(clock).atTime(0, 0).toInstant(ZoneOffset.UTC)
   private val startingInstant = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC)
-  private var failRequests = false
 
+  var responseMode: ResponseMode = ResponseMode.SUCCESS
   val deviceLocation1 = DeviceLocation(-37.798336, 144.978468)
   val deviceLocation2 = DeviceLocation(-37.829855, 144.886371)
-  val location1 = Location("1", "1", "Fakezroy", "VIC", deviceLocation1.latitude, deviceLocation1.longitude, ZoneId.of("Australia/Melbourne"))
-  val location2 = Location("2", "2", "Mockswood", "VIC", deviceLocation2.latitude, deviceLocation2.longitude, ZoneId.of("Australia/Melbourne"))
+  val location1 = Location(
+      "1",
+      "1",
+      "Fakezroy",
+      "VIC",
+      deviceLocation1.latitude,
+      deviceLocation1.longitude,
+      ZoneId.of("Australia/Melbourne")
+  )
+  val location2 = Location(
+      "2",
+      "2",
+      "Mockswood",
+      "VIC",
+      deviceLocation2.latitude,
+      deviceLocation2.longitude,
+      ZoneId.of("Australia/Melbourne")
+  )
   private val locations = listOf(location1, location2)
 
-  fun failRequests(fail: Boolean) {
-    failRequests = fail
-  }
-
   override suspend fun searchForLocation(query: String): List<SearchResult> {
-    if (failRequests) throw IOException("TestApi failure.")
+    failIfNecessary()
 
     return when {
       query.contains(',') -> {
@@ -41,7 +56,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getLocation(geohash: String): Location {
-    if (failRequests) throw IOException("TestApi failure.")
+    failIfNecessary()
 
     return when (geohash) {
       "1" -> location1
@@ -51,12 +66,12 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getObservations(geohash: String): CurrentObservations {
-    if (failRequests) throw IOException("TestApi failure.")
+    failIfNecessary()
     return CurrentObservations(21f, 20f, Station("PlayStation"))
   }
 
   override suspend fun getDateForecasts(geohash: String): List<DateForecast> {
-    if (failRequests) throw IOException("TestApi failure.")
+    failIfNecessary()
 
     return listOf(
         DateForecast(
@@ -142,7 +157,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getThreeHourlyForecasts(geohash: String): List<ThreeHourlyForecast> {
-    if (failRequests) throw IOException("TestApi failure.")
+    failIfNecessary()
 
     return listOf(
         ThreeHourlyForecast(
@@ -268,4 +283,9 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   private fun Location.toSearchResult() = SearchResult(id, geohash, name, "TEST", state)
+
+  private fun failIfNecessary() {
+    if (responseMode == ResponseMode.NETWORK_ERROR) throw IOException("TestApi failure.")
+    else if (responseMode == ResponseMode.DATA_ERROR) throw JsonDataException("TestApi failure.")
+  }
 }

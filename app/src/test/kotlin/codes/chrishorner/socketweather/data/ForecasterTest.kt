@@ -6,6 +6,7 @@ import codes.chrishorner.socketweather.data.Forecaster.State.FindingLocation
 import codes.chrishorner.socketweather.data.Forecaster.State.Loaded
 import codes.chrishorner.socketweather.data.Forecaster.State.LoadingForecast
 import codes.chrishorner.socketweather.data.Forecaster.State.Refreshing
+import codes.chrishorner.socketweather.data.TestApi.ResponseMode
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.asFlow
@@ -160,18 +161,18 @@ class ForecasterTest {
     val deviceLocations = emptyFlow<DeviceLocation>()
 
     // Initially configure network requests to fail.
-    testApi.failRequests(true)
+    testApi.responseMode = ResponseMode.NETWORK_ERROR
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
     val states = forecaster.observeState().test(this)
 
-    // With network requests failing, our initial state should be `Error`.
+    // With network requests failing, our initial state should be `Error` with type `NETWORK`.
     assertThat(states[0]).isInstanceOf<Error>()
     val errorState = states[0] as Error
     assertThat(errorState.type).isEqualTo(ErrorType.NETWORK)
 
     // Next, reconfigure network requests to succeed and request a refresh.
-    testApi.failRequests(false)
+    testApi.responseMode = ResponseMode.SUCCESS
     forecaster.refresh()
 
     // When refreshing, we should transition from `LoadingForecast` -> `Loaded`.
@@ -194,6 +195,33 @@ class ForecasterTest {
     assertThat(states[0]).isInstanceOf<Error>()
     val errorState = states[0] as Error
     assertThat(errorState.type).isEqualTo(ErrorType.NOT_AUSTRALIA)
+    states.dispose()
+  }
+
+  @Test fun `malformed response produces error`() = runBlockingTest {
+
+    val selections = flowOf(LocationSelection.Static(testApi.location1))
+    val deviceLocations = emptyFlow<DeviceLocation>()
+
+    // Initially configure network requests to fail with a data error.
+    testApi.responseMode = ResponseMode.DATA_ERROR
+
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    val states = forecaster.observeState().test(this)
+
+    // With network requests failing, our initial state should be `Error` with type `DATA`.
+    assertThat(states[0]).isInstanceOf<Error>()
+    val errorState = states[0] as Error
+    assertThat(errorState.type).isEqualTo(ErrorType.DATA)
+
+    // Next, reconfigure network requests to succeed and request a refresh.
+    testApi.responseMode = ResponseMode.SUCCESS
+    forecaster.refresh()
+
+    // When refreshing, we should transition from `LoadingForecast` -> `Loaded`.
+    assertThat(states[1]).isInstanceOf<LoadingForecast>()
+    assertThat(states[2]).isInstanceOf<Loaded>()
+
     states.dispose()
   }
 }

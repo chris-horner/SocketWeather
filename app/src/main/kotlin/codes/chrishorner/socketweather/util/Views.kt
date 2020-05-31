@@ -7,7 +7,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.view.inputmethod.InputMethodManager
+import android.widget.ViewFlipper
+import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.core.view.forEachIndexed
 import androidx.core.view.updatePadding
 
 @Suppress("UNCHECKED_CAST")
@@ -69,4 +72,17 @@ inline fun View.doOnApplyWindowInsets(crossinline block: (insets: WindowInsets) 
       override fun onViewDetachedFromWindow(v: View) = Unit
     })
   }
+}
+
+fun ViewFlipper.setDisplayedChildId(@IdRes id: Int) {
+  forEachIndexed { index, view ->
+    if (view.id == id) {
+      if (displayedChild == index) return
+      displayedChild = index
+      return
+    }
+  }
+
+  val name = resources.getResourceName(id)
+  throw IllegalArgumentException("No child with ID $name")
 }

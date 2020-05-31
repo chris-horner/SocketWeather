@@ -4,18 +4,16 @@ import android.content.Context
 import android.text.format.DateUtils
 import android.view.View
 import android.widget.TextView
+import android.widget.ViewFlipper
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.data.Forecast
+import codes.chrishorner.socketweather.data.Forecaster.State
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
-import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.Loading
-import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.LocationFailed
-import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.NetworkFailed
-import codes.chrishorner.socketweather.home.HomeViewModel.State.LoadingStatus.Success
+import codes.chrishorner.socketweather.util.setDisplayedChildId
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,25 +25,24 @@ import reactivecircus.flowbinding.appcompat.itemClicks
 
 class HomePresenter(view: View) {
 
+  enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }
+
   private val toolbar: Toolbar = view.findViewById(R.id.home_toolbar)
   private val locationDropdown: View = view.findViewById(R.id.home_locationDropdown)
   private val toolbarTitle: TextView = view.findViewById(R.id.home_toolbarTitle)
   private val toolbarSubtitle: TextView = view.findViewById(R.id.home_toolbarSubtitle)
-  private val forecastContainer: View = view.findViewById(R.id.home_forecastContainer)
-  private val loading: View = view.findViewById(R.id.home_loading)
   private val secondaryLoading: View = view.findViewById(R.id.home_secondaryLoading)
-  private val error: View = view.findViewById(R.id.home_error)
-  private val errorMessage: TextView = view.findViewById(R.id.home_errorMessage)
-  private val retryButton: View = view.findViewById(R.id.home_retryButton)
-  private val timeForecastsView: TimeForecastView = view.findViewById(R.id.home_timeForecasts)
-  private val dateForecastsView: DateForecastsView = view.findViewById(R.id.home_dateForecasts)
-  private val observationsPresenter = ObservationsPresenter(view.findViewById(R.id.home_observations))
+  private val contentContainer: ViewFlipper = view.findViewById(R.id.home_contentContainer)
+  private val retryButton: View = view.findViewById(R.id.home_error_retryButton)
+
+  private val forecastPresenter = HomeForecastPresenter(view.findViewById(R.id.home_forecast))
+  private val errorPresenter = HomeErrorPresenter(view.findViewById(R.id.home_error))
 
   private val context: Context = view.context
 
   val events: Flow<Event>
 
-  private var currentState: HomeViewModel.State? = null
+  private var currentState: State? = null
 
   init {
     toolbar.updatePaddingWithInsets(left = true, top = true, right = true)
@@ -67,63 +64,85 @@ class HomePresenter(view: View) {
     )
   }
 
-  fun display(state: HomeViewModel.State) {
-    toolbarTitle.text = when (state.selection) {
-      is LocationSelection.Static -> state.selection.location.name
-      is LocationSelection.FollowMe -> state.location?.name ?: context.getString(R.string.home_findingLocation)
-      is LocationSelection.None -> throw IllegalArgumentException("Cannot display LocationSelection.None")
+  fun display(state: State) {
+
+    when (state) {
+      is State.Idle -> {
+        contentContainer.setDisplayedChildId(R.id.home_loading)
+        toolbarTitle.setText(R.string.home_loading)
+      }
+
+      is State.FindingLocation -> {
+        contentContainer.setDisplayedChildId(R.id.home_loading)
+        toolbarTitle.setText(R.string.home_findingLocation)
+      }
+
+      is State.LoadingForecast -> {
+        contentContainer.setDisplayedChildId(R.id.home_loading)
+        toolbarTitle.setText(R.string.home_loading)
+      }
+
+      is State.Error -> {
+        contentContainer.setDisplayedChildId(R.id.home_error)
+        val title: String = when (val selection = state.selection) {
+          is LocationSelection.Static -> selection.location.name
+          is LocationSelection.FollowMe -> context.getString(R.string.home_findingLocation)
+          is LocationSelection.None -> throw IllegalStateException("Cannot display LocationSelection of None.")
+        }
+
+        toolbarTitle.text = title
+        errorPresenter.display(state)
+      }
+
+      is State.Refreshing -> {
+        contentContainer.setDisplayedChildId(R.id.home_forecast)
+        toolbarTitle.text = state.previousForecast.location.name
+        forecastPresenter.display(state.previousForecast)
+      }
+
+      is State.Loaded -> {
+        contentContainer.setDisplayedChildId(R.id.home_forecast)
+        toolbarTitle.text = state.forecast.location.name
+        forecastPresenter.display(state.forecast)
+      }
     }
 
-    val forecast: Forecast? = state.forecast
-
-    if (forecast != null && (state.loadingStatus == Loading || state.loadingStatus == Success)) {
-      forecastContainer.isVisible = true
-      observationsPresenter.display(forecast)
-      timeForecastsView.display(forecast)
-      dateForecastsView.display(forecast)
-    } else {
-      forecastContainer.isVisible = false
-    }
-
-    error.isVisible = state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed
-    if (state.loadingStatus == LocationFailed) {
-      errorMessage.setText(R.string.home_locationError)
-    } else if (state.loadingStatus == NetworkFailed) {
-      errorMessage.setText(R.string.home_networkError)
-    }
-
-    loading.isVisible = state.loadingStatus == Loading && forecast == null
-    secondaryLoading.isVisible = state.loadingStatus == Loading && forecast != null
+    // The secondary loading view (the little progress bar in the Toolbar) should only
+    // be visible when we're refreshing.
+    secondaryLoading.isVisible = state is State.Refreshing
 
     currentState = state
     updateRefreshTimeText()
   }
 
+  /**
+   * Updates the text that appears below the Toolbar title on the home screen.
+   *
+   * This method relies on `display(state)` being called first.
+   */
   fun updateRefreshTimeText() {
-    val state = currentState
 
-    if (state == null || state.loadingStatus == LocationFailed || state.loadingStatus == NetworkFailed) {
-      toolbarSubtitle.isVisible = false
-      return
-    }
+    when (val state = currentState) {
 
-    toolbarSubtitle.isVisible = true
-
-    if (state.loadingStatus == Loading) {
-      toolbarSubtitle.setText(R.string.home_updatingNow)
-    } else if (state.forecast != null) {
-
-      val updateTime = state.forecast.updateTime
-      val now = Instant.now()
-
-      if (Duration.between(updateTime, now).toMinutes() > 0) {
-        val timeAgoText = DateUtils.getRelativeTimeSpanString(updateTime.toEpochMilli())
-        toolbarSubtitle.text = context.getString(R.string.home_lastUpdated, timeAgoText)
-      } else {
-        toolbarSubtitle.setText(R.string.home_justUpdated)
+      is State.Refreshing -> {
+        toolbarSubtitle.isVisible = true
+        toolbarSubtitle.setText(R.string.home_updatingNow)
       }
+
+      is State.Loaded -> {
+        toolbarSubtitle.isVisible = true
+        val updateTime = state.forecast.updateTime
+        val now = Instant.now()
+
+        if (Duration.between(updateTime, now).toMinutes() > 0) {
+          val timeAgoText = DateUtils.getRelativeTimeSpanString(updateTime.toEpochMilli())
+          toolbarSubtitle.text = context.getString(R.string.home_lastUpdated, timeAgoText)
+        } else {
+          toolbarSubtitle.setText(R.string.home_justUpdated)
+        }
+      }
+
+      else -> toolbarSubtitle.isVisible = false
     }
   }
-
-  enum class Event { SwitchLocationClicked, RefreshClicked, AboutClicked }
 }

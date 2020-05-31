@@ -22,6 +22,7 @@
       app:layout_constraintBottom_toBottomOf="@id/home_currentTemp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
+      tools:src="@drawable/ic_weather_partly_cloudy_24dp"
       />
 
   <TextView
@@ -101,6 +102,7 @@
       app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
       app:layout_goneMarginTop="0dp"
       app:lineHeight="22sp"
+      tools:text="Cloudy. Medium (40%) chance of showers, most likely over eastern suburbs. Winds west to southwesterly 15 to 20 km/h becoming light in the early afternoon."
       />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

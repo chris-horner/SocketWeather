@@ -3,6 +3,7 @@ package codes.chrishorner.socketweather.data
 import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.Forecaster.State
 import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
+import codes.chrishorner.socketweather.data.Forecaster.State.Idle
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
@@ -30,6 +31,7 @@ class Forecaster(
 ) {
 
   sealed class State(open val selection: LocationSelection) {
+    object Idle : State(LocationSelection.None)
     data class FindingLocation(override val selection: LocationSelection) : State(selection)
     data class LoadingForecast(override val selection: LocationSelection, val location: Location) : State(selection)
     data class Loaded(override val selection: LocationSelection, val forecast: Forecast) : State(selection)
@@ -39,7 +41,7 @@ class Forecaster(
     enum class ErrorType { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
   }
 
-  private val stateChannel = ConflatedBroadcastChannel<State>()
+  private val stateChannel = ConflatedBroadcastChannel<State>(Idle)
   private val refreshChannel = ConflatedBroadcastChannel(Unit)
 
   private val stateFlow: Flow<State> = createStateFlow(
@@ -51,6 +53,9 @@ class Forecaster(
   )
 
   private var subscribed = false
+
+  val currentState: State
+    get() = stateChannel.value
 
   @MainThread
   fun observeState(): Flow<State> {

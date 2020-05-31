@@ -34,6 +34,7 @@
     <item name="colorScrim">@color/scrimLight</item>
     <item name="android:windowBackground">@color/backgroundBlue</item>
     <item name="android:windowLightStatusBar" tools:ignore="NewApi">true</item>
+    <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
   </style>
 
 </resources>

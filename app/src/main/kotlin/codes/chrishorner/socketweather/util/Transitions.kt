@@ -1,7 +1,7 @@
 package codes.chrishorner.socketweather.util
 
-import android.transition.Transition
-import android.transition.TransitionSet
+import androidx.transition.Transition
+import androidx.transition.TransitionSet
 
 /**
  * Allows for building transitions in a DSL.

@@ -18,8 +18,8 @@ class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
    * Create a list where the current selection is at the beginning.
    */
   fun getOrderedSelections(): List<LocationSelection> {
-    val selections: Set<LocationSelection> = locationChoices.getSavedSelections()
-    val currentSelection: LocationSelection = locationChoices.getCurrentSelection()
+    val selections: Set<LocationSelection> = locationChoices.savedSelections
+    val currentSelection: LocationSelection = locationChoices.currentSelection
     return selections.sortedByDescending { it == currentSelection }
   }
 

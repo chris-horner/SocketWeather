@@ -8,8 +8,7 @@ import codes.chrishorner.socketweather.data.Forecaster.State.LoadingForecast
 import codes.chrishorner.socketweather.data.Forecaster.State.Refreshing
 import codes.chrishorner.socketweather.data.TestApi.ResponseMode
 import com.google.common.truth.Truth.assertThat
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOf
@@ -52,9 +51,10 @@ class ForecasterTest {
   @Test fun `FollowMe location updates produce new forecasts`() = runBlockingTest {
 
     val selections = flowOf(LocationSelection.FollowMe)
-    val deviceLocationChannel = ConflatedBroadcastChannel(testApi.deviceLocation1)
+    val deviceLocations = MutableStateFlow(testApi.deviceLocation1)
 
-    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocationChannel.asFlow())
+    val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // Initially we should be displaying `Success` with location1's forecast.
@@ -63,7 +63,7 @@ class ForecasterTest {
     assertThat(initialState.forecast.location).isEqualTo(testApi.location1)
 
     // Next we pretend to be the device providing an updated location.
-    deviceLocationChannel.send(testApi.deviceLocation2)
+    deviceLocations.value = testApi.deviceLocation2
 
     // This should kick us into a `Refreshing` status.
     assertThat(states[1]).isInstanceOf<Refreshing>()
@@ -84,6 +84,7 @@ class ForecasterTest {
     val deviceLocations = emptyFlow<DeviceLocation>()
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // Initially display `Loaded`.
@@ -101,10 +102,11 @@ class ForecasterTest {
 
   @Test fun `selecting different locations produces new forecasts`() = runBlockingTest {
 
-    val selectionChannel = ConflatedBroadcastChannel(LocationSelection.Static(testApi.location1))
+    val locationSelections = MutableStateFlow(LocationSelection.Static(testApi.location1))
     val deviceLocations = emptyFlow<DeviceLocation>()
 
-    val forecaster = Forecaster(fixedClock, testApi, selectionChannel.asFlow(), deviceLocations)
+    val forecaster = Forecaster(fixedClock, testApi, locationSelections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // Initially we should be displaying `Loaded` with location1's forecast.
@@ -113,7 +115,7 @@ class ForecasterTest {
     assertThat(initialState.forecast.location).isEqualTo(testApi.location1)
 
     // Next we pretend to be the user selecting a different location.
-    selectionChannel.send(LocationSelection.Static(testApi.location2))
+    locationSelections.value = LocationSelection.Static(testApi.location2)
 
     // When loading the new location, we should transition from `Refreshing` -> `Loaded`.
     assertThat(states[1]).isInstanceOf<Refreshing>()
@@ -135,6 +137,7 @@ class ForecasterTest {
     val deviceLocations = flow { if (failDeviceLocation) throw RuntimeException() else emit(testApi.deviceLocation1) }
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // Our first state should be failure.
@@ -164,6 +167,7 @@ class ForecasterTest {
     testApi.responseMode = ResponseMode.NETWORK_ERROR
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // With network requests failing, our initial state should be `Error` with type `NETWORK`.
@@ -189,6 +193,7 @@ class ForecasterTest {
     val deviceLocations = flowOf(DeviceLocation(35.680349, 139.769060))
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // The state emitted should be `Error` with type `NOT_AUSTRALIA`.
@@ -207,6 +212,7 @@ class ForecasterTest {
     testApi.responseMode = ResponseMode.DATA_ERROR
 
     val forecaster = Forecaster(fixedClock, testApi, selections, deviceLocations)
+    forecaster.refresh()
     val states = forecaster.observeState().test(this)
 
     // With network requests failing, our initial state should be `Error` with type `DATA`.

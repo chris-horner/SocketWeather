@@ -33,7 +33,7 @@ class MainActivity : AppCompatActivity() {
     if (!router.hasRootController()) {
       val locationChoices: LocationChoices = getLocationChoices()
 
-      if (locationChoices.getCurrentSelection() == LocationSelection.None) {
+      if (locationChoices.currentSelection == LocationSelection.None) {
         router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
       } else {
         router.setRoot(HomeController().asTransaction())

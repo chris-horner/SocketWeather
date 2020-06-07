@@ -18,17 +18,17 @@ class DebugDeviceLocatorModule(private val locator: DebugDeviceLocator) : DebugD
     val locationSpinner: Spinner = view.findViewById(R.id.debugDrawer_mockLocation)
 
     modeSpinner.adapter = ModeAdapter()
-    modeSpinner.setSelection(Mode.values().indexOf(locator.currentMode))
+    modeSpinner.setSelection(Mode.values().indexOf(locator.mode))
     modeSpinner.onItemSelected { position ->
       val mode = Mode.values()[position]
-      locator.setMode(mode)
+      locator.mode = mode
       locationSpinner.isEnabled = mode == Mode.MOCK
     }
 
     locationSpinner.adapter = LocationAdapter(locator.locationNames)
     locationSpinner.setSelection(locator.locationNames.indexOf(locator.currentLocationName))
-    locationSpinner.onItemSelected { position -> locator.setLocation(locator.locationNames[position]) }
-    locationSpinner.isEnabled = locator.currentMode == Mode.MOCK
+    locationSpinner.onItemSelected { position -> locator.locationName = locator.locationNames[position] }
+    locationSpinner.isEnabled = locator.mode == Mode.MOCK
 
     return view
   }

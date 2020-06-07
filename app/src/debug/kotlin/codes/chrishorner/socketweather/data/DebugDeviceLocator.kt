@@ -2,9 +2,8 @@ package codes.chrishorner.socketweather.data
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
@@ -26,50 +25,51 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
 
   private val sharedPrefs = app.getSharedPreferences("debugDeviceLocator", MODE_PRIVATE)
   private val realLocator = RealDeviceLocator(app)
-  private val modeChannel: ConflatedBroadcastChannel<Mode>
-  private val locationNameChannel: ConflatedBroadcastChannel<String>
+  private val modeFlow: MutableStateFlow<Mode>
+  private val locationNameFlow: MutableStateFlow<String>
 
   val locationNames: List<String> = mockLocations.keys.toList()
 
-  val currentMode: Mode
-    get() = modeChannel.value
+  var mode: Mode
+    get() = modeFlow.value
+    set(value) {
+      if (value == modeFlow.value) return
+      sharedPrefs.edit().putInt("mode", mode.ordinal).apply()
+      if (modeFlow.value == Mode.REAL) realLocator.disable()
+      modeFlow.value = mode
+    }
+
+  var locationName: String
+    get() = locationNameFlow.value
+    set(value) {
+      if (value == locationNameFlow.value) return
+      sharedPrefs.edit().putString("locationName", value).apply()
+      locationNameFlow.value = value
+    }
 
   val currentLocationName: String
-    get() = locationNameChannel.value
+    get() = locationNameFlow.value
 
   init {
     val mode = Mode.values()[sharedPrefs.getInt("mode", Mode.REAL.ordinal)]
     val locationName = sharedPrefs.getString("locationName", null) ?: "Melbourne"
-    modeChannel = ConflatedBroadcastChannel(mode)
-    locationNameChannel = ConflatedBroadcastChannel(locationName)
-  }
-
-  fun setMode(mode: Mode) {
-    if (mode == modeChannel.value) return
-    sharedPrefs.edit().putInt("mode", mode.ordinal).apply()
-    if (modeChannel.value == Mode.REAL) realLocator.disable()
-    modeChannel.offer(mode)
-  }
-
-  fun setLocation(name: String) {
-    if (name == locationNameChannel.value) return
-    sharedPrefs.edit().putString("locationName", name).apply()
-    locationNameChannel.offer(name)
+    modeFlow = MutableStateFlow(mode)
+    locationNameFlow = MutableStateFlow(locationName)
   }
 
   override fun enable() {
-    if (modeChannel.value == Mode.REAL) realLocator.enable()
+    if (mode == Mode.REAL) realLocator.enable()
   }
 
   override fun disable() {
-    if (modeChannel.value == Mode.REAL) realLocator.disable()
+    if (mode == Mode.REAL) realLocator.disable()
   }
 
   override fun observeDeviceLocation(): Flow<DeviceLocation> {
-    return modeChannel.asFlow().flatMapLatest { mode ->
+    return modeFlow.flatMapLatest { mode ->
       when (mode) {
         Mode.REAL -> realLocator.observeDeviceLocation()
-        Mode.MOCK -> locationNameChannel.asFlow().map { mockLocations.getValue(it) }
+        Mode.MOCK -> locationNameFlow.map { mockLocations.getValue(it) }
       }
     }
   }

@@ -5,15 +5,18 @@ import codes.chrishorner.socketweather.data.Forecaster.State
 import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import codes.chrishorner.socketweather.data.Forecaster.State.Idle
 import com.squareup.moshi.JsonDataException
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
+import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.supervisorScope
 import org.threeten.bp.Clock
@@ -41,37 +44,32 @@ class Forecaster(
     enum class ErrorType { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
   }
 
-  private val stateChannel = ConflatedBroadcastChannel<State>(Idle)
-  private val refreshChannel = ConflatedBroadcastChannel(Unit)
-
-  private val stateFlow: Flow<State> = createStateFlow(
-      clock,
-      api,
-      locationSelections,
-      deviceLocations,
-      refreshChannel.asFlow()
-  )
-
-  private var subscribed = false
+  private val states = MutableStateFlow<State>(Idle)
+  private val refreshes = BroadcastChannel<Unit>(1)
 
   val currentState: State
-    get() = stateChannel.value
+    get() = states.value
 
-  @MainThread
-  fun observeState(): Flow<State> {
-    // Remove these shenanigans once Flows are able to be multicast.
-    val flow = stateChannel.asFlow()
+  init {
+    val stateFlow: Flow<State> = createStateFlow(
+        clock,
+        api,
+        locationSelections,
+        deviceLocations,
+        refreshes.asFlow().onStart { emit(Unit) }
+    )
 
-    if (!subscribed) {
-      stateFlow.onEach { stateChannel.send(it) }.launchIn(MainScope())
-      subscribed = true
-    }
-
-    return flow
+    // Potentially tidier in the future: https://github.com/Kotlin/kotlinx.coroutines/issues/2047
+    stateFlow
+        .onEach { states.value = it }
+        .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate))
   }
 
+  @MainThread
+  fun observeState(): Flow<State> = states
+
   fun refresh() {
-    refreshChannel.offer(Unit)
+    refreshes.offer(Unit)
   }
 }
 
@@ -139,7 +137,7 @@ private fun createStateFlow(
         }
       }
     }
-  }.distinctUntilChanged()
+  }
 }
 
 private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Location): Forecast = supervisorScope {

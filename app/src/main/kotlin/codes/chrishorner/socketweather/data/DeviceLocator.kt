@@ -12,10 +12,9 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,18 +30,18 @@ interface DeviceLocator {
 
 class RealDeviceLocator(private val app: Application) : DeviceLocator {
 
-  private val enabledChannel = ConflatedBroadcastChannel(false)
+  private val enabledFlow = MutableStateFlow(false)
 
   override fun enable() {
-    enabledChannel.offer(true)
+    enabledFlow.value = true
   }
 
   override fun disable() {
-    enabledChannel.offer(false)
+    enabledFlow.value = false
   }
 
   override fun observeDeviceLocation(): Flow<DeviceLocation> {
-    return enabledChannel.asFlow()
+    return enabledFlow
         .flatMapLatest { enabled -> if (enabled) getDeviceLocationUpdates(app) else emptyFlow() }
         .distinctUntilChanged()
         .conflate()
@@ -68,7 +67,8 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
 
     val lastKnownLocation: Location? = try {
       client.lastLocation.await()
-    } catch (e: Exception) {
+    } catch (e: SecurityException) {
+      Timber.e(e, "Location permission not granted.")
       null
     }
 
@@ -92,7 +92,11 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
     }
 
     if (!isClosedForSend) {
-      client.requestLocationUpdates(request, callback, Looper.getMainLooper())
+      try {
+        client.requestLocationUpdates(request, callback, Looper.getMainLooper())
+      } catch (e: SecurityException) {
+        Timber.e(e, "Location permission not granted.")
+      }
     }
 
     awaitClose { client.removeLocationUpdates(callback) }

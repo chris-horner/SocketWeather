@@ -12,13 +12,14 @@ import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
@@ -35,14 +36,14 @@ class ChooseLocationViewModel(
     private val locationChoices: LocationChoices
 ) {
 
-  private val scope = MainScope()
-  private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved())
-  private val statesChannel = ConflatedBroadcastChannel(idleState)
-  private val searchQueryChannel = ConflatedBroadcastChannel<String>()
-  private val eventsChannel = BroadcastChannel<Event>(1)
+  private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+  private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved)
+  private val statesFlow = MutableStateFlow(idleState)
+  private val searchQueryFlow = MutableStateFlow("")
+  private val events = BroadcastChannel<Event>(1)
 
   init {
-    searchQueryChannel.asFlow()
+    searchQueryFlow
         .map { query ->
           if (query.isBlank()) {
             query to idleState
@@ -58,32 +59,32 @@ class ChooseLocationViewModel(
           }
         }
         .distinctUntilChanged()
-        .onEach { statesChannel.send(it) }
+        .onEach { statesFlow.value = it }
         .launchIn(scope)
   }
 
-  fun observeStates(): Flow<State> = statesChannel.asFlow()
+  fun observeStates(): Flow<State> = statesFlow
 
-  fun observeEvents(): Flow<Event> = eventsChannel.asFlow()
+  fun observeEvents(): Flow<Event> = events.asFlow()
 
   fun inputSearchQuery(query: String) {
-    searchQueryChannel.offer(query)
+    searchQueryFlow.value = query
   }
 
   fun selectResult(result: SearchResult) {
     scope.launch {
-      statesChannel.offer(idleState.copy(loadingStatus = Submitting))
+      statesFlow.value = idleState.copy(loadingStatus = Submitting)
 
       try {
         val location = api.getLocation(result.geohash)
         locationChoices.saveAndSelect(LocationSelection.Static(location))
-        eventsChannel.offer(SubmissionSuccess)
+        events.offer(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
-        eventsChannel.offer(SubmissionError)
+        events.offer(SubmissionError)
       }
 
-      statesChannel.offer(idleState)
+      statesFlow.value = idleState
     }
   }
 
@@ -91,10 +92,10 @@ class ChooseLocationViewModel(
     if (locationPermissionGranted) {
       scope.launch {
         locationChoices.saveAndSelect(LocationSelection.FollowMe)
-        eventsChannel.offer(SubmissionSuccess)
+        events.offer(SubmissionSuccess)
       }
     } else {
-      eventsChannel.offer(PermissionError)
+      events.offer(PermissionError)
     }
   }
 

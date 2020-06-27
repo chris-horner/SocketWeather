@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      val locationChoices: LocationChoices = getLocationChoices()
+      val locationChoices: LocationChoices = Singletons.locationChoices
 
       if (locationChoices.currentSelection == LocationSelection.None) {
         router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
@@ -43,12 +43,12 @@ class MainActivity : AppCompatActivity() {
 
   override fun onStart() {
     super.onStart()
-    getDeviceLocator().enable()
+    Singletons.deviceLocator.enable()
   }
 
   override fun onStop() {
     super.onStop()
-    getDeviceLocator().disable()
+    Singletons.deviceLocator.disable()
   }
 
   override fun onBackPressed() {

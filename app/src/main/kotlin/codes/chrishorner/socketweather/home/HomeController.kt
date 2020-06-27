@@ -4,8 +4,8 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.Singletons
 import codes.chrishorner.socketweather.about.AboutController
-import codes.chrishorner.socketweather.getForecaster
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.RefreshClicked
 import codes.chrishorner.socketweather.home.HomePresenter.Event.SwitchLocationClicked
@@ -28,7 +28,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
   override fun onCreatePresenter(view: View, viewModel: HomeViewModel) = HomePresenter(view)
 
   override fun onCreateViewModel(context: Context): HomeViewModel =
-      HomeViewModel(context.getForecaster(), Clock.systemDefaultZone())
+      HomeViewModel(Singletons.forecaster, Clock.systemDefaultZone())
 
   override fun onAttach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
 

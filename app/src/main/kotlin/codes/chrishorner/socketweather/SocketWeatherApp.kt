@@ -31,8 +31,7 @@ class SocketWeatherApp : Application() {
     // needed for the whole app to do its thing.
     allowMainThreadDiskOperations {
       AndroidThreeTen.init(this)
-      getNetworkComponents()
-      getLocationChoices()
+      Singletons.initialise(this)
     }
   }
 }

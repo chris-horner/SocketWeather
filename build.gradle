@@ -20,7 +20,7 @@ buildscript {
                   'play_services_location': '17.0.0',
                   'play_publisher'        : '2.6.1',
                   'threetenbp'            : '1.4.2',
-                  'flowbinding'           : '1.0.0-alpha01',
+                  'flowbinding'           : '1.0.0-alpha02',
                   'junit'                 : '4.13',
                   'truth'                 : '1.0.1']
 

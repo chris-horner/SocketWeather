@@ -115,6 +115,7 @@ dependencies {
   implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
   debugImplementation "com.squareup.retrofit2:retrofit-mock:${versions.retrofit}"
   implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
+  implementation "io.github.reactivecircus.flowbinding:flowbinding-common:${versions.flowbinding}"
   implementation "io.github.reactivecircus.flowbinding:flowbinding-android:${versions.flowbinding}"
   implementation "io.github.reactivecircus.flowbinding:flowbinding-appcompat:${versions.flowbinding}"
   implementation "com.google.android.gms:play-services-location:${versions.play_services_location}"

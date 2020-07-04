@@ -2,6 +2,7 @@
 
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingTop="8dp"
@@ -20,6 +21,7 @@
       android:ellipsize="end"
       android:lines="1"
       android:textAppearance="?attr/textAppearanceSubtitle1"
+      tools:text="Wednesday"
       />
 
   <TextView
@@ -32,14 +34,17 @@
       android:textAppearance="?attr/textAppearanceSubtitle2"
       android:textColor="?android:attr/textColorSecondary"
       android:visibility="gone"
+      tools:text="90%"
+      tools:visibility="visible"
       />
 
   <ImageView
       android:id="@+id/dateForecastItem_icon"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginEnd="16dp"
+      android:layout_marginEnd="8dp"
       android:importantForAccessibility="no"
+      tools:src="@drawable/ic_weather_rain_24dp"
       />
 
   <TextView
@@ -50,6 +55,7 @@
       android:gravity="end"
       android:minWidth="32dp"
       android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      tools:text="9°"
       />
 
   <View
@@ -67,6 +73,7 @@
       android:gravity="end"
       android:minWidth="36sp"
       android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      tools:text="14°"
       />
 
 </LinearLayout>

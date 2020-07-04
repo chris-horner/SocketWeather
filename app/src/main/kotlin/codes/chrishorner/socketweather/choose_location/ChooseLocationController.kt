@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.Singletons
+import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
@@ -35,8 +35,8 @@ class ChooseLocationController(
 
   override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
       args.getBoolean("displayAsRoot"),
-      Singletons.networkComponents.api,
-      Singletons.locationChoices
+      context.appSingletons.networkComponents.api,
+      context.appSingletons.locationChoices
   )
 
   override fun onCreatePresenter(view: View, viewModel: ChooseLocationViewModel) = ChooseLocationPresenter(view)

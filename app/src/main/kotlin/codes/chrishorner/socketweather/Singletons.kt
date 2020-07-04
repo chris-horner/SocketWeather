@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather
 
 import android.app.Application
+import android.content.Context
 import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.Forecaster
@@ -12,32 +13,34 @@ import org.threeten.bp.Clock
  * A cheap and dirty service locator that houses singletons used throughout
  * the app.
  */
-object Singletons {
-
-  private var deviceLocatorInstance: DeviceLocator? = null
-  private var locationChoicesInstance: LocationChoices? = null
-  private var networkComponentsInstance: NetworkComponents? = null
-  private var forecasterInstance: Forecaster? = null
-
+interface Singletons {
   val deviceLocator: DeviceLocator
-    get() = checkNotNull(deviceLocatorInstance) { "Singletons.initialise() not called." }
   val locationChoices: LocationChoices
-    get() = checkNotNull(locationChoicesInstance) { "Singletons.initialise() not called." }
   val networkComponents: NetworkComponents
-    get() = checkNotNull(networkComponentsInstance) { "Singletons.initialise() not called." }
   val forecaster: Forecaster
-    get() = checkNotNull(forecasterInstance) { "Singletons.initialise() not called." }
+}
 
-  @MainThread
-  fun initialise(app: Application) {
-    deviceLocatorInstance = BuildTypeConfig.getDeviceLocator(app)
-    locationChoicesInstance = LocationChoices(app)
-    networkComponentsInstance = NetworkComponents(app, locationChoices)
-    forecasterInstance = Forecaster(
-        clock = Clock.systemDefaultZone(),
-        api = networkComponents.api,
-        locationSelections = locationChoices.observeCurrentSelection(),
-        deviceLocations = deviceLocator.observeDeviceLocation()
-    )
-  }
+private var singletons: Singletons? = null
+
+// Although this technically doesn't need to be an extension on Context, it's
+// useful to limit access to service locators to when only a Context is available.
+@Suppress("unused")
+val Context.appSingletons
+  get() = checkNotNull(singletons) { "initialiseSingletons() must be called in Application." }
+
+@MainThread
+fun initialiseSingletons(app: Application) {
+  singletons = SingletonCache(app)
+}
+
+private class SingletonCache(app: Application) : Singletons {
+  override val deviceLocator: DeviceLocator = BuildTypeConfig.getDeviceLocator(app)
+  override val locationChoices = LocationChoices(app)
+  override val networkComponents = NetworkComponents(app, locationChoices)
+  override val forecaster = Forecaster(
+      clock = Clock.systemDefaultZone(),
+      api = networkComponents.api,
+      locationSelections = locationChoices.observeCurrentSelection(),
+      deviceLocations = deviceLocator.observeDeviceLocation()
+  )
 }

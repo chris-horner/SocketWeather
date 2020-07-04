@@ -26,7 +26,7 @@ object BuildTypeConfig {
     // Temporarily allow disk operations on main thread to allow debug drawer
     // modules to do their thing.
     allowMainThreadDiskOperations {
-      val networkComponents: NetworkComponents = Singletons.networkComponents
+      val networkComponents: NetworkComponents = activity.appSingletons.networkComponents
       val deviceLocator = getDeviceLocator(activity.app) as DebugDeviceLocator
       drawerBuilder
           .addSectionTitle("Device location")

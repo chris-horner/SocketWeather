@@ -4,7 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.Singletons
+import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.choose_location.ChooseLocationController
 import codes.chrishorner.socketweather.switch_location.SwitchLocationPresenter.Event.AddLocationClicked
 import codes.chrishorner.socketweather.switch_location.SwitchLocationPresenter.Event.DismissClicked
@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 
 class SwitchLocationController : ScopedController<SwitchLocationViewModel, SwitchLocationPresenter>() {
 
-  override fun onCreateViewModel(context: Context) = SwitchLocationViewModel(Singletons.locationChoices)
+  override fun onCreateViewModel(context: Context) = SwitchLocationViewModel(context.appSingletons.locationChoices)
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.switch_location)
 

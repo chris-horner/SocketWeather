@@ -34,9 +34,9 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
     get() = modeFlow.value
     set(value) {
       if (value == modeFlow.value) return
-      sharedPrefs.edit().putInt("mode", mode.ordinal).apply()
       if (modeFlow.value == Mode.REAL) realLocator.disable()
-      modeFlow.value = mode
+      sharedPrefs.edit().putInt("mode", value.ordinal).apply()
+      modeFlow.value = value
     }
 
   var locationName: String

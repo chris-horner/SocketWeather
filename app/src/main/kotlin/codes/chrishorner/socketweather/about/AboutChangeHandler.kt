@@ -8,6 +8,6 @@ import com.google.android.material.transition.MaterialSharedAxis
 
 class AboutChangeHandler : TransitionChangeHandler() {
   override fun getTransition(container: ViewGroup, from: View?, to: View?, isPush: Boolean): Transition {
-    return MaterialSharedAxis(MaterialSharedAxis.Z, isPush)
+    return MaterialSharedAxis(MaterialSharedAxis.Z, isPush).setDuration(250)
   }
 }

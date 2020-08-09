@@ -4,6 +4,7 @@ import android.content.Context
 import android.view.View
 import android.view.ViewGroup
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.about.AboutChangeHandler
 import codes.chrishorner.socketweather.about.AboutController
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.home.HomePresenter.Event.AboutClicked
@@ -44,7 +45,12 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
                     .pushChangeHandler(SwitchLocationChangeHandler())
             )
             RefreshClicked -> viewModel.forceRefresh()
-            AboutClicked -> router.pushController(AboutController().asTransaction())
+            AboutClicked -> router.pushController(
+                AboutController()
+                    .asTransaction()
+                    .pushChangeHandler(AboutChangeHandler())
+                    .popChangeHandler(AboutChangeHandler())
+            )
           }
         }
         .launchIn(viewScope)

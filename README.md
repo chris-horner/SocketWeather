@@ -19,7 +19,7 @@ I stumbled upon https://api.weather.bom.gov.au/v1. All requests and responses ha
 
 ### Where are the Fragments?
 
-Not here. The codebase actually unironically used something similar to [FragNums](https://github.com/pyricau/fragnums) in the early stages of its development before swapping to [Conductor](https://github.com/bluelinelabs/Conductor). Although Conductor isn't being actively maintained anymore, it's well battle tested at this point and provides a simpler API compared to Fragments.
+Not here. The codebase actually unironically used something similar to [FragNums](https://github.com/pyricau/fragnums) in the early stages of its development before swapping to [Conductor](https://github.com/bluelinelabs/Conductor). Although FragNums isn't being actively maintained anymore, it's well battle tested at this point and provides a simpler API compared to Fragments.
 
 ### What's with all the weird `Flow` stuff?
 

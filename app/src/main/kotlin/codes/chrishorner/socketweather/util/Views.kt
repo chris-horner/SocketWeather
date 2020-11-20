@@ -10,6 +10,8 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.ViewFlipper
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat.Type
 import androidx.core.view.forEachIndexed
 import androidx.core.view.updatePadding
 
@@ -41,36 +43,15 @@ fun View.updatePaddingWithInsets(
   // Create a snapshot of padding.
   val initialPadding = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
 
-  doOnApplyWindowInsets { insets ->
-    updatePadding(
-        left = if (left) initialPadding.left + insets.systemWindowInsetLeft else initialPadding.left,
-        top = if (top) initialPadding.top + insets.systemWindowInsetTop else initialPadding.top,
-        right = if (right) initialPadding.right + insets.systemWindowInsetRight else initialPadding.right,
-        bottom = if (bottom) initialPadding.bottom + insets.systemWindowInsetBottom else initialPadding.bottom
+  ViewCompat.setOnApplyWindowInsetsListener(this) { v, insets ->
+    val systemBarInsets = insets.getInsets(Type.systemBars())
+    v.updatePadding(
+        left = if (left) initialPadding.left + systemBarInsets.left else initialPadding.left,
+        top = if (top) initialPadding.top + systemBarInsets.top else initialPadding.top,
+        right = if (right) initialPadding.right + systemBarInsets.right else initialPadding.right,
+        bottom = if (bottom) initialPadding.bottom + systemBarInsets.bottom else initialPadding.bottom
     )
-  }
-}
-
-inline fun View.doOnApplyWindowInsets(crossinline block: (insets: WindowInsets) -> Unit) {
-  // Set an actual OnApplyWindowInsetsListener which proxies to the given lambda.
-  setOnApplyWindowInsetsListener { _, insets ->
-    block(insets)
-    return@setOnApplyWindowInsetsListener insets
-  }
-
-  if (isAttachedToWindow) {
-    // We're already attached, just request as normal.
-    requestApplyInsets()
-  } else {
-    // We're not attached to the hierarchy. Add a listener to request when we are.
-    addOnAttachStateChangeListener(object : View.OnAttachStateChangeListener {
-      override fun onViewAttachedToWindow(v: View) {
-        v.removeOnAttachStateChangeListener(this)
-        v.requestApplyInsets()
-      }
-
-      override fun onViewDetachedFromWindow(v: View) = Unit
-    })
+    insets
   }
 }
 

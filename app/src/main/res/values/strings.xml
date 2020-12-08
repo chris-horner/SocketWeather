@@ -20,6 +20,7 @@
   <string name="home_refresh">Refresh</string>
   <string name="home_about">About</string>
   <string name="home_feelsLike">Feels like</string>
+  <string name="home_humidity">Humidity</string>
   <string name="home_loading">Loading forecast…</string>
   <string name="home_networkError">Network request failed</string>
   <string name="home_locationError">Failed to find current location</string>

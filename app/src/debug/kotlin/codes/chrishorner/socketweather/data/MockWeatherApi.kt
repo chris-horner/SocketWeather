@@ -58,6 +58,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
     val currentObservations = CurrentObservations(
         temp = 17f,
         temp_feels_like = 15.8f,
+        humidity = 98,
         station = Station(name = "Melbourne (Olympic Park)")
     )
 

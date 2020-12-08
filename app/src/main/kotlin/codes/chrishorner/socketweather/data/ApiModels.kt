@@ -30,6 +30,7 @@ data class Location(
 data class CurrentObservations(
     val temp: Float,
     val temp_feels_like: Float?,
+    val humidity: Int?,
     val station: Station
 )
 

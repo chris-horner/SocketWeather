@@ -59,24 +59,18 @@
       />
 
   <TextView
-      android:id="@+id/home_humidityTitle"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="24dp"
-      android:text="@string/home_humidity"
-      android:textAppearance="@style/TextAppearance.SocketWeather.Headline5.Secondary"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
-      />
-
-  <TextView
       android:id="@+id/home_humidity"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
-      android:layout_marginStart="8dp"
-      android:textAppearance="@style/TextAppearance.SocketWeather.MediumTemp"
-      app:layout_constraintBaseline_toBaselineOf="@id/home_humidityTitle"
-      app:layout_constraintStart_toEndOf="@id/home_humidityTitle"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="16dp"
+      android:contentDescription="@string/home_humidityIconDesc"
+      android:drawablePadding="8dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      android:textColor="?android:textColorSecondary"
+      app:drawableStartCompat="@drawable/ic_water_24dp"
+      app:layout_constraintStart_toStartOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
       tools:text="98%"
       />
 
@@ -96,7 +90,7 @@
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:textAppearance="@style/TextAppearance.SocketWeather.MediumTemp"
-      app:layout_constraintBaseline_toBaselineOf="@id/home_humidityTitle"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
       app:layout_constraintEnd_toEndOf="parent"
       tools:text="18°"
       />
@@ -121,7 +115,7 @@
       android:textAppearance="?attr/textAppearanceBody1"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/home_humidityTitle"
+      app:layout_constraintTop_toBottomOf="@id/home_humidity"
       app:layout_goneMarginTop="0dp"
       app:lineHeight="22sp"
       tools:text="Cloudy. Medium (40%) chance of showers, most likely over eastern suburbs. Winds west to southwesterly 15 to 20 km/h becoming light in the early afternoon."

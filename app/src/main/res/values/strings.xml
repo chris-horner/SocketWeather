@@ -20,7 +20,6 @@
   <string name="home_refresh">Refresh</string>
   <string name="home_about">About</string>
   <string name="home_feelsLike">Feels like</string>
-  <string name="home_humidity">Humidity</string>
   <string name="home_loading">Loading forecast…</string>
   <string name="home_networkError">Network request failed</string>
   <string name="home_locationError">Failed to find current location</string>
@@ -30,6 +29,7 @@
   <string name="home_justUpdated">Updated just now</string>
   <string name="home_dateForecastTomorrow">Tomorrow</string>
   <string name="home_currentIconDesc">Icon for current conditions.</string>
+  <string name="home_humidityIconDesc">Icon for humidity.</string>
 
   <string name="home_error_retryButton">Try again</string>
   <string name="home_error_unknownLocation_title">Where are you?</string>

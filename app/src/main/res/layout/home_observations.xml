@@ -75,6 +75,23 @@
       />
 
   <TextView
+      android:id="@+id/home_wind"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="24dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="16dp"
+      android:contentDescription="@string/home_windIconDesc"
+      android:drawablePadding="8dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.SmallTemp"
+      android:textColor="?android:textColorSecondary"
+      app:drawableStartCompat="@drawable/ic_weather_windy_24dp"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_humidity"
+      app:layout_constraintStart_toEndOf="@id/home_humidity"
+      tools:text="19 km/h NE"
+      />
+
+  <TextView
       android:id="@+id/home_highTemp"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"

@@ -59,6 +59,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
         temp = 17f,
         temp_feels_like = 15.8f,
         humidity = 98,
+        wind = Wind(speed_knot = 6, speed_kilometre = 3, direction = "NW"),
         station = Station(name = "Melbourne (Olympic Park)")
     )
 
@@ -154,6 +155,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 17,
+              wind = Wind(speed_knot = 9, speed_kilometre = 17, direction = "E"),
               icon_descriptor = "mostly_sunny",
               time = startingInstant,
               is_night = false
@@ -161,6 +163,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(2f, 5f, "mm"), chance = 90),
               temp = 15,
+              wind = Wind(speed_knot = 9, speed_kilometre = 17, direction = "E"),
               icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(3)),
               is_night = true
@@ -168,6 +171,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(3f, 6f, "mm"), chance = 50),
               temp = 15,
+              wind = Wind(speed_knot = 10, speed_kilometre = 19, direction = "E"),
               icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(6)),
               is_night = true
@@ -175,6 +179,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 14,
+              wind = Wind(speed_knot = 10, speed_kilometre = 19, direction = "ENE"),
               icon_descriptor = "mostly_sunny",
               time = startingInstant.plus(Duration.ofHours(6)),
               is_night = true
@@ -182,6 +187,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 15,
+              wind = Wind(speed_knot = 6, speed_kilometre = 11, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(12)),
               is_night = false
@@ -189,6 +195,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 22,
+              wind = Wind(speed_knot = 6, speed_kilometre = 11, direction = "E"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(15)),
               is_night = false
@@ -196,6 +203,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 27,
+              wind = Wind(speed_knot = 5, speed_kilometre = 9, direction = "E"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(18)),
               is_night = false
@@ -203,6 +211,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(1f, 2f, "mm"), chance = 60),
               temp = 28,
+              wind = Wind(speed_knot = 5, speed_kilometre = 9, direction = "E"),
               icon_descriptor = "shower",
               time = startingInstant.plus(Duration.ofHours(21)),
               is_night = false
@@ -210,6 +219,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 25,
+              wind = Wind(speed_knot = 7, speed_kilometre = 13, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(24)),
               is_night = false
@@ -217,6 +227,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 20,
+              wind = Wind(speed_knot = 9, speed_kilometre = 17, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(27)),
               is_night = true
@@ -224,6 +235,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 17,
+              wind = Wind(speed_knot = 11, speed_kilometre = 20, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(30)),
               is_night = true
@@ -231,6 +243,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 15,
+              wind = Wind(speed_knot = 11, speed_kilometre = 20, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(33)),
               is_night = true
@@ -238,6 +251,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 17,
+              wind = Wind(speed_knot = 8, speed_kilometre = 15, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(36)),
               is_night = false
@@ -245,6 +259,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 24,
+              wind = Wind(speed_knot = 5, speed_kilometre = 9, direction = "ENE"),
               icon_descriptor = "hazy",
               time = startingInstant.plus(Duration.ofHours(39)),
               is_night = false
@@ -252,6 +267,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 28,
+              wind = Wind(speed_knot = 5, speed_kilometre = 9, direction = "ENE"),
               icon_descriptor = "mostly_sunny",
               time = startingInstant.plus(Duration.ofHours(41)),
               is_night = false
@@ -259,6 +275,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 28,
+              wind = Wind(speed_knot = 4, speed_kilometre = 7, direction = "NE"),
               icon_descriptor = "sunny",
               time = startingInstant.plus(Duration.ofHours(44)),
               is_night = false
@@ -266,6 +283,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
           ThreeHourlyForecast(
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               temp = 22,
+              wind = Wind(speed_knot = 7, speed_kilometre = 13, direction = "NE"),
               icon_descriptor = "sunny",
               time = startingInstant.plus(Duration.ofHours(47)),
               is_night = false

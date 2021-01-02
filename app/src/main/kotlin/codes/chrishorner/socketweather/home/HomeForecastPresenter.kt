@@ -18,6 +18,7 @@ class HomeForecastPresenter(view: View) {
   private val currentTemp: TextView = view.findViewById(R.id.home_currentTemp)
   private val feelsLikeTemp: TextView = view.findViewById(R.id.home_feelsLikeTemp)
   private val humidity: TextView = view.findViewById(R.id.home_humidity)
+  private val wind: TextView = view.findViewById(R.id.home_wind)
   private val highTemp: TextView = view.findViewById(R.id.home_highTemp)
   private val lowTemp: TextView = view.findViewById(R.id.home_lowTemp)
   private val description: TextView = view.findViewById(R.id.home_description)
@@ -30,6 +31,7 @@ class HomeForecastPresenter(view: View) {
     currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
     feelsLikeTemp.text = forecast.tempFeelsLike?.formatAsDegrees(context) ?: "--"
     humidity.text = forecast.humidity?.formatAsPercent(context) ?: "--"
+    wind.text = forecast.wind.run { "$speed_kilometre km/h $direction" }
     highTemp.text = forecast.highTemp.formatAsDegrees(context)
     lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
 

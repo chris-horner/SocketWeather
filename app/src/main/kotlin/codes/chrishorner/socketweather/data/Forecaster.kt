@@ -177,6 +177,7 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
       currentTemp = observations.temp,
       tempFeelsLike = observations.temp_feels_like,
       humidity = observations.humidity,
+      wind = observations.wind,
       highTemp = todayForecast.temp_max,
       lowTemp = lowTemp,
       todayForecast = todayForecast,

@@ -88,6 +88,12 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Showers.",
             icon_descriptor = "showers",
             rain = Rain(Amount(4f, 8f, "mm"), chance = 80),
+            uv = UV(
+                max_index = 13,
+                category = "extreme",
+                start_time = LocalDate.now().atTime(6, 10).toInstant(ZoneOffset.UTC),
+                end_time = LocalDate.now().plusDays(1).atTime(21, 40).toInstant(ZoneOffset.UTC)
+            ),
             now = CurrentInformation(
                 is_night = false,
                 now_label = "Overnight Min",
@@ -103,7 +109,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Mostly sunny. The chance of fog about the outer southeast suburbs in the early morning. Areas of haze. Winds southerly 15 to 20 km/h increasing to 25 km/h before turning east to southeasterly 15 to 20 km/h during the day.",
             short_text = "Hazy.",
             icon_descriptor = "hazy",
-            rain = Rain(Amount(0f, null, "mm"), chance = 0)
+            rain = Rain(Amount(0f, null, "mm"), chance = 0),
+            uv = UV(
+                max_index = 14,
+                category = "extreme",
+                start_time = LocalDate.now().plusDays(1).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                end_time = LocalDate.now().plusDays(2).atTime(21, 30).toInstant(ZoneOffset.UTC)
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(2)),
@@ -112,7 +124,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Mostly sunny. The chance of fog in the early morning, mainly over the western suburbs. Areas of haze in the morning and afternoon. Light winds becoming southerly 20 to 30 km/h in the early afternoon.",
             short_text = "Hazy at times.",
             icon_descriptor = "hazy",
-            rain = Rain(Amount(0f, null, "mm"), chance = 0)
+            rain = Rain(Amount(0f, null, "mm"), chance = 0),
+            uv = UV(
+                max_index = 14,
+                category = "extreme",
+                start_time = LocalDate.now().plusDays(2).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                end_time = LocalDate.now().plusDays(3).atTime(21, 30).toInstant(ZoneOffset.UTC)
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(3)),
@@ -121,7 +139,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Partly cloudy. Winds southerly 15 to 25 km/h.",
             short_text = "Partly cloudy.",
             icon_descriptor = "mostly_sunny",
-            rain = Rain(Amount(0f, null, "mm"), chance = 5)
+            rain = Rain(Amount(0f, null, "mm"), chance = 5),
+            uv = UV(
+                max_index = 14,
+                category = "extreme",
+                start_time = LocalDate.now().plusDays(3).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                end_time = LocalDate.now().plusDays(4).atTime(21, 30).toInstant(ZoneOffset.UTC)
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(4)),
@@ -130,7 +154,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Mostly sunny. Winds southerly 15 to 20 km/h becoming light during the evening.",
             short_text = "Mostly sunny.",
             icon_descriptor = "mostly_sunny",
-            rain = Rain(Amount(0f, null, "mm"), chance = 0)
+            rain = Rain(Amount(0f, null, "mm"), chance = 0),
+            uv = UV(
+                max_index = null,
+                category = null,
+                start_time = null,
+                end_time = null
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(5)),
@@ -139,7 +169,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Hot and mostly sunny. Light winds becoming north to northwesterly 15 to 20 km/h during the morning.",
             short_text = "Mostly sunny.",
             icon_descriptor = "mostly_sunny",
-            rain = Rain(Amount(0f, null, "mm"), chance = 0)
+            rain = Rain(Amount(0f, null, "mm"), chance = 0),
+            uv = UV(
+                max_index = null,
+                category = null,
+                start_time = null,
+                end_time = null
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(6)),
@@ -148,7 +184,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Very hot. Partly cloudy. The chance of a thunderstorm with little or no rainfall during the afternoon and evening. Winds northerly 20 to 30 km/h turning northwesterly 25 to 35 km/h during the morning.",
             short_text = "Hot. Partly cloudy.",
             icon_descriptor = "mostly_sunny",
-            rain = Rain(Amount(0f, null, "mm"), chance = 10)
+            rain = Rain(Amount(0f, null, "mm"), chance = 10),
+            uv = UV(
+                max_index = null,
+                category = null,
+                start_time = null,
+                end_time = null
+            )
         ),
         DateForecast(
             date = firstDayInstant.plus(Period.ofDays(7)),
@@ -157,7 +199,13 @@ class TestApi(clock: Clock) : WeatherApi {
             extended_text = "Hot. Partly cloudy. Medium (60%) chance of showers, most likely later in the day. The chance of a thunderstorm. Winds northerly 25 to 40 km/h shifting cooler southwesterly 20 to 30 km/h later in the day.",
             short_text = "Hot. Cool change later.",
             icon_descriptor = "shower",
-            rain = Rain(Amount(0f, 8f, "mm"), chance = 60)
+            rain = Rain(Amount(0f, 8f, "mm"), chance = 60),
+            uv = UV(
+                max_index = null,
+                category = null,
+                start_time = null,
+                end_time = null
+            )
         )
     )
   }

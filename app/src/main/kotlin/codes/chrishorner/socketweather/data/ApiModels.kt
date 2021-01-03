@@ -45,6 +45,7 @@ data class DateForecast(
     val short_text: String?,
     val icon_descriptor: String,
     val rain: Rain,
+    val uv: UV,
     val now: CurrentInformation? = null
 )
 
@@ -53,6 +54,8 @@ data class Rain(val amount: Amount, val chance: Int) {
 }
 
 data class Wind(val speed_knot: Int, val speed_kilometre: Int, val direction: String)
+
+data class UV(val max_index: Int?, val category: String?, val start_time: Instant?, val end_time: Instant?)
 
 data class CurrentInformation(
     val is_night: Boolean,

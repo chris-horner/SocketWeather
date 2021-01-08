@@ -104,7 +104,7 @@
       app:layout_constraintBaseline_toBaselineOf="@id/home_wind"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toEndOf="@id/home_wind"
-      tools:text="7 (Extreme)ffffffffffffffff"
+      tools:text="09:00—15:00"
       />
 
   <TextView

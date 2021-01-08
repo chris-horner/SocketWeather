@@ -88,7 +88,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Showers.",
             icon_descriptor = "showers",
             rain = Rain(Amount(4f, 8f, "mm"), chance = 80),
-            uv = UV(
+            uv = Uv(
                 max_index = 13,
                 start_time = LocalDate.now().atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(1).atTime(21, 40).toInstant(ZoneOffset.UTC)
@@ -109,7 +109,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Hazy.",
             icon_descriptor = "hazy",
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
-            uv = UV(
+            uv = Uv(
                 max_index = 14,
                 start_time = LocalDate.now().plusDays(1).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(2).atTime(21, 30).toInstant(ZoneOffset.UTC)
@@ -123,7 +123,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Hazy at times.",
             icon_descriptor = "hazy",
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
-            uv = UV(
+            uv = Uv(
                 max_index = 14,
                 start_time = LocalDate.now().plusDays(2).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(3).atTime(21, 30).toInstant(ZoneOffset.UTC)
@@ -137,7 +137,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Partly cloudy.",
             icon_descriptor = "mostly_sunny",
             rain = Rain(Amount(0f, null, "mm"), chance = 5),
-            uv = UV(
+            uv = Uv(
                 max_index = 14,
                 start_time = LocalDate.now().plusDays(3).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(4).atTime(21, 30).toInstant(ZoneOffset.UTC)
@@ -151,7 +151,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Mostly sunny.",
             icon_descriptor = "mostly_sunny",
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
-            uv = UV(
+            uv = Uv(
                 max_index = null,
                 start_time = null,
                 end_time = null
@@ -165,7 +165,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Mostly sunny.",
             icon_descriptor = "mostly_sunny",
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
-            uv = UV(
+            uv = Uv(
                 max_index = null,
                 start_time = null,
                 end_time = null
@@ -179,7 +179,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Hot. Partly cloudy.",
             icon_descriptor = "mostly_sunny",
             rain = Rain(Amount(0f, null, "mm"), chance = 10),
-            uv = UV(
+            uv = Uv(
                 max_index = null,
                 start_time = null,
                 end_time = null
@@ -193,7 +193,7 @@ class TestApi(clock: Clock) : WeatherApi {
             short_text = "Hot. Cool change later.",
             icon_descriptor = "shower",
             rain = Rain(Amount(0f, 8f, "mm"), chance = 60),
-            uv = UV(
+            uv = Uv(
                 max_index = null,
                 start_time = null,
                 end_time = null

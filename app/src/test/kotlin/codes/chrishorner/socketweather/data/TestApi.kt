@@ -70,7 +70,7 @@ class TestApi(clock: Clock) : WeatherApi {
     return CurrentObservations(
         temp = 21f,
         temp_feels_like = 20f,
-        wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+        wind = Wind(speed_kilometre = 0, direction = "N"),
         humidity = 98,
         station = Station("PlayStation")
     )
@@ -90,7 +90,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(4f, 8f, "mm"), chance = 80),
             uv = UV(
                 max_index = 13,
-                category = "extreme",
                 start_time = LocalDate.now().atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(1).atTime(21, 40).toInstant(ZoneOffset.UTC)
             ),
@@ -112,7 +111,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             uv = UV(
                 max_index = 14,
-                category = "extreme",
                 start_time = LocalDate.now().plusDays(1).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(2).atTime(21, 30).toInstant(ZoneOffset.UTC)
             )
@@ -127,7 +125,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             uv = UV(
                 max_index = 14,
-                category = "extreme",
                 start_time = LocalDate.now().plusDays(2).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(3).atTime(21, 30).toInstant(ZoneOffset.UTC)
             )
@@ -142,7 +139,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 5),
             uv = UV(
                 max_index = 14,
-                category = "extreme",
                 start_time = LocalDate.now().plusDays(3).atTime(6, 10).toInstant(ZoneOffset.UTC),
                 end_time = LocalDate.now().plusDays(4).atTime(21, 30).toInstant(ZoneOffset.UTC)
             )
@@ -157,7 +153,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             uv = UV(
                 max_index = null,
-                category = null,
                 start_time = null,
                 end_time = null
             )
@@ -172,7 +167,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             uv = UV(
                 max_index = null,
-                category = null,
                 start_time = null,
                 end_time = null
             )
@@ -187,7 +181,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, null, "mm"), chance = 10),
             uv = UV(
                 max_index = null,
-                category = null,
                 start_time = null,
                 end_time = null
             )
@@ -202,7 +195,6 @@ class TestApi(clock: Clock) : WeatherApi {
             rain = Rain(Amount(0f, 8f, "mm"), chance = 60),
             uv = UV(
                 max_index = null,
-                category = null,
                 start_time = null,
                 end_time = null
             )
@@ -217,7 +209,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 17,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "mostly_sunny",
             time = startingInstant,
             is_night = false
@@ -225,7 +217,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 15,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "mostly_sunny",
             time = startingInstant.plus(Duration.ofHours(3)),
             is_night = true
@@ -233,7 +225,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 15,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "mostly_sunny",
             time = startingInstant.plus(Duration.ofHours(6)),
             is_night = true
@@ -241,7 +233,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 14,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "mostly_sunny",
             time = startingInstant.plus(Duration.ofHours(6)),
             is_night = true
@@ -249,7 +241,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 15,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(12)),
             is_night = false
@@ -257,7 +249,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 22,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(15)),
             is_night = false
@@ -265,7 +257,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 27,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(18)),
             is_night = false
@@ -273,7 +265,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 28,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(21)),
             is_night = false
@@ -281,7 +273,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 25,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(24)),
             is_night = false
@@ -289,7 +281,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 20,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(27)),
             is_night = true
@@ -297,7 +289,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 17,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(30)),
             is_night = true
@@ -305,7 +297,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 15,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(33)),
             is_night = true
@@ -313,7 +305,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 17,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(36)),
             is_night = false
@@ -321,7 +313,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 24,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "hazy",
             time = startingInstant.plus(Duration.ofHours(39)),
             is_night = false
@@ -329,7 +321,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 28,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "mostly_sunny",
             time = startingInstant.plus(Duration.ofHours(41)),
             is_night = false
@@ -337,7 +329,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 28,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "sunny",
             time = startingInstant.plus(Duration.ofHours(44)),
             is_night = false
@@ -345,7 +337,7 @@ class TestApi(clock: Clock) : WeatherApi {
         ThreeHourlyForecast(
             rain = Rain(Amount(0f, null, "mm"), chance = 0),
             temp = 22,
-            wind = Wind(speed_knot = 0, speed_kilometre = 0, direction = "N"),
+            wind = Wind(speed_kilometre = 0, direction = "N"),
             icon_descriptor = "sunny",
             time = startingInstant.plus(Duration.ofHours(47)),
             is_night = false

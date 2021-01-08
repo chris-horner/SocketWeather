@@ -7,6 +7,7 @@ import org.threeten.bp.LocalDateTime
 import org.threeten.bp.LocalTime
 import org.threeten.bp.Period
 import org.threeten.bp.ZoneId
+import org.threeten.bp.ZoneOffset
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.create
@@ -64,8 +65,7 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
     )
 
     fun generateDateForecasts(): List<DateForecast> {
-      val zoneOffset = ZoneId.systemDefault().rules.getOffset(LocalDateTime.now())
-      val firstDayInstant = LocalDate.now().atTime(0, 0).toInstant(zoneOffset)
+      val firstDayInstant = LocalDate.now().atTime(0, 0).toInstant(ZoneOffset.UTC)
       val isNight = LocalTime.now().isAfter(LocalTime.of(20, 0)) && LocalTime.now().isBefore(LocalTime.of(6, 0))
       return listOf(
           DateForecast(
@@ -78,8 +78,8 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               uv = Uv(
                   max_index = 13,
-                  start_time = LocalDate.now().atTime(6, 10).toInstant(zoneOffset),
-                  end_time = LocalDate.now().plusDays(1).atTime(21, 40).toInstant(zoneOffset)
+                  start_time = LocalDate.now().atTime(6, 10).toInstant(ZoneOffset.UTC),
+                  end_time = LocalDate.now().plusDays(1).atTime(21, 40).toInstant(ZoneOffset.UTC)
               ),
               now = CurrentInformation(
                   is_night = isNight,
@@ -99,8 +99,8 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               uv = Uv(
                   max_index = 14,
-                  start_time = LocalDate.now().plusDays(1).atTime(6, 10).toInstant(zoneOffset),
-                  end_time = LocalDate.now().plusDays(2).atTime(21, 30).toInstant(zoneOffset)
+                  start_time = LocalDate.now().plusDays(1).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                  end_time = LocalDate.now().plusDays(2).atTime(21, 30).toInstant(ZoneOffset.UTC)
               )
           ),
           DateForecast(
@@ -113,8 +113,8 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               rain = Rain(Amount(0f, null, "mm"), chance = 0),
               uv = Uv(
                   max_index = 14,
-                  start_time = LocalDate.now().plusDays(2).atTime(6, 10).toInstant(zoneOffset),
-                  end_time = LocalDate.now().plusDays(3).atTime(21, 30).toInstant(zoneOffset)
+                  start_time = LocalDate.now().plusDays(2).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                  end_time = LocalDate.now().plusDays(3).atTime(21, 30).toInstant(ZoneOffset.UTC)
               )
           ),
           DateForecast(
@@ -127,8 +127,8 @@ class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
               rain = Rain(Amount(0f, null, "mm"), chance = 5),
               uv = Uv(
                   max_index = 14,
-                  start_time = LocalDate.now().plusDays(3).atTime(6, 10).toInstant(zoneOffset),
-                  end_time = LocalDate.now().plusDays(4).atTime(21, 30).toInstant(zoneOffset)
+                  start_time = LocalDate.now().plusDays(3).atTime(6, 10).toInstant(ZoneOffset.UTC),
+                  end_time = LocalDate.now().plusDays(4).atTime(21, 30).toInstant(ZoneOffset.UTC)
               )
           ),
           DateForecast(

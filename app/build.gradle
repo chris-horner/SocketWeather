@@ -7,7 +7,6 @@ def versionMinor = 6
 def versionPatch = 2
 
 android {
-  buildToolsVersion versions.android_build_tools
   compileSdkVersion versions.compile_sdk
 
   defaultConfig {
@@ -63,6 +62,16 @@ android {
 
   kotlinOptions {
     jvmTarget = JavaVersion.VERSION_1_8
+    useIR = true
+  }
+
+  buildFeatures {
+    compose true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion versions.compose
+    kotlinCompilerVersion versions.kotlin
   }
 
   lintOptions {
@@ -101,6 +110,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
 dependencies {
   implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
+  implementation "androidx.compose.ui:ui:${versions.compose}"
+  implementation "androidx.compose.material:material:${versions.compose}"
+  implementation "androidx.compose.ui:ui-tooling:${versions.compose}"
   implementation "androidx.appcompat:appcompat:${versions.appcompat}"
   implementation "androidx.core:core-ktx:${versions.androidx_core}"
   implementation "com.google.android.material:material:${versions.material}"

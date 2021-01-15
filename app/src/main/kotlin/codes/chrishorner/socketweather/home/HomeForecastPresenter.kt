@@ -32,7 +32,8 @@ class HomeForecastPresenter(view: View) {
     currentIcon.setImageDrawable(context.getWeatherIconFor(forecast.iconDescriptor, forecast.night))
     currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
     feelsLikeTemp.text = forecast.tempFeelsLike?.formatAsDegrees(context) ?: "--"
-    humidity.text = forecast.humidity?.formatAsPercent(context) ?: "--"
+    humidity.isVisible = forecast.humidity != null
+    humidity.text = forecast.humidity?.formatAsPercent(context)
     wind.text = context.getString(R.string.home_wind, forecast.wind.speed_kilometre)
 
     with(forecast.todayForecast.uv) {

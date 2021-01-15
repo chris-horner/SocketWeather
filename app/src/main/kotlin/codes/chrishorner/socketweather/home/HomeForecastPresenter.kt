@@ -10,8 +10,7 @@ import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.util.formatAsDegrees
 import codes.chrishorner.socketweather.util.formatAsPercent
 import codes.chrishorner.socketweather.util.getWeatherIconFor
-import org.threeten.bp.LocalTime
-import org.threeten.bp.ZoneId
+import codes.chrishorner.socketweather.util.localTimeAtZone
 
 class HomeForecastPresenter(view: View) {
 
@@ -35,14 +34,20 @@ class HomeForecastPresenter(view: View) {
     feelsLikeTemp.text = forecast.tempFeelsLike?.formatAsDegrees(context) ?: "--"
     humidity.text = forecast.humidity?.formatAsPercent(context) ?: "--"
     wind.text = context.getString(R.string.home_wind, forecast.wind.speed_kilometre)
-    uvProtection.text = forecast.todayForecast.uv.run {
-      if (start_time == null || end_time == null) {
-        "--"
-      } else {
-        val zoneId = ZoneId.systemDefault()
-        "${LocalTime.from(start_time.atZone(zoneId))}—${LocalTime.from(end_time.atZone(zoneId))}"
+
+    with(forecast.todayForecast.uv) {
+      uvProtection.isVisible = start_time != null && end_time != null
+
+      if (uvProtection.isVisible) {
+        val zoneId = forecast.location.timezone
+        uvProtection.text = context.getString(
+            R.string.home_uvProtection,
+            start_time!!.localTimeAtZone(zoneId),
+            end_time!!.localTimeAtZone(zoneId)
+        )
       }
     }
+
     highTemp.text = forecast.highTemp.formatAsDegrees(context)
     lowTemp.text = forecast.lowTemp.formatAsDegrees(context)
 

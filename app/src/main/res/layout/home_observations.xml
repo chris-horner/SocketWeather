@@ -85,7 +85,7 @@
       app:drawableStartCompat="@drawable/ic_weather_windy_24dp"
       app:layout_constraintBaseline_toBaselineOf="@id/home_humidity"
       app:layout_constraintStart_toEndOf="@id/home_humidity"
-      tools:text="19 km/h NE"
+      tools:text="19 km/h"
       />
 
   <TextView

@@ -34,7 +34,7 @@ class HomeForecastPresenter(view: View) {
     currentTemp.text = forecast.currentTemp.formatAsDegrees(context)
     feelsLikeTemp.text = forecast.tempFeelsLike?.formatAsDegrees(context) ?: "--"
     humidity.text = forecast.humidity?.formatAsPercent(context) ?: "--"
-    wind.text = forecast.wind.run { "$speed_kilometre km/h $direction" }
+    wind.text = context.getString(R.string.home_wind, forecast.wind.speed_kilometre)
     uvProtection.text = forecast.todayForecast.uv.run {
       if (start_time == null || end_time == null) {
         "--"

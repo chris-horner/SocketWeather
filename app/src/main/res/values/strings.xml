@@ -30,6 +30,7 @@
   <string name="home_dateForecastTomorrow">Tomorrow</string>
   <string name="home_currentIconDesc">Icon for current conditions.</string>
   <string name="home_humidityIconDesc">Icon for humidity.</string>
+  <string name="home_wind">%1$d km/h</string>
   <string name="home_windIconDesc">Icon for wind.</string>
   <string name="home_uvProtectionIconDesc">Icon for UV protection.</string>
 

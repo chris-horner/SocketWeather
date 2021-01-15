@@ -35,7 +35,7 @@ class ComposeActivity : AppCompatActivity() {
     setContent {
       SocketWeatherTheme {
         ProvideWindowInsets {
-          TestLayout()
+          ChooseLocationScreen()
         }
       }
     }

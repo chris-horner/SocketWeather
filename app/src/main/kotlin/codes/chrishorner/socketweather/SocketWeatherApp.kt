@@ -20,7 +20,6 @@ class SocketWeatherApp : Application() {
       StrictMode.setVmPolicy(
           VmPolicy.Builder()
               .detectActivityLeaks()
-              .detectLeakedClosableObjects()
               .detectLeakedRegistrationObjects()
               .penaltyDeath()
               .build()

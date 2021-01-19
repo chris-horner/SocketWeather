@@ -13,6 +13,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Providers
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,9 +24,15 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import com.github.zsoltk.compose.backpress.AmbientBackPressHandler
+import com.github.zsoltk.compose.backpress.BackPressHandler
+import com.github.zsoltk.compose.savedinstancestate.BundleScope
+import com.github.zsoltk.compose.savedinstancestate.saveAmbient
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
 class ComposeActivity : AppCompatActivity() {
+
+  private val backPressHandler = BackPressHandler()
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -33,12 +40,27 @@ class ComposeActivity : AppCompatActivity() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
     setContent {
-      SocketWeatherTheme {
-        ProvideWindowInsets {
-          ChooseLocationScreen()
+      BundleScope(savedInstanceState) {
+        Providers(AmbientBackPressHandler provides backPressHandler) {
+          SocketWeatherTheme {
+            ProvideWindowInsets {
+              //ScreenNavigation(backPressHandler, appSingletons.locationChoices.currentSelection)
+              //HomeScreen()
+              NavThing(appSingletons.locationChoices.currentSelection)
+            }
+          }
         }
       }
     }
+  }
+
+  override fun onBackPressed() {
+    if (!backPressHandler.handle()) finishAfterTransition()
+  }
+
+  override fun onSaveInstanceState(outState: Bundle) {
+    super.onSaveInstanceState(outState)
+    outState.saveAmbient()
   }
 }
 

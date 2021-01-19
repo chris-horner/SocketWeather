@@ -1,4 +1,4 @@
-package codes.chrishorner.socketweather
+package codes.chrishorner.socketweather.choose_location
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import codes.chrishorner.socketweather.R.string
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.systemBarsPadding
@@ -49,14 +50,14 @@ fun ChooseLocationScreen() {
       }
       Spacer(modifier = Modifier.weight(1f))
       Text(
-          text = stringResource(R.string.chooseLocation_title),
+          text = stringResource(string.chooseLocation_title),
           style = MaterialTheme.typography.h4,
           modifier = Modifier.padding(horizontal = 32.dp)
       )
       Spacer(modifier = Modifier.size(16.dp))
       OutlinedTextField(
           value = "",
-          label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
+          label = { Text(text = stringResource(string.chooseLocation_searchHint)) },
           onValueChange = { /*TODO*/ },
           leadingIcon = { Icon(Icons.Rounded.Search) },
           modifier = Modifier

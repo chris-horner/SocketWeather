@@ -18,10 +18,10 @@
       android:layout_width="72dp"
       android:layout_height="72dp"
       android:contentDescription="@string/home_currentIconDesc"
-      app:tint="?attr/colorOnBackground"
       app:layout_constraintBottom_toBottomOf="@id/home_currentTemp"
       app:layout_constraintStart_toStartOf="parent"
       app:layout_constraintTop_toTopOf="parent"
+      app:tint="?attr/colorOnBackground"
       tools:src="@drawable/ic_weather_partly_cloudy_24dp"
       />
 
@@ -56,6 +56,55 @@
       app:layout_constraintBaseline_toBaselineOf="@id/home_feelsLikeTitle"
       app:layout_constraintStart_toEndOf="@id/home_feelsLikeTitle"
       tools:text="29.2°"
+      />
+
+  <TextView
+      android:id="@+id/home_humidity"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:contentDescription="@string/home_humidityIconDesc"
+      android:drawablePadding="8dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.ObservationExtra"
+      app:drawableStartCompat="@drawable/ic_water_24dp"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_wind"
+      app:layout_constraintStart_toStartOf="parent"
+      tools:text="98%"
+      />
+
+  <TextView
+      android:id="@+id/home_wind"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="24dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="16dp"
+      android:contentDescription="@string/home_windIconDesc"
+      android:drawablePadding="8dp"
+      android:textAppearance="@style/TextAppearance.SocketWeather.ObservationExtra"
+      app:drawableStartCompat="@drawable/ic_weather_windy_24dp"
+      app:layout_constraintStart_toEndOf="@id/home_humidity"
+      app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
+      app:layout_goneMarginStart="0dp"
+      tools:text="19 km/h"
+      />
+
+  <TextView
+      android:id="@+id/home_uvProtection"
+      android:layout_width="0dp"
+      android:layout_height="wrap_content"
+      android:layout_marginStart="24dp"
+      android:layout_marginTop="16dp"
+      android:layout_marginBottom="16dp"
+      android:contentDescription="@string/home_uvProtectionIconDesc"
+      android:drawablePadding="8dp"
+      android:ellipsize="end"
+      android:lines="1"
+      android:textAppearance="@style/TextAppearance.SocketWeather.ObservationExtra"
+      app:drawableStartCompat="@drawable/ic_weather_sunny_alert_24dp"
+      app:layout_constraintBaseline_toBaselineOf="@id/home_wind"
+      app:layout_constraintEnd_toEndOf="parent"
+      app:layout_constraintStart_toEndOf="@id/home_wind"
+      tools:text="09:00–15:00"
       />
 
   <TextView
@@ -99,7 +148,7 @@
       android:textAppearance="?attr/textAppearanceBody1"
       app:layout_constraintEnd_toEndOf="parent"
       app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/home_feelsLikeTitle"
+      app:layout_constraintTop_toBottomOf="@id/home_wind"
       app:layout_goneMarginTop="0dp"
       app:lineHeight="22sp"
       tools:text="Cloudy. Medium (40%) chance of showers, most likely over eastern suburbs. Winds west to southwesterly 15 to 20 km/h becoming light in the early afternoon."

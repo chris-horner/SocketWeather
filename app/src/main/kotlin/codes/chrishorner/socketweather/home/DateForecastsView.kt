@@ -10,6 +10,7 @@ import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.util.formatAsDegrees
+import codes.chrishorner.socketweather.util.formatAsPercent
 import codes.chrishorner.socketweather.util.getWeatherIconFor
 import codes.chrishorner.socketweather.util.inflate
 import org.threeten.bp.LocalDate
@@ -49,7 +50,7 @@ class DateForecastsView(context: Context, attrs: AttributeSet) : LinearLayout(co
       if (dateForecast.rain.chance > 0 && dateForecast.rain.amount.max ?: 0f >= 1f) {
         val rainChance: TextView = view.findViewById(R.id.dateForecastItem_rainChance)
         rainChance.isVisible = true
-        rainChance.text = context.getString(R.string.percentFormat, dateForecast.rain.chance)
+        rainChance.text = dateForecast.rain.chance.formatAsPercent(context)
       }
 
       title.text = titleText

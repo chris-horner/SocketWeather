@@ -29,6 +29,11 @@
   <string name="home_justUpdated">Updated just now</string>
   <string name="home_dateForecastTomorrow">Tomorrow</string>
   <string name="home_currentIconDesc">Icon for current conditions.</string>
+  <string name="home_humidityIconDesc">Icon for humidity.</string>
+  <string name="home_wind">%1$d km/h</string>
+  <string name="home_windIconDesc">Icon for wind.</string>
+  <string name="home_uvProtection">%1$s–%2$s</string>
+  <string name="home_uvProtectionIconDesc">Icon for UV protection.</string>
 
   <string name="home_error_retryButton">Try again</string>
   <string name="home_error_unknownLocation_title">Where are you?</string>

@@ -18,6 +18,10 @@ fun Int.formatAsDegrees(context: Context): String {
   return context.getString(R.string.temperatureFormat, decimalFormat.format(this))
 }
 
+fun Int.formatAsPercent(context: Context): String {
+  return context.getString(R.string.percentFormat, this)
+}
+
 fun TypedArray.getCompatFontOrThrow(context: Context, index: Int): Typeface {
   if (!hasValue(index)) throw IllegalArgumentException("Attribute not defined in set.")
   val fontId = getResourceIdOrThrow(index)

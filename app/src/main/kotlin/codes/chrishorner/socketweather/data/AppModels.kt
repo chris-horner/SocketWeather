@@ -15,6 +15,8 @@ data class Forecast(
     val night: Boolean,
     val currentTemp: Float,
     val tempFeelsLike: Float?,
+    val humidity: Int?,
+    val wind: Wind,
     val highTemp: Int,
     val lowTemp: Int,
     val todayForecast: DateForecast,

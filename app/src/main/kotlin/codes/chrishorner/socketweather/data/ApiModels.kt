@@ -30,6 +30,8 @@ data class Location(
 data class CurrentObservations(
     val temp: Float,
     val temp_feels_like: Float?,
+    val wind: Wind,
+    val humidity: Int?,
     val station: Station
 )
 
@@ -43,12 +45,17 @@ data class DateForecast(
     val short_text: String?,
     val icon_descriptor: String,
     val rain: Rain,
+    val uv: Uv,
     val now: CurrentInformation? = null
 )
 
 data class Rain(val amount: Amount, val chance: Int) {
   data class Amount(val min: Float?, val max: Float?, val units: String)
 }
+
+data class Wind(val speed_kilometre: Int, val direction: String)
+
+data class Uv(val max_index: Int?, val start_time: Instant?, val end_time: Instant?)
 
 data class CurrentInformation(
     val is_night: Boolean,
@@ -61,6 +68,7 @@ data class CurrentInformation(
 data class ThreeHourlyForecast(
     val rain: Rain,
     val temp: Int,
+    val wind: Wind,
     val icon_descriptor: String,
     val time: Instant,
     val is_night: Boolean

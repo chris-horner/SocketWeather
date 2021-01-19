@@ -102,8 +102,8 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     rainChanceTexts = forecasts.map { it.rain.getPercentageString() }
     displayRainChance = rainChanceTexts.any { it.isNotEmpty() }
 
-    minTemp = forecasts.map { it.temp }.min()!!
-    maxTemp = forecasts.map { it.temp }.max()!!
+    minTemp = forecasts.map { it.temp }.minOrNull()!!
+    maxTemp = forecasts.map { it.temp }.maxOrNull()!!
     scale = abs(maxTemp - minTemp)
 
     // Check the scale at which the temperature is changing. If it's lower than our minimum,

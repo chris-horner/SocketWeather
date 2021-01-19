@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.data
 
+import app.cash.turbine.FlowTurbine
 import com.google.common.truth.Subject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -46,4 +47,11 @@ fun <T> Flow<T>.test(scope: CoroutineScope) = TestCollector(scope, this)
 
 inline fun <reified T> Subject.isInstanceOf() {
   isInstanceOf(T::class.java)
+}
+
+/**
+ * Like [FlowTurbine.expectItem], except asserts and returns the item as a different type.
+ */
+suspend inline fun <reified R> FlowTurbine<*>.expectItemAs(): R {
+  return expectItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
 }

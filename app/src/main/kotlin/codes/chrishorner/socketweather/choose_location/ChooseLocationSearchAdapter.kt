@@ -8,16 +8,15 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.choose_location.ChooseLocationSearchAdapter.ViewHolder
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.util.inflate
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class ChooseLocationSearchAdapter : RecyclerView.Adapter<ViewHolder>() {
 
-  private val clicksChannel = BroadcastChannel<SearchResult>(1)
+  private val clicksFlow = MutableSharedFlow<SearchResult>(extraBufferCapacity = 1)
   private var items: List<SearchResult> = emptyList()
 
-  fun clicks(): Flow<SearchResult> = clicksChannel.asFlow()
+  fun clicks(): Flow<SearchResult> = clicksFlow
 
   fun set(items: List<SearchResult>) {
     this.items = items
@@ -44,7 +43,7 @@ class ChooseLocationSearchAdapter : RecyclerView.Adapter<ViewHolder>() {
     private var item: SearchResult? = null
 
     init {
-      view.setOnClickListener { clicksChannel.offer(requireNotNull(item)) }
+      view.setOnClickListener { clicksFlow.tryEmit(requireNotNull(item)) }
     }
 
     fun bind(result: SearchResult) {

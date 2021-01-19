@@ -16,11 +16,10 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -40,7 +39,7 @@ class ChooseLocationViewModel(
   private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved)
   private val statesFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
-  private val events = BroadcastChannel<Event>(1)
+  private val events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
 
   init {
     searchQueryFlow
@@ -65,7 +64,7 @@ class ChooseLocationViewModel(
 
   fun observeStates(): Flow<State> = statesFlow
 
-  fun observeEvents(): Flow<Event> = events.asFlow()
+  fun observeEvents(): Flow<Event> = events
 
   fun inputSearchQuery(query: String) {
     searchQueryFlow.value = query
@@ -78,10 +77,10 @@ class ChooseLocationViewModel(
       try {
         val location = api.getLocation(result.geohash)
         locationChoices.saveAndSelect(LocationSelection.Static(location))
-        events.offer(SubmissionSuccess)
+        events.emit(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
-        events.offer(SubmissionError)
+        events.emit(SubmissionError)
       }
 
       statesFlow.value = idleState
@@ -92,10 +91,10 @@ class ChooseLocationViewModel(
     if (locationPermissionGranted) {
       scope.launch {
         locationChoices.saveAndSelect(LocationSelection.FollowMe)
-        events.offer(SubmissionSuccess)
+        events.emit(SubmissionSuccess)
       }
     } else {
-      events.offer(PermissionError)
+      events.tryEmit(PermissionError)
     }
   }
 

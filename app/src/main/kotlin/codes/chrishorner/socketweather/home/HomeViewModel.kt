@@ -9,7 +9,7 @@ import org.threeten.bp.Instant
 
 class HomeViewModel(private val forecaster: Forecaster, private val clock: Clock) {
 
-  fun observeStates(): Flow<State> = forecaster.observeState()
+  fun observeStates(): Flow<State> = forecaster.states
 
   fun forceRefresh() {
     forecaster.refresh()
@@ -18,7 +18,7 @@ class HomeViewModel(private val forecaster: Forecaster, private val clock: Clock
   fun refreshIfNecessary() {
     // Refresh the forecast if we don't currently have one, or if the current forecast
     // is more than 1 minute old.
-    when (val state = forecaster.currentState) {
+    when (val state = forecaster.states.value) {
 
       is State.Idle -> forecaster.refresh()
 

@@ -12,18 +12,17 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.switch_location.SwitchLocationAdapter.ViewHolder
 import codes.chrishorner.socketweather.util.inflate
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 /**
  * Assumes the item at position 0 is the current `LocationSelection`.
  */
 class SwitchLocationAdapter(private val items: List<LocationSelection>) : RecyclerView.Adapter<ViewHolder>() {
 
-  private val clicksChannel = BroadcastChannel<LocationSelection>(1)
+  private val clicksFlow = MutableSharedFlow<LocationSelection>(extraBufferCapacity = 1)
 
-  fun clicks(): Flow<LocationSelection> = clicksChannel.asFlow()
+  fun clicks(): Flow<LocationSelection> = clicksFlow
 
   override fun getItemCount(): Int = items.size
 
@@ -46,7 +45,7 @@ class SwitchLocationAdapter(private val items: List<LocationSelection>) : Recycl
     private var item: LocationSelection? = null
 
     init {
-      view.setOnClickListener { clicksChannel.offer(requireNotNull(item)) }
+      view.setOnClickListener { clicksFlow.tryEmit(requireNotNull(item)) }
     }
 
     fun bind(selection: LocationSelection, position: Int) {

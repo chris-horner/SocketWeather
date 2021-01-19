@@ -1,6 +1,5 @@
 package codes.chrishorner.socketweather.data
 
-import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.Forecaster.State
 import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import codes.chrishorner.socketweather.data.Forecaster.State.Idle
@@ -9,14 +8,13 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
-import kotlinx.coroutines.channels.BroadcastChannel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.supervisorScope
 import org.threeten.bp.Clock
@@ -44,36 +42,29 @@ class Forecaster(
     enum class ErrorType { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
   }
 
-  private val states = MutableStateFlow<State>(Idle)
-  private val refreshes = BroadcastChannel<Unit>(1)
+  private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-  val currentState: State
-    get() = states.value
+  val states: StateFlow<State>
 
   init {
-    val stateFlow: Flow<State> = createStateFlow(
+    val stateFlow: Flow<State> = createFlowOfStates(
         clock,
         api,
         locationSelections,
         deviceLocations,
-        refreshes.asFlow().onStart { emit(Unit) }
+        refreshes.onStart { emit(Unit) }
     )
 
-    // Potentially tidier in the future: https://github.com/Kotlin/kotlinx.coroutines/issues/2047
-    stateFlow
-        .onEach { states.value = it }
-        .launchIn(CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate))
+    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+    states = stateFlow.stateIn(scope, started = SharingStarted.Eagerly, Idle)
   }
 
-  @MainThread
-  fun observeState(): Flow<State> = states
-
   fun refresh() {
-    refreshes.offer(Unit)
+    refreshes.tryEmit(Unit)
   }
 }
 
-private fun createStateFlow(
+private fun createFlowOfStates(
     clock: Clock,
     api: WeatherApi,
     locationSelections: Flow<LocationSelection>,

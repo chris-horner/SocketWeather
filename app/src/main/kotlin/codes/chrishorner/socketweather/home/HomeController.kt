@@ -33,7 +33,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
 
   override fun onAttach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
 
-    viewModel.observeStates().onEach { presenter.display(it) }.launchIn(viewScope)
+    viewModel.states.onEach { presenter.display(it) }.launchIn(viewScope)
     viewModel.refreshIfNecessary()
 
     presenter.events

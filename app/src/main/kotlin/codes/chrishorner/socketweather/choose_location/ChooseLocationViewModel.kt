@@ -1,5 +1,7 @@
 package codes.chrishorner.socketweather.choose_location
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
@@ -12,14 +14,12 @@ import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
@@ -33,13 +33,15 @@ class ChooseLocationViewModel(
     displayAsRoot: Boolean,
     private val api: WeatherApi,
     private val locationChoices: LocationChoices
-) {
+) : ViewModel() {
 
-  private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
   private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved)
   private val statesFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
-  private val events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+  private val eventsFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+
+  val states: StateFlow<State> = statesFlow
+  val events: Flow<Event> = eventsFlow
 
   init {
     searchQueryFlow
@@ -59,10 +61,8 @@ class ChooseLocationViewModel(
         }
         .distinctUntilChanged()
         .onEach { statesFlow.value = it }
-        .launchIn(scope)
+        .launchIn(viewModelScope)
   }
-
-  fun observeStates(): Flow<State> = statesFlow
 
   fun observeEvents(): Flow<Event> = events
 
@@ -71,16 +71,16 @@ class ChooseLocationViewModel(
   }
 
   fun selectResult(result: SearchResult) {
-    scope.launch {
+    viewModelScope.launch {
       statesFlow.value = idleState.copy(loadingStatus = Submitting)
 
       try {
         val location = api.getLocation(result.geohash)
         locationChoices.saveAndSelect(LocationSelection.Static(location))
-        events.emit(SubmissionSuccess)
+        eventsFlow.emit(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
-        events.emit(SubmissionError)
+        eventsFlow.emit(SubmissionError)
       }
 
       statesFlow.value = idleState
@@ -89,17 +89,13 @@ class ChooseLocationViewModel(
 
   fun selectFollowMe(locationPermissionGranted: Boolean) {
     if (locationPermissionGranted) {
-      scope.launch {
+      viewModelScope.launch {
         locationChoices.saveAndSelect(LocationSelection.FollowMe)
-        events.emit(SubmissionSuccess)
+        eventsFlow.emit(SubmissionSuccess)
       }
     } else {
-      events.tryEmit(PermissionError)
+      eventsFlow.tryEmit(PermissionError)
     }
-  }
-
-  fun destroy() {
-    scope.cancel()
   }
 
   private suspend fun search(query: String): State {

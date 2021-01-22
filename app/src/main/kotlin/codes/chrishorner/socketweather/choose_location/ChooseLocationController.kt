@@ -7,6 +7,7 @@ import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.os.bundleOf
+import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
@@ -22,6 +23,7 @@ import codes.chrishorner.socketweather.util.asTransaction
 import codes.chrishorner.socketweather.util.dismissKeyboard
 import codes.chrishorner.socketweather.util.inflate
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
@@ -48,7 +50,7 @@ class ChooseLocationController(
       viewScope: CoroutineScope
   ) {
 
-    viewModel.observeStates()
+    viewModel.states
         .onEach { presenter.display(it) }
         .launchIn(viewScope)
 
@@ -93,6 +95,6 @@ class ChooseLocationController(
   }
 
   override fun onDestroy(viewModel: ChooseLocationViewModel?) {
-    viewModel?.destroy()
+    viewModel?.viewModelScope?.cancel()
   }
 }

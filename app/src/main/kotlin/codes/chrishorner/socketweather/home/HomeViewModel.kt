@@ -1,15 +1,19 @@
 package codes.chrishorner.socketweather.home
 
+import androidx.lifecycle.ViewModel
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.Forecaster.State
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.StateFlow
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
-class HomeViewModel(private val forecaster: Forecaster, private val clock: Clock) {
+class HomeViewModel(
+    private val forecaster: Forecaster,
+    private val clock: Clock = Clock.systemDefaultZone()
+) : ViewModel() {
 
-  fun observeStates(): Flow<State> = forecaster.states
+  val states: StateFlow<State> = forecaster.states
 
   fun forceRefresh() {
     forecaster.refresh()

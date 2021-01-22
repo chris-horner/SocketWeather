@@ -19,28 +19,29 @@ import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Providers
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import codes.chrishorner.socketweather.R.string
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Idle
+import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 import dev.chrisbanes.accompanist.insets.systemBarsPadding
 
-@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, device = Devices.NEXUS_5)
 @Composable
-fun ChooseLocationPreview() {
-  SocketWeatherTheme {
-    ProvideWindowInsets {
-      ChooseLocationScreen()
-    }
-  }
+fun ChooseLocationScreen(navController: NavController, viewModel: ChooseLocationViewModel) {
+  val state: State by viewModel.states.collectAsState()
+  ChooseLocationUi(state)
 }
 
 @Composable
-fun ChooseLocationScreen() {
+fun ChooseLocationUi(state: State) {
   Surface(color = MaterialTheme.colors.background) {
     Column(modifier = Modifier.systemBarsPadding()) {
       IconButton(onClick = { /*TODO*/ }) {
@@ -65,6 +66,23 @@ fun ChooseLocationScreen() {
               .fillMaxWidth()
       )
       Spacer(modifier = Modifier.weight(2f))
+    }
+  }
+}
+
+@Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, device = Devices.NEXUS_5)
+@Composable
+fun ChooseLocationPreview() {
+  SocketWeatherTheme {
+    ProvideWindowInsets {
+      ChooseLocationUi(
+          State(
+              rootScreen = true,
+              showFollowMe = true,
+              results = emptyList(),
+              loadingStatus = Idle
+          )
+      )
     }
   }
 }

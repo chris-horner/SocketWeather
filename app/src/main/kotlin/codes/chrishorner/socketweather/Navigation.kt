@@ -6,12 +6,10 @@ import androidx.compose.ui.platform.AmbientContext
 import androidx.compose.ui.viewinterop.viewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
-import androidx.navigation.compose.navigate
 import androidx.navigation.compose.rememberNavController
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
@@ -19,54 +17,47 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.home.HomeViewModel
 
-private object RouteNames {
-  const val HOME = "home"
-  const val CHOOSE_LOCATION = "choose_location"
-  const val ABOUT = "about"
-}
-
 private object NavArgs {
-  const val SHOW_AS_ROOT = "show_as_root"
+  const val SHOW_CLOSE_BUTTON = "show_close_button"
 }
 
-sealed class Route(val name: String) {
-  open val navPath: String = name
+sealed class Screen(val routeDefinition: String) {
 
-  object Home : Route(RouteNames.HOME)
-
-  data class ChooseLocation(val showAsRoot: Boolean = false) : Route(RouteNames.CHOOSE_LOCATION) {
-    override val navPath = "$name/$showAsRoot"
+  object Home : Screen("home") {
+    fun getRoute() = routeDefinition
   }
 
-  object About : Route(RouteNames.ABOUT)
-}
+  object ChooseLocation : Screen("choose_location/{${NavArgs.SHOW_CLOSE_BUTTON}}") {
+    fun getRoute(showCloseButton: Boolean = true) = "choose_location/$showCloseButton"
+  }
 
-fun NavController.navigate(destination: Route) {
-  navigate(destination.navPath)
+  object About : Screen("about") {
+    fun getRoute() = routeDefinition
+  }
 }
 
 @Composable
 fun NavGraph(currentSelection: LocationSelection) {
   val navController = rememberNavController()
   val initialRoute =
-      if (currentSelection != LocationSelection.None) Route.Home
-      else Route.ChooseLocation(showAsRoot = true)
+      if (currentSelection != LocationSelection.None) Screen.Home.getRoute()
+      else Screen.ChooseLocation.routeDefinition
 
   NavHost(
       navController = navController,
-      startDestination = initialRoute.navPath
+      startDestination = initialRoute
   ) {
-    composable(RouteNames.HOME) {
+    composable(Screen.Home.routeDefinition) {
       val viewModel = createVm { context -> HomeViewModel(context.appSingletons.forecaster) }
       HomeScreen(navController, viewModel)
     }
     composable(
-        route = "${RouteNames.CHOOSE_LOCATION}/{${NavArgs.SHOW_AS_ROOT}}",
-        arguments = listOf(navArgument(NavArgs.SHOW_AS_ROOT) { type = NavType.BoolType })
+        route = Screen.ChooseLocation.routeDefinition,
+        arguments = listOf(navArgument(NavArgs.SHOW_CLOSE_BUTTON) { type = NavType.BoolType })
     ) { entry ->
       val viewModel = createVm { context ->
         ChooseLocationViewModel(
-            displayAsRoot = entry.arguments!!.getBoolean(NavArgs.SHOW_AS_ROOT),
+            displayAsRoot = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
             api = context.appSingletons.networkComponents.api,
             locationChoices = context.appSingletons.locationChoices
         )

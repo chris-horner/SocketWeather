@@ -13,10 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
-import codes.chrishorner.socketweather.Route
+import androidx.navigation.compose.navigate
+import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.home.HomeEvent.ChooseLocation
-import codes.chrishorner.socketweather.navigate
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
@@ -28,7 +28,7 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
   val state: Forecaster.State by viewModel.states.collectAsState()
   HomeUi(state) { event ->
     when (event) {
-      ChooseLocation -> navController.navigate(Route.ChooseLocation())
+      ChooseLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
     }
   }
 }

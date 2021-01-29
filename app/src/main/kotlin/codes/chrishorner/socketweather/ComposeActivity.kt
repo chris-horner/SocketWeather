@@ -2,6 +2,8 @@ package codes.chrishorner.socketweather
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Divider
 import androidx.compose.material.DropdownMenu
 import androidx.compose.material.DropdownMenuItem
@@ -17,14 +19,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.setContent
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
+@ExperimentalAnimatedInsets
 class ComposeActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,9 +38,11 @@ class ComposeActivity : AppCompatActivity() {
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
     setContent {
-      ProvideWindowInsets {
+      ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
         SocketWeatherTheme {
-          NavGraph(currentSelection = appSingletons.locationChoices.currentSelection)
+          Box(modifier = Modifier.fillMaxSize()) {
+            NavGraph(currentSelection = appSingletons.locationChoices.currentSelection)
+          }
         }
       }
     }
@@ -63,7 +70,7 @@ private fun Menu() {
   var expanded by remember { mutableStateOf(false) }
   val iconButton = @Composable {
     IconButton(onClick = { expanded = true }) {
-      Icon(Icons.Default.MoreVert)
+      Icon(Icons.Default.MoreVert, contentDescription = null)
     }
   }
 

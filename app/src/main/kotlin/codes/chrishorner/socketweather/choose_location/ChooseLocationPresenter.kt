@@ -18,12 +18,11 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.E
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.ResultSelected
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Idle
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Searching
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingDone
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Submitting
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.State
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.util.dismissKeyboard
 import codes.chrishorner.socketweather.util.updatePaddingWithInsets
@@ -101,8 +100,8 @@ class ChooseLocationPresenter(private val view: View) {
     }
   }
 
-  fun display(state: State) {
-    toolbar.isVisible = !state.rootScreen
+  fun display(state: ChooseLocationState) {
+    toolbar.isVisible = state.showCloseButton
     titleView.isVisible = state.loadingStatus == Idle
     followMeButton.isVisible = state.showFollowMe && state.loadingStatus == Idle
     topSpace.isVisible = state.loadingStatus == Idle

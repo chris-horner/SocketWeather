@@ -104,7 +104,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
                                      '-Xopt-in=kotlinx.coroutines.FlowPreview',
                                      '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
                                      '-Xopt-in=kotlin.ExperimentalStdlibApi',
-                                     '-Xopt-in=kotlin.time.ExperimentalTime']
+                                     '-Xopt-in=kotlin.time.ExperimentalTime',
+                                     '-Xopt-in=androidx.compose.material.ExperimentalMaterialApi',
+                                     '-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi']
 }
 
 dependencies {
@@ -112,7 +114,10 @@ dependencies {
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
   implementation "androidx.compose.ui:ui:${versions.compose}"
   implementation "androidx.compose.material:material:${versions.compose}"
+  implementation "androidx.compose.material:material-icons-core:${versions.compose}"
+  implementation "androidx.compose.material:material-icons-extended:${versions.compose}"
   implementation "androidx.compose.ui:ui-tooling:${versions.compose}"
+  implementation "androidx.compose.ui:ui-graphics:${versions.compose}"
   implementation "dev.chrisbanes.accompanist:accompanist-insets:${versions.accompanist}"
   implementation "androidx.navigation:navigation-compose:${versions.navigation}"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"

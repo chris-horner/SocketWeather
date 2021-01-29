@@ -10,13 +10,13 @@ import androidx.core.os.bundleOf
 import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.PermissionError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionSuccess
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationPresenter.Event.ResultSelected
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ScopedController
 import codes.chrishorner.socketweather.util.asTransaction

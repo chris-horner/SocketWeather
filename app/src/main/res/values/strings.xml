@@ -11,10 +11,11 @@
   <string name="chooseLocation_searchHint">Search</string>
   <string name="chooseLocation_submissionError">Something went wrong 😕</string>
   <string name="chooseLocation_searchLoading">Loading results…</string>
-  <string name="chooseLocation_searchError">Something went wrong 😕</string>
+  <string name="chooseLocation_searchError">Something went wrong 😕. Check your internet connection?</string>
   <string name="chooseLocation_searchEmpty">No locations found</string>
   <string name="chooseLocation_permissionError">Location permission required</string>
   <string name="chooseLocation_submitting">Saving location…</string>
+  <string name="chooseLocation_closeDesc">Close</string>
 
   <string name="home_findingLocation">Finding location…</string>
   <string name="home_refresh">Refresh</string>

@@ -57,7 +57,7 @@ fun NavGraph(currentSelection: LocationSelection) {
     ) { entry ->
       val viewModel = createVm { context ->
         ChooseLocationViewModel(
-            displayAsRoot = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
+            showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
             api = context.appSingletons.networkComponents.api,
             locationChoices = context.appSingletons.locationChoices
         )

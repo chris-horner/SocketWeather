@@ -2,14 +2,19 @@ package codes.chrishorner.socketweather.choose_location
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.PermissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.Event.SubmissionSuccess
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Idle
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Searching
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingDone
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.SearchingError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel.LoadingStatus.Submitting
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.PermissionError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionSuccess
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitted
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.SearchResult
@@ -30,33 +35,29 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ChooseLocationViewModel(
-    displayAsRoot: Boolean,
+    showCloseButton: Boolean,
     private val api: WeatherApi,
     private val locationChoices: LocationChoices
 ) : ViewModel() {
 
-  private val idleState = State(displayAsRoot, showFollowMe = !locationChoices.hasFollowMeSaved)
+  private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationChoices.hasFollowMeSaved)
   private val statesFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
-  private val eventsFlow = MutableSharedFlow<Event>(extraBufferCapacity = 1)
+  private val eventsFlow = MutableSharedFlow<ChooseLocationDataEvent>(extraBufferCapacity = 1)
 
-  val states: StateFlow<State> = statesFlow
-  val events: Flow<Event> = eventsFlow
+  val states: StateFlow<ChooseLocationState> = statesFlow
+  val events: Flow<ChooseLocationDataEvent> = eventsFlow
 
   init {
     searchQueryFlow
         .map { query ->
-          if (query.isBlank()) {
-            query to idleState
-          } else {
-            query to idleState.copy(loadingStatus = Searching)
-          }
+          idleState.copy(query = query, loadingStatus = if (query.isBlank()) Idle else Searching)
         }
-        .transformLatest { (query, state) ->
+        .transformLatest { state ->
           emit(state)
-          if (state.loadingStatus == Searching && query.length > 2) {
+          if (state.loadingStatus == Searching && state.query.length > 2) {
             delay(300)
-            emit(search(query))
+            emit(search(state.query))
           }
         }
         .distinctUntilChanged()
@@ -64,7 +65,16 @@ class ChooseLocationViewModel(
         .launchIn(viewModelScope)
   }
 
-  fun observeEvents(): Flow<Event> = events
+  fun handle(uiEvent: ChooseLocationUiEvent) {
+    when (uiEvent) {
+      is InputSearch -> searchQueryFlow.value = uiEvent.query
+      is ResultSelected -> selectResult(uiEvent.result)
+      FollowMeClicked -> TODO()
+      CloseClicked -> TODO()
+    }
+  }
+
+  fun observeEvents(): Flow<ChooseLocationDataEvent> = events
 
   fun inputSearchQuery(query: String) {
     searchQueryFlow.value = query
@@ -72,18 +82,18 @@ class ChooseLocationViewModel(
 
   fun selectResult(result: SearchResult) {
     viewModelScope.launch {
-      statesFlow.value = idleState.copy(loadingStatus = Submitting)
+      statesFlow.value = statesFlow.value.copy(loadingStatus = Submitting)
 
       try {
         val location = api.getLocation(result.geohash)
         locationChoices.saveAndSelect(LocationSelection.Static(location))
         eventsFlow.emit(SubmissionSuccess)
+        statesFlow.value = statesFlow.value.copy(loadingStatus = Submitted)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
         eventsFlow.emit(SubmissionError)
+        statesFlow.value = statesFlow.value.copy(loadingStatus = SearchingError)
       }
-
-      statesFlow.value = idleState
     }
   }
 
@@ -98,24 +108,13 @@ class ChooseLocationViewModel(
     }
   }
 
-  private suspend fun search(query: String): State {
+  private suspend fun search(query: String): ChooseLocationState {
     return try {
       val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
-      idleState.copy(results = results, loadingStatus = SearchingDone)
+      statesFlow.value.copy(results = results, loadingStatus = SearchingDone)
     } catch (e: Exception) {
       Timber.e(e, "Search failed with query %s", query)
-      idleState.copy(loadingStatus = SearchingError)
+      statesFlow.value.copy(loadingStatus = SearchingError)
     }
   }
-
-  data class State(
-      val rootScreen: Boolean,
-      val showFollowMe: Boolean,
-      val results: List<SearchResult> = emptyList(),
-      val loadingStatus: LoadingStatus = Idle
-  )
-
-  enum class LoadingStatus { Idle, Searching, SearchingError, SearchingDone, Submitting }
-
-  enum class Event { SubmissionError, SubmissionSuccess, PermissionError }
 }

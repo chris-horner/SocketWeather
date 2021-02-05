@@ -3,6 +3,8 @@ package codes.chrishorner.socketweather.util
 import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Typeface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.res.ResourcesCompat
 import androidx.core.content.res.getResourceIdOrThrow
 import codes.chrishorner.socketweather.R
@@ -14,8 +16,18 @@ fun Float.formatAsDegrees(context: Context): String {
   return context.getString(R.string.temperatureFormat, decimalFormat.format(this))
 }
 
+@Composable
+fun Float.formatAsDegrees(): String {
+  return stringResource(R.string.temperatureFormat, decimalFormat.format(this))
+}
+
 fun Int.formatAsDegrees(context: Context): String {
   return context.getString(R.string.temperatureFormat, decimalFormat.format(this))
+}
+
+@Composable
+fun Int.formatAsDegrees(): String {
+  return stringResource(R.string.temperatureFormat, decimalFormat.format(this))
 }
 
 fun Int.formatAsPercent(context: Context): String {

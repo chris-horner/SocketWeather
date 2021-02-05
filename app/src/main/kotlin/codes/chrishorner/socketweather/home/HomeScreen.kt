@@ -43,7 +43,6 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
-import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import codes.chrishorner.socketweather.data.LocationSelection
@@ -103,12 +102,18 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
       expanded = expanded,
       onDismissRequest = { expanded = false },
       toggle = menuButton,
-      dropdownOffset = DpOffset(0.dp, (-56).dp)
+      dropdownOffset = DpOffset(0.dp, (-56).dp),
   ) {
-    DropdownMenuItem(onClick = { eventHandler(HomeEvent.Refresh) }) {
+    DropdownMenuItem(onClick = {
+      eventHandler(Refresh)
+      expanded = false
+    }) {
       Text(stringResource(R.string.home_refresh))
     }
-    DropdownMenuItem(onClick = { eventHandler(HomeEvent.ViewAbout) }) {
+    DropdownMenuItem(onClick = {
+      eventHandler(ViewAbout)
+      expanded = false
+    }) {
       Text(stringResource(R.string.home_about))
     }
   }
@@ -142,15 +147,10 @@ private fun LocationDropdown(state: HomeState) {
 private fun Content(state: Forecaster.State) {
   when (state) {
     is Forecaster.State.Error -> Error(state.type)
-    is Forecaster.State.Refreshing -> Forecast(state.previousForecast)
-    is Forecaster.State.Loaded -> Forecast(state.forecast)
+    is Forecaster.State.Refreshing -> ForecastUi(state.previousForecast)
+    is Forecaster.State.Loaded -> ForecastUi(state.forecast)
     else -> Loading()
   }
-}
-
-@Composable
-private fun Forecast(forecast: Forecast) {
-
 }
 
 @Composable
@@ -235,7 +235,10 @@ private fun RefreshTime.asText(): String? = when (this) {
   InProgress -> stringResource(R.string.home_updatingNow)
   JustNow -> stringResource(R.string.home_justUpdated)
   Failed -> null
-  is TimeAgo -> DateUtils.getRelativeTimeSpanString(time.toEpochMilli()).toString()
+  is TimeAgo -> {
+    val timeAgoText = DateUtils.getRelativeTimeSpanString(time.toEpochMilli()).toString()
+    stringResource(R.string.home_lastUpdated, timeAgoText)
+  }
 }
 
 @Preview(device = Devices.NEXUS_5, showBackground = true)

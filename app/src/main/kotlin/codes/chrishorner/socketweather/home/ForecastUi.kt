@@ -30,12 +30,19 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
+import codes.chrishorner.socketweather.util.ThickDivider
 import codes.chrishorner.socketweather.util.formatAsDegrees
 
 @Composable
 fun ForecastUi(forecast: Forecast) {
   Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
     Observations(forecast)
+
+    ThickDivider(
+        modifier = Modifier
+            .padding(horizontal = 16.dp)
+            .fillMaxWidth()
+    )
   }
 }
 
@@ -47,7 +54,7 @@ private fun Observations(forecast: Forecast) {
           .padding(top = 8.dp, bottom = 16.dp)
           .fillMaxWidth()
   ) {
-    val (icon, currentTemp, feelsLikeTitle, feelsLikeTemp, highTemp, lowTemp, tempLine) = createRefs()
+    val (icon, currentTemp, feelsLikeTitle, feelsLikeTemp, highTemp, lowTemp, tempLine, description) = createRefs()
 
     Image(
         imageVector = vectorResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
@@ -121,6 +128,18 @@ private fun Observations(forecast: Forecast) {
             .clip(RoundedCornerShape(2.dp))
             .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
     )
+
+    val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
+    if (descriptionText != null) {
+      Text(
+          text = descriptionText,
+          modifier = Modifier
+              .constrainAs(description) {
+                top.linkTo(feelsLikeTitle.bottom, margin = 16.dp)
+              }
+              .fillMaxWidth()
+      )
+    }
   }
 }
 

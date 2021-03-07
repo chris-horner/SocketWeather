@@ -29,7 +29,7 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
   override fun onCreatePresenter(view: View, viewModel: HomeViewModel) = HomePresenter(view)
 
   override fun onCreateViewModel(context: Context): HomeViewModel =
-      HomeViewModel(context.appSingletons.forecaster, Clock.systemDefaultZone())
+    HomeViewModel(context.appSingletons.forecaster, Clock.systemDefaultZone())
 
   override fun onAttach(view: View, presenter: HomePresenter, viewModel: HomeViewModel, viewScope: CoroutineScope) {
 
@@ -37,23 +37,23 @@ class HomeController : ScopedController<HomeViewModel, HomePresenter>() {
     viewModel.refreshIfNecessary()
 
     presenter.events
-        .onEach { event ->
-          when (event) {
-            SwitchLocationClicked -> router.pushController(
-                SwitchLocationController()
-                    .asTransaction()
-                    .pushChangeHandler(SwitchLocationChangeHandler())
-            )
-            RefreshClicked -> viewModel.forceRefresh()
-            AboutClicked -> router.pushController(
-                AboutController()
-                    .asTransaction()
-                    .pushChangeHandler(AboutChangeHandler())
-                    .popChangeHandler(AboutChangeHandler())
-            )
-          }
+      .onEach { event ->
+        when (event) {
+          SwitchLocationClicked -> router.pushController(
+            SwitchLocationController()
+              .asTransaction()
+              .pushChangeHandler(SwitchLocationChangeHandler())
+          )
+          RefreshClicked -> viewModel.forceRefresh()
+          AboutClicked -> router.pushController(
+            AboutController()
+              .asTransaction()
+              .pushChangeHandler(AboutChangeHandler())
+              .popChangeHandler(AboutChangeHandler())
+          )
         }
-        .launchIn(viewScope)
+      }
+      .launchIn(viewScope)
 
     // Update the refreshed time text every 10 seconds while the view is displayed.
     viewScope.launch {

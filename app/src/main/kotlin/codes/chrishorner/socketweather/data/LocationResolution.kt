@@ -31,32 +31,32 @@ private val australiaLongitudeRange = 112.169980..154.927992
  * current selection is `FollowMe`).
  */
 fun resolveLocations(
-    locationSelections: Flow<LocationSelection>,
-    deviceLocations: Flow<DeviceLocation>,
-    api: WeatherApi
+  locationSelections: Flow<LocationSelection>,
+  deviceLocations: Flow<DeviceLocation>,
+  api: WeatherApi
 ): Flow<LocationResolution> {
 
   val followMeStates: Flow<LocationResolution> = deviceLocations
-      .transformLatest { (latitude, longitude) ->
-        if (latitude in australiaLatitudeRange && longitude in australiaLongitudeRange) {
-          try {
-            val searchResults = api.searchForLocation("$latitude,$longitude")
-            val location = api.getLocation(searchResults[0].geohash)
-            emit(Resolved(LocationSelection.FollowMe, location))
-          } catch (e: Exception) {
-            Timber.e(e, "Failed to resolve Location.")
-            emit(NetworkError)
-          }
-        } else {
-          emit(NotInAustralia)
+    .transformLatest { (latitude, longitude) ->
+      if (latitude in australiaLatitudeRange && longitude in australiaLongitudeRange) {
+        try {
+          val searchResults = api.searchForLocation("$latitude,$longitude")
+          val location = api.getLocation(searchResults[0].geohash)
+          emit(Resolved(LocationSelection.FollowMe, location))
+        } catch (e: Exception) {
+          Timber.e(e, "Failed to resolve Location.")
+          emit(NetworkError)
         }
+      } else {
+        emit(NotInAustralia)
       }
-      .catch {
-        Timber.e(it, "Failed to get device location.")
-        emit(DeviceLocationError)
-      }
-      .distinctUntilChanged()
-      .onStart { emit(Searching) }
+    }
+    .catch {
+      Timber.e(it, "Failed to get device location.")
+      emit(DeviceLocationError)
+    }
+    .distinctUntilChanged()
+    .onStart { emit(Searching) }
 
   return locationSelections.flatMapLatest { selection ->
     when (selection) {

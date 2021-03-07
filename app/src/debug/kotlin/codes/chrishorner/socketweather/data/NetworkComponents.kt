@@ -20,8 +20,8 @@ class NetworkComponents(app: Application, locationChoices: LocationChoices) {
 
   init {
     val endpoints = listOf(
-        Endpoint("Mock", "https://localhost/mock/", isMock = true),
-        Endpoint("Production", DataConfig.API_ENDPOINT)
+      Endpoint("Mock", "https://localhost/mock/", isMock = true),
+      Endpoint("Production", DataConfig.API_ENDPOINT)
     )
     val networkBehavior = NetworkBehavior.create()
     debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
@@ -32,22 +32,22 @@ class NetworkComponents(app: Application, locationChoices: LocationChoices) {
     }
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
-        .addInterceptor(httpLogger.interceptor)
-        .build()
+      .addInterceptor(httpLogger.interceptor)
+      .build()
 
     val currentEndpoint = debugRetrofitConfig.currentEndpoint
     val retrofit: Retrofit = Retrofit.Builder()
-        .baseUrl(currentEndpoint.url)
-        .client(httpClient)
-        .addConverterFactory(EnvelopeConverter)
-        .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
-        .build()
+      .baseUrl(currentEndpoint.url)
+      .client(httpClient)
+      .addConverterFactory(EnvelopeConverter)
+      .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
+      .build()
 
     api = if (currentEndpoint.isMock) {
       MockRetrofit.Builder(retrofit)
-          .networkBehavior(networkBehavior)
-          .build()
-          .let { MockWeatherApi(it) }
+        .networkBehavior(networkBehavior)
+        .build()
+        .let { MockWeatherApi(it) }
     } else {
       retrofit.create()
     }

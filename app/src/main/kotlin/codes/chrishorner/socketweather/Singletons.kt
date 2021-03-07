@@ -38,9 +38,9 @@ private class SingletonCache(app: Application) : Singletons {
   override val locationChoices = LocationChoices(app)
   override val networkComponents = NetworkComponents(app, locationChoices)
   override val forecaster = Forecaster(
-      clock = Clock.systemDefaultZone(),
-      api = networkComponents.api,
-      locationSelections = locationChoices.observeCurrentSelection(),
-      deviceLocations = deviceLocator.observeDeviceLocation()
+    clock = Clock.systemDefaultZone(),
+    api = networkComponents.api,
+    locationSelections = locationChoices.observeCurrentSelection(),
+    deviceLocations = deviceLocator.observeDeviceLocation()
   )
 }

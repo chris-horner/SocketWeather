@@ -26,27 +26,27 @@ import dev.chrisbanes.accompanist.insets.statusBarsPadding
  */
 @Composable
 fun InsetAwareTopAppBar(
-    title: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    navigationIcon: @Composable (() -> Unit)? = null,
-    actions: @Composable RowScope.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
-    contentColor: Color = contentColorFor(backgroundColor),
-    elevation: Dp = 4.dp
+  title: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  navigationIcon: @Composable (() -> Unit)? = null,
+  actions: @Composable RowScope.() -> Unit = {},
+  backgroundColor: Color = MaterialTheme.colors.primarySurface,
+  contentColor: Color = contentColorFor(backgroundColor),
+  elevation: Dp = 4.dp
 ) {
   Surface(
-      color = backgroundColor,
-      elevation = elevation,
-      modifier = modifier
+    color = backgroundColor,
+    elevation = elevation,
+    modifier = modifier
   ) {
     TopAppBar(
-        title = title,
-        navigationIcon = navigationIcon,
-        actions = actions,
-        backgroundColor = Color.Transparent,
-        contentColor = contentColor,
-        elevation = 0.dp,
-        modifier = Modifier.statusBarsPadding()
+      title = title,
+      navigationIcon = navigationIcon,
+      actions = actions,
+      backgroundColor = Color.Transparent,
+      contentColor = contentColor,
+      elevation = 0.dp,
+      modifier = Modifier.statusBarsPadding()
     )
   }
 }
@@ -54,9 +54,9 @@ fun InsetAwareTopAppBar(
 @Composable
 fun ThickDivider(modifier: Modifier = Modifier) {
   Box(
-      modifier = modifier
-          .height(4.dp)
-          .clip(RoundedCornerShape(2.dp))
-          .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+    modifier = modifier
+      .height(4.dp)
+      .clip(RoundedCornerShape(2.dp))
+      .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
   )
 }

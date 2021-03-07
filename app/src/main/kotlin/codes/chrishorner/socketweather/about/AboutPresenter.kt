@@ -34,10 +34,10 @@ class AboutPresenter(view: View) {
     val websiteButton: View = view.findViewById(R.id.about_websiteButton)
 
     events = merge(
-        toolbar.navigationClicks().map { GoBack },
-        bomButton.clicks().map { OpenUrl("http://www.bom.gov.au/") },
-        sourceButton.clicks().map { OpenUrl("https://github.com/chris-horner/SocketWeather") },
-        websiteButton.clicks().map { OpenUrl("https://chrishorner.codes") }
+      toolbar.navigationClicks().map { GoBack },
+      bomButton.clicks().map { OpenUrl("http://www.bom.gov.au/") },
+      sourceButton.clicks().map { OpenUrl("https://github.com/chris-horner/SocketWeather") },
+      websiteButton.clicks().map { OpenUrl("https://chrishorner.codes") }
     )
   }
 

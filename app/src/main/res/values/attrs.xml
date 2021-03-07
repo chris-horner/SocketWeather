@@ -2,8 +2,8 @@
 
 <resources>
 
-  <attr name="colorDivider" format="color" />
-  <attr name="colorScrim" format="color" />
-  <attr name="colorHint" format="color"/>
+  <attr format="color" name="colorDivider" />
+  <attr format="color" name="colorScrim" />
+  <attr format="color" name="colorHint" />
 
 </resources>

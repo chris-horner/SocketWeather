@@ -4,8 +4,8 @@ import codes.chrishorner.socketweather.data.Forecaster
 import org.threeten.bp.Instant
 
 data class HomeState(
-    val refreshTime: RefreshTime,
-    val forecasterState: Forecaster.State
+  val refreshTime: RefreshTime,
+  val forecasterState: Forecaster.State
 ) {
   sealed class RefreshTime {
     object InProgress : RefreshTime()

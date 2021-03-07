@@ -18,11 +18,11 @@ class SocketWeatherApp : Application() {
       Timber.plant(Timber.DebugTree())
       StrictMode.setThreadPolicy(ThreadPolicy.Builder().detectAll().penaltyDeath().build())
       StrictMode.setVmPolicy(
-          VmPolicy.Builder()
-              .detectActivityLeaks()
-              .detectLeakedRegistrationObjects()
-              .penaltyDeath()
-              .build()
+        VmPolicy.Builder()
+          .detectActivityLeaks()
+          .detectLeakedRegistrationObjects()
+          .penaltyDeath()
+          .build()
       )
     }
 

@@ -40,26 +40,26 @@ sealed class Screen(val routeDefinition: String) {
 fun NavGraph(currentSelection: LocationSelection) {
   val navController = rememberNavController()
   val initialRoute =
-      if (currentSelection != LocationSelection.None) Screen.Home.getRoute()
-      else Screen.ChooseLocation.routeDefinition
+    if (currentSelection != LocationSelection.None) Screen.Home.getRoute()
+    else Screen.ChooseLocation.routeDefinition
 
   NavHost(
-      navController = navController,
-      startDestination = initialRoute
+    navController = navController,
+    startDestination = initialRoute
   ) {
     composable(Screen.Home.routeDefinition) {
       val viewModel = createVm { context -> HomeViewModel(context.appSingletons.forecaster) }
       HomeScreen(navController, viewModel)
     }
     composable(
-        route = Screen.ChooseLocation.routeDefinition,
-        arguments = listOf(navArgument(NavArgs.SHOW_CLOSE_BUTTON) { type = NavType.BoolType })
+      route = Screen.ChooseLocation.routeDefinition,
+      arguments = listOf(navArgument(NavArgs.SHOW_CLOSE_BUTTON) { type = NavType.BoolType })
     ) { entry ->
       val viewModel = createVm { context ->
         ChooseLocationViewModel(
-            showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
-            api = context.appSingletons.networkComponents.api,
-            locationChoices = context.appSingletons.locationChoices
+          showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
+          api = context.appSingletons.networkComponents.api,
+          locationChoices = context.appSingletons.locationChoices
         )
       }
       ChooseLocationScreen(navController, viewModel)

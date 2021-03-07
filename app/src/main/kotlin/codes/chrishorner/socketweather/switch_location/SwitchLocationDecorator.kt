@@ -20,7 +20,7 @@ class SwitchLocationDecorator(context: Context) : ItemDecoration() {
 
   init {
     val attrArray: TypedArray =
-        context.obtainStyledAttributes(intArrayOf(android.R.attr.listDivider))
+      context.obtainStyledAttributes(intArrayOf(android.R.attr.listDivider))
     divider = attrArray.getDrawableOrThrow(0)
     attrArray.recycle()
   }

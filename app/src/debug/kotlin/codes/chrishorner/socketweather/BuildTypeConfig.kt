@@ -29,18 +29,18 @@ object BuildTypeConfig {
       val networkComponents: NetworkComponents = activity.appSingletons.networkComponents
       val deviceLocator = getDeviceLocator(activity.app) as DebugDeviceLocator
       drawerBuilder
-          .addSectionTitle("Device location")
-          .addModule(DebugDeviceLocatorModule(deviceLocator))
-          .addSectionTitle("Network")
-          .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))
-          .addSectionTitle("Logs")
-          .addModule(OkHttpLoggerModule(networkComponents.httpLogger))
-          .addModule(TimberModule())
-          .addSectionTitle("Leaks")
-          .addModule(LeakCanaryModule)
-          .addSectionTitle("Device information")
-          .addModule(DeviceInfoModule())
-          .overrideMainContainer(ChangeHandlerFrameLayout(activity))
+        .addSectionTitle("Device location")
+        .addModule(DebugDeviceLocatorModule(deviceLocator))
+        .addSectionTitle("Network")
+        .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))
+        .addSectionTitle("Logs")
+        .addModule(OkHttpLoggerModule(networkComponents.httpLogger))
+        .addModule(TimberModule())
+        .addSectionTitle("Leaks")
+        .addModule(LeakCanaryModule)
+        .addSectionTitle("Device information")
+        .addModule(DeviceInfoModule())
+        .overrideMainContainer(ChangeHandlerFrameLayout(activity))
     }
 
     return drawerBuilder.buildMainContainer()

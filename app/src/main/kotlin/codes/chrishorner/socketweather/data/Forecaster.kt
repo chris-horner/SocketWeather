@@ -25,10 +25,10 @@ import timber.log.Timber
  * A singleton that holds the current state of the [Forecast] for the whole application.
  */
 class Forecaster(
-    clock: Clock,
-    api: WeatherApi,
-    locationSelections: Flow<LocationSelection>,
-    deviceLocations: Flow<DeviceLocation>
+  clock: Clock,
+  api: WeatherApi,
+  locationSelections: Flow<LocationSelection>,
+  deviceLocations: Flow<DeviceLocation>
 ) {
 
   sealed class State(open val selection: LocationSelection) {
@@ -48,11 +48,11 @@ class Forecaster(
 
   init {
     val stateFlow: Flow<State> = createFlowOfStates(
-        clock,
-        api,
-        locationSelections,
-        deviceLocations,
-        refreshes.onStart { emit(Unit) }
+      clock,
+      api,
+      locationSelections,
+      deviceLocations,
+      refreshes.onStart { emit(Unit) }
     )
 
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
@@ -65,16 +65,16 @@ class Forecaster(
 }
 
 private fun createFlowOfStates(
-    clock: Clock,
-    api: WeatherApi,
-    locationSelections: Flow<LocationSelection>,
-    deviceLocations: Flow<DeviceLocation>,
-    refreshRequests: Flow<Unit>
+  clock: Clock,
+  api: WeatherApi,
+  locationSelections: Flow<LocationSelection>,
+  deviceLocations: Flow<DeviceLocation>,
+  refreshRequests: Flow<Unit>
 ): Flow<State> {
   // Emit a LocationSelection whenever a new selection is made, or whenever a
   // new refresh request comes through.
   val selectionTriggers: Flow<LocationSelection> =
-      combine(locationSelections, refreshRequests) { selection, _ -> selection }
+    combine(locationSelections, refreshRequests) { selection, _ -> selection }
 
   val locationResolutions = resolveLocations(selectionTriggers, deviceLocations, api)
 
@@ -161,18 +161,18 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
   val upcomingForecasts: List<DateForecast> = dateForecasts.drop(1)
 
   return@supervisorScope Forecast(
-      updateTime = Instant.now(clock),
-      location = location,
-      iconDescriptor = todayForecast.icon_descriptor,
-      night = currentInfo.is_night,
-      currentTemp = observations.temp,
-      tempFeelsLike = observations.temp_feels_like,
-      humidity = observations.humidity,
-      wind = observations.wind,
-      highTemp = todayForecast.temp_max,
-      lowTemp = lowTemp,
-      todayForecast = todayForecast,
-      hourlyForecasts = hourlyForecasts,
-      upcomingForecasts = upcomingForecasts
+    updateTime = Instant.now(clock),
+    location = location,
+    iconDescriptor = todayForecast.icon_descriptor,
+    night = currentInfo.is_night,
+    currentTemp = observations.temp,
+    tempFeelsLike = observations.temp_feels_like,
+    humidity = observations.humidity,
+    wind = observations.wind,
+    highTemp = todayForecast.temp_max,
+    lowTemp = lowTemp,
+    todayForecast = todayForecast,
+    hourlyForecasts = hourlyForecasts,
+    upcomingForecasts = upcomingForecasts
   )
 }

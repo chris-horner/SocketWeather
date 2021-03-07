@@ -25,15 +25,15 @@ class AboutController : ScopedController<AboutViewModel, AboutPresenter>() {
   override fun onAttach(view: View, presenter: AboutPresenter, viewModel: AboutViewModel, viewScope: CoroutineScope) {
 
     presenter.events
-        .onEach { event ->
-          when (event) {
-            GoBack -> router.popCurrentController()
-            is OpenUrl -> {
-              val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.url))
-              startActivity(intent)
-            }
+      .onEach { event ->
+        when (event) {
+          GoBack -> router.popCurrentController()
+          is OpenUrl -> {
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(event.url))
+            startActivity(intent)
           }
         }
-        .launchIn(viewScope)
+      }
+      .launchIn(viewScope)
   }
 }

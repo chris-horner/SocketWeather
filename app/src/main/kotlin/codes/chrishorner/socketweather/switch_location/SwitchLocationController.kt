@@ -28,25 +28,25 @@ class SwitchLocationController : ScopedController<SwitchLocationViewModel, Switc
   }
 
   override fun onAttach(
-      view: View,
-      presenter: SwitchLocationPresenter,
-      viewModel: SwitchLocationViewModel,
-      viewScope: CoroutineScope
+    view: View,
+    presenter: SwitchLocationPresenter,
+    viewModel: SwitchLocationViewModel,
+    viewScope: CoroutineScope
   ) {
 
     presenter.events
-        .onEach { event ->
-          when (event) {
-            is LocationClicked -> viewModel.select(event.selection)
-            DismissClicked -> router.popCurrentController()
-            AddLocationClicked -> navigateToChooseLocation()
-          }
+      .onEach { event ->
+        when (event) {
+          is LocationClicked -> viewModel.select(event.selection)
+          DismissClicked -> router.popCurrentController()
+          AddLocationClicked -> navigateToChooseLocation()
         }
-        .launchIn(viewScope)
+      }
+      .launchIn(viewScope)
 
     viewModel.observeCloseEvents()
-        .onEach { router.popCurrentController() }
-        .launchIn(viewScope)
+      .onEach { router.popCurrentController() }
+      .launchIn(viewScope)
   }
 
   private fun navigateToChooseLocation() {

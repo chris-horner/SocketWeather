@@ -9,9 +9,9 @@ import retrofit2.create
 class NetworkComponents(app: Application, locationChoices: LocationChoices) {
 
   val api: WeatherApi = Retrofit.Builder()
-      .baseUrl(DataConfig.API_ENDPOINT)
-      .addConverterFactory(EnvelopeConverter)
-      .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
-      .build()
-      .create()
+    .baseUrl(DataConfig.API_ENDPOINT)
+    .addConverterFactory(EnvelopeConverter)
+    .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
+    .build()
+    .create()
 }

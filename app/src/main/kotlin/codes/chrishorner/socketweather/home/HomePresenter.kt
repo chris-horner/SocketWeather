@@ -58,9 +58,9 @@ class HomePresenter(view: View) {
     }
 
     events = merge(
-        locationDropdown.clicks().map { SwitchLocationClicked },
-        retryButton.clicks().map { RefreshClicked },
-        menuEvents
+      locationDropdown.clicks().map { SwitchLocationClicked },
+      retryButton.clicks().map { RefreshClicked },
+      menuEvents
     )
   }
 

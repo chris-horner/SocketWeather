@@ -18,7 +18,7 @@ import androidx.core.view.updatePadding
 
 @Suppress("UNCHECKED_CAST")
 fun <T : View> ViewGroup.inflate(@LayoutRes layout: Int, attach: Boolean = false): T =
-    LayoutInflater.from(context).inflate(layout, this, attach) as T
+  LayoutInflater.from(context).inflate(layout, this, attach) as T
 
 fun View.dismissKeyboard() {
   val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
@@ -36,10 +36,10 @@ fun View.dpToPx(dp: Float): Float = dp * resources.displayMetrics.density
  * allowing content to be displayed edge-to-edge.
  */
 fun View.updatePaddingWithInsets(
-    left: Boolean = false,
-    top: Boolean = false,
-    right: Boolean = false,
-    bottom: Boolean = false
+  left: Boolean = false,
+  top: Boolean = false,
+  right: Boolean = false,
+  bottom: Boolean = false
 ) {
   // Create a snapshot of padding.
   val initialPadding = Rect(paddingLeft, paddingTop, paddingRight, paddingBottom)
@@ -47,10 +47,10 @@ fun View.updatePaddingWithInsets(
   doOnApplyWindowInsets { insets ->
     val systemBarInsets = insets.getInsets(Type.systemBars())
     updatePadding(
-        left = if (left) initialPadding.left + systemBarInsets.left else initialPadding.left,
-        top = if (top) initialPadding.top + systemBarInsets.top else initialPadding.top,
-        right = if (right) initialPadding.right + systemBarInsets.right else initialPadding.right,
-        bottom = if (bottom) initialPadding.bottom + systemBarInsets.bottom else initialPadding.bottom
+      left = if (left) initialPadding.left + systemBarInsets.left else initialPadding.left,
+      top = if (top) initialPadding.top + systemBarInsets.top else initialPadding.top,
+      right = if (right) initialPadding.right + systemBarInsets.right else initialPadding.right,
+      bottom = if (bottom) initialPadding.bottom + systemBarInsets.bottom else initialPadding.bottom
     )
   }
 }

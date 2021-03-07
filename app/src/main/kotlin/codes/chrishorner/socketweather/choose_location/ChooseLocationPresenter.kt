@@ -59,10 +59,10 @@ class ChooseLocationPresenter(private val view: View) {
     recycler.layoutManager = LinearLayoutManager(view.context)
 
     events = merge(
-        toolbar.navigationClicks().map { CloseClicked },
-        followMeButton.clicks().onEach { view.dismissKeyboard() }.map { FollowMeClicked },
-        adapter.clicks().onEach { view.dismissKeyboard() }.map { ResultSelected(it) },
-        inputView.textChanges().onEach { inputView.requestFocus() }.map { InputSearch(it.toString()) }
+      toolbar.navigationClicks().map { CloseClicked },
+      followMeButton.clicks().onEach { view.dismissKeyboard() }.map { FollowMeClicked },
+      adapter.clicks().onEach { view.dismissKeyboard() }.map { ResultSelected(it) },
+      inputView.textChanges().onEach { inputView.requestFocus() }.map { InputSearch(it.toString()) }
     )
 
     with(container.layoutTransition) {
@@ -81,19 +81,19 @@ class ChooseLocationPresenter(private val view: View) {
     container.doOnLayout {
       container.layoutTransition.addTransitionListener(object : TransitionListener {
         override fun startTransition(
-            transition: LayoutTransition?,
-            container: ViewGroup?,
-            view: View?,
-            transitionType: Int
+          transition: LayoutTransition?,
+          container: ViewGroup?,
+          view: View?,
+          transitionType: Int
         ) {
           inputView.requestFocus()
         }
 
         override fun endTransition(
-            transition: LayoutTransition?,
-            container: ViewGroup?,
-            view: View?,
-            transitionType: Int
+          transition: LayoutTransition?,
+          container: ViewGroup?,
+          view: View?,
+          transitionType: Int
         ) {
         }
       })

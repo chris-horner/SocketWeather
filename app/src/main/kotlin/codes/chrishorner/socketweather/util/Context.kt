@@ -23,8 +23,8 @@ val Context.app: Application
   val typedValue = TypedValue()
   theme.resolveAttribute(attrId, typedValue, true)
   val colourRes: Int =
-      if (typedValue.resourceId != 0) typedValue.resourceId
-      else typedValue.data
+    if (typedValue.resourceId != 0) typedValue.resourceId
+    else typedValue.data
 
   return getColor(colourRes)
 }

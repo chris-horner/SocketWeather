@@ -76,20 +76,20 @@ abstract class ScopedController<VM : Any, P : Any>(args: Bundle? = null) : Contr
 object ControllerLeakListener : ControllerChangeListener {
 
   override fun onChangeStarted(
-      to: Controller?,
-      from: Controller?,
-      isPush: Boolean,
-      container: ViewGroup,
-      handler: ControllerChangeHandler
+    to: Controller?,
+    from: Controller?,
+    isPush: Boolean,
+    container: ViewGroup,
+    handler: ControllerChangeHandler
   ) {
   }
 
   override fun onChangeCompleted(
-      to: Controller?,
-      from: Controller?,
-      isPush: Boolean,
-      container: ViewGroup,
-      handler: ControllerChangeHandler
+    to: Controller?,
+    from: Controller?,
+    isPush: Boolean,
+    container: ViewGroup,
+    handler: ControllerChangeHandler
   ) {
     val objectWatcher = AppWatcher.objectWatcher
     val fromView: View? = from?.view

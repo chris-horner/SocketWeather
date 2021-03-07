@@ -15,20 +15,20 @@ import java.lang.reflect.Type
 object EnvelopeConverter : Converter.Factory() {
 
   override fun responseBodyConverter(
-      type: Type,
-      annotations: Array<Annotation>,
-      retrofit: Retrofit
+    type: Type,
+    annotations: Array<Annotation>,
+    retrofit: Retrofit
   ): Converter<ResponseBody, *>? {
 
     val envelopedType = Types.newParameterizedType(Envelope::class.java, type)
     val delegate: Converter<ResponseBody, Envelope<Any>>? =
-        retrofit.nextResponseBodyConverter(this, envelopedType, annotations)
+      retrofit.nextResponseBodyConverter(this, envelopedType, annotations)
 
     return Unwrapper(delegate)
   }
 
   private class Unwrapper<T>(
-      private val delegate: Converter<ResponseBody, Envelope<T>>?
+    private val delegate: Converter<ResponseBody, Envelope<T>>?
   ) : Converter<ResponseBody, T> {
 
     override fun convert(value: ResponseBody): T? {

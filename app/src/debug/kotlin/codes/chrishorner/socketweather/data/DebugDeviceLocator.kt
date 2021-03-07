@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
 private val mockLocations = mapOf(
-    "Melbourne" to DeviceLocation(-37.817691, 144.967311),
-    "Canberra" to DeviceLocation(-35.306129, 149.126262),
-    "Sydney" to DeviceLocation(-33.857808, 151.214608),
-    "Brisbane" to DeviceLocation(-27.460755, 153.032066),
-    "Darwin" to DeviceLocation(-12.463112, 130.841628),
-    "Perth" to DeviceLocation(-31.956895, 115.859991),
-    "Adelaide" to DeviceLocation(-34.928395, 138.599915),
-    "Hobart" to DeviceLocation(-42.883274, 147.330152),
-    "Tokyo" to DeviceLocation(35.680349, 139.769060)
+  "Melbourne" to DeviceLocation(-37.817691, 144.967311),
+  "Canberra" to DeviceLocation(-35.306129, 149.126262),
+  "Sydney" to DeviceLocation(-33.857808, 151.214608),
+  "Brisbane" to DeviceLocation(-27.460755, 153.032066),
+  "Darwin" to DeviceLocation(-12.463112, 130.841628),
+  "Perth" to DeviceLocation(-31.956895, 115.859991),
+  "Adelaide" to DeviceLocation(-34.928395, 138.599915),
+  "Hobart" to DeviceLocation(-42.883274, 147.330152),
+  "Tokyo" to DeviceLocation(35.680349, 139.769060)
 )
 
 class DebugDeviceLocator(app: Application) : DeviceLocator {

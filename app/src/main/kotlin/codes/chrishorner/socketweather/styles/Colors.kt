@@ -16,26 +16,26 @@ private val ScrimLight = Color(0x44000000)
 private val ScrimDark = Color(0xAA000000)
 
 val LightColors = lightColors(
-    primary = LightBlue,
-    primaryVariant = Blue,
-    onPrimary = Color.Black,
-    secondary = Orange,
-    secondaryVariant = LightOrange,
-    onSecondary = Color.Black,
-    surface = Color.White,
-    onSurface = Color.Black,
-    background = LightestBlue,
-    onBackground = Color.Black
+  primary = LightBlue,
+  primaryVariant = Blue,
+  onPrimary = Color.Black,
+  secondary = Orange,
+  secondaryVariant = LightOrange,
+  onSecondary = Color.Black,
+  surface = Color.White,
+  onSurface = Color.Black,
+  background = LightestBlue,
+  onBackground = Color.Black
 )
 
 val DarkColors = darkColors(
-    primary = LightBlue,
-    primaryVariant = Blue,
-    onPrimary = Color.Black,
-    secondary = LightOrange,
-    onSecondary = Color.Black,
-    surface = DarkGrey,
-    onSurface = Color.White,
+  primary = LightBlue,
+  primaryVariant = Blue,
+  onPrimary = Color.Black,
+  secondary = LightOrange,
+  onSecondary = Color.Black,
+  surface = DarkGrey,
+  onSurface = Color.White,
 )
 
 val ScrimColor: Color

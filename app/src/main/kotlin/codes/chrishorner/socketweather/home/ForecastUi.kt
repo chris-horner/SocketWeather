@@ -40,9 +40,9 @@ fun ForecastUi(forecast: Forecast) {
     Observations(forecast)
 
     ThickDivider(
-        modifier = Modifier
-            .padding(horizontal = 16.dp)
-            .fillMaxWidth()
+      modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .fillMaxWidth()
     )
   }
 }
@@ -50,95 +50,95 @@ fun ForecastUi(forecast: Forecast) {
 @Composable
 private fun Observations(forecast: Forecast) {
   ConstraintLayout(
-      modifier = Modifier
-          .padding(horizontal = 16.dp)
-          .padding(top = 8.dp, bottom = 16.dp)
-          .fillMaxWidth()
+    modifier = Modifier
+      .padding(horizontal = 16.dp)
+      .padding(top = 8.dp, bottom = 16.dp)
+      .fillMaxWidth()
   ) {
     val (icon, currentTemp, feelsLikeTitle, feelsLikeTemp, highTemp, lowTemp, tempLine, description) = createRefs()
 
     Image(
-        painter = painterResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
-        contentDescription = stringResource(string.home_currentIconDesc),
-        colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
-        modifier = Modifier
-            .size(72.dp)
-            .constrainAs(icon) {
-              start.linkTo(parent.start)
-              top.linkTo(parent.top)
-              bottom.linkTo(currentTemp.bottom)
-            }
+      painter = painterResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
+      contentDescription = stringResource(string.home_currentIconDesc),
+      colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+      modifier = Modifier
+        .size(72.dp)
+        .constrainAs(icon) {
+          start.linkTo(parent.start)
+          top.linkTo(parent.top)
+          bottom.linkTo(currentTemp.bottom)
+        }
     )
 
     Text(
-        text = forecast.currentTemp.formatAsDegrees(),
-        style = LargeTempTextStyle,
-        modifier = Modifier.constrainAs(currentTemp) {
-          start.linkTo(icon.end, margin = 12.dp)
-          top.linkTo(parent.top)
-        }
+      text = forecast.currentTemp.formatAsDegrees(),
+      style = LargeTempTextStyle,
+      modifier = Modifier.constrainAs(currentTemp) {
+        start.linkTo(icon.end, margin = 12.dp)
+        top.linkTo(parent.top)
+      }
     )
 
     CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
       Text(
-          text = stringResource(string.home_feelsLike),
-          style = MaterialTheme.typography.h5,
-          modifier = Modifier.constrainAs(feelsLikeTitle) {
-            start.linkTo(parent.start)
-            top.linkTo(currentTemp.bottom, margin = 16.dp)
-          }
+        text = stringResource(string.home_feelsLike),
+        style = MaterialTheme.typography.h5,
+        modifier = Modifier.constrainAs(feelsLikeTitle) {
+          start.linkTo(parent.start)
+          top.linkTo(currentTemp.bottom, margin = 16.dp)
+        }
       )
     }
 
     Text(
-        text = forecast.tempFeelsLike?.formatAsDegrees() ?: "--",
-        style = MediumTempTextStyle,
-        modifier = Modifier.constrainAs(feelsLikeTemp) {
-          start.linkTo(feelsLikeTitle.end, margin = 8.dp)
-          baseline.linkTo(feelsLikeTitle.baseline)
-        }
+      text = forecast.tempFeelsLike?.formatAsDegrees() ?: "--",
+      style = MediumTempTextStyle,
+      modifier = Modifier.constrainAs(feelsLikeTemp) {
+        start.linkTo(feelsLikeTitle.end, margin = 8.dp)
+        baseline.linkTo(feelsLikeTitle.baseline)
+      }
     )
 
     Text(
-        text = forecast.highTemp.formatAsDegrees(),
-        style = MediumTempTextStyle,
-        modifier = Modifier.constrainAs(highTemp) {
-          end.linkTo(parent.end)
-          top.linkTo(parent.top, margin = 12.dp)
-        }
+      text = forecast.highTemp.formatAsDegrees(),
+      style = MediumTempTextStyle,
+      modifier = Modifier.constrainAs(highTemp) {
+        end.linkTo(parent.end)
+        top.linkTo(parent.top, margin = 12.dp)
+      }
     )
 
     Text(
-        text = forecast.lowTemp.formatAsDegrees(),
-        style = MediumTempTextStyle,
-        modifier = Modifier.constrainAs(lowTemp) {
-          end.linkTo(parent.end)
-          baseline.linkTo(feelsLikeTemp.baseline)
-        }
+      text = forecast.lowTemp.formatAsDegrees(),
+      style = MediumTempTextStyle,
+      modifier = Modifier.constrainAs(lowTemp) {
+        end.linkTo(parent.end)
+        baseline.linkTo(feelsLikeTemp.baseline)
+      }
     )
 
     Box(
-        modifier = Modifier
-            .width(4.dp)
-            .constrainAs(tempLine) {
-              centerHorizontallyTo(highTemp)
-              top.linkTo(highTemp.bottom, margin = 12.dp)
-              bottom.linkTo(lowTemp.top, margin = 12.dp)
-              height = Dimension.fillToConstraints
-            }
-            .clip(RoundedCornerShape(2.dp))
-            .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+      modifier = Modifier
+        .width(4.dp)
+        .constrainAs(tempLine) {
+          centerHorizontallyTo(highTemp)
+          top.linkTo(highTemp.bottom, margin = 12.dp)
+          bottom.linkTo(lowTemp.top, margin = 12.dp)
+          height = Dimension.fillToConstraints
+        }
+        .clip(RoundedCornerShape(2.dp))
+        .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
     )
 
     val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
     if (descriptionText != null) {
       Text(
-          text = descriptionText,
-          modifier = Modifier
-              .constrainAs(description) {
-                top.linkTo(feelsLikeTitle.bottom, margin = 16.dp)
-              }
-              .fillMaxWidth()
+        text = descriptionText,
+        modifier = Modifier
+          .constrainAs(description) {
+            top.linkTo(feelsLikeTitle.bottom, margin = 16.dp)
+          }
+          .fillMaxWidth()
       )
     }
   }

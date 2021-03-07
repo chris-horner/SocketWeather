@@ -28,7 +28,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 class ChooseLocationController(
-    args: Bundle
+  args: Bundle
 ) : ScopedController<ChooseLocationViewModel, ChooseLocationPresenter>(args) {
 
   constructor(displayAsRoot: Boolean = false) : this(bundleOf("displayAsRoot" to displayAsRoot))
@@ -36,47 +36,47 @@ class ChooseLocationController(
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.choose_location)
 
   override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
-      args.getBoolean("displayAsRoot"),
-      context.appSingletons.networkComponents.api,
-      context.appSingletons.locationChoices
+    args.getBoolean("displayAsRoot"),
+    context.appSingletons.networkComponents.api,
+    context.appSingletons.locationChoices
   )
 
   override fun onCreatePresenter(view: View, viewModel: ChooseLocationViewModel) = ChooseLocationPresenter(view)
 
   override fun onAttach(
-      view: View,
-      presenter: ChooseLocationPresenter,
-      viewModel: ChooseLocationViewModel,
-      viewScope: CoroutineScope
+    view: View,
+    presenter: ChooseLocationPresenter,
+    viewModel: ChooseLocationViewModel,
+    viewScope: CoroutineScope
   ) {
 
     viewModel.states
-        .onEach { presenter.display(it) }
-        .launchIn(viewScope)
+      .onEach { presenter.display(it) }
+      .launchIn(viewScope)
 
     viewModel.observeEvents()
-        .onEach { event ->
-          when (event) {
-            SubmissionError -> presenter.showSelectionError()
-            PermissionError -> presenter.showPermissionError()
-            SubmissionSuccess -> router.setRoot(HomeController().asTransaction())
-          }
+      .onEach { event ->
+        when (event) {
+          SubmissionError -> presenter.showSelectionError()
+          PermissionError -> presenter.showPermissionError()
+          SubmissionSuccess -> router.setRoot(HomeController().asTransaction())
         }
-        .launchIn(viewScope)
+      }
+      .launchIn(viewScope)
 
     presenter.events
-        .onEach { event ->
-          when (event) {
-            is InputSearch -> viewModel.inputSearchQuery(event.query)
-            is FollowMeClicked -> processFollowMe(viewModel)
-            is ResultSelected -> viewModel.selectResult(event.result)
-            is CloseClicked -> {
-              view.dismissKeyboard()
-              router.popCurrentController()
-            }
+      .onEach { event ->
+        when (event) {
+          is InputSearch -> viewModel.inputSearchQuery(event.query)
+          is FollowMeClicked -> processFollowMe(viewModel)
+          is ResultSelected -> viewModel.selectResult(event.result)
+          is CloseClicked -> {
+            view.dismissKeyboard()
+            router.popCurrentController()
           }
         }
-        .launchIn(viewScope)
+      }
+      .launchIn(viewScope)
   }
 
   private fun processFollowMe(viewModel: ChooseLocationViewModel) {

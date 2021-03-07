@@ -18,13 +18,13 @@ class JsonParsingTest {
 
   @Test fun `Static LocationSelection serialises and deserialises`() {
     val location = Location(
-        id = "Fakezroy-r1r0gnd",
-        geohash = "r1r0gnd",
-        name = "Fakezroy",
-        state = "VIC",
-        latitude = -37.80052185058594,
-        longitude = 144.97901916503906,
-        timezone = ZoneId.of("Australia/Melbourne")
+      id = "Fakezroy-r1r0gnd",
+      geohash = "r1r0gnd",
+      name = "Fakezroy",
+      state = "VIC",
+      latitude = -37.80052185058594,
+      longitude = 144.97901916503906,
+      timezone = ZoneId.of("Australia/Melbourne")
     )
 
     val selectedLocation = LocationSelection.Static(location)

@@ -77,10 +77,10 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
   val currentlyIdle = state.loadingStatus == Idle
 
   Surface(
-      color = MaterialTheme.colors.background,
-      modifier = Modifier
-          .statusBarsPadding()
-          .navigationBarsWithImePadding()
+    color = MaterialTheme.colors.background,
+    modifier = Modifier
+      .statusBarsPadding()
+      .navigationBarsWithImePadding()
   ) {
     Column {
       if (state.showCloseButton) {
@@ -93,26 +93,26 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
         }
       }
       Spacer(
-          modifier = Modifier
-              .animateContentSize()
-              .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
+        modifier = Modifier
+          .animateContentSize()
+          .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
       )
       AnimatedVisibility(visible = currentlyIdle) {
         Text(
-            text = stringResource(R.string.chooseLocation_title),
-            style = MaterialTheme.typography.h4,
-            modifier = Modifier.padding(horizontal = 32.dp)
+          text = stringResource(R.string.chooseLocation_title),
+          style = MaterialTheme.typography.h4,
+          modifier = Modifier.padding(horizontal = 32.dp)
         )
       }
       OutlinedTextField(
-          value = state.query,
-          label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
-          onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
-          leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
-          singleLine = true,
-          modifier = Modifier
-              .padding(horizontal = 32.dp)
-              .fillMaxWidth()
+        value = state.query,
+        label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
+        onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
+        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+        singleLine = true,
+        modifier = Modifier
+          .padding(horizontal = 32.dp)
+          .fillMaxWidth()
       )
       Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
         when (loadingStatus) {
@@ -132,16 +132,16 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 @Composable
 private fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
   Row(
-      modifier = Modifier
-          .fillMaxWidth()
-          .height(64.dp)
-          .clickable(onClick = onClick)
-          .padding(horizontal = 32.dp)
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(64.dp)
+      .clickable(onClick = onClick)
+      .padding(horizontal = 32.dp)
   ) {
     Column(
-        modifier = Modifier
-            .weight(1f)
-            .align(Alignment.CenterVertically)
+      modifier = Modifier
+        .weight(1f)
+        .align(Alignment.CenterVertically)
     ) {
       Text(text = result.name, maxLines = 1)
       Text(text = result.state, maxLines = 1)
@@ -157,13 +157,13 @@ private fun SearchResults(results: List<SearchResult>, onClick: (item: SearchRes
   if (results.isEmpty()) {
     Box(modifier = Modifier.fillMaxSize()) {
       Text(
-          text = stringResource(R.string.chooseLocation_searchEmpty),
-          style = MaterialTheme.typography.subtitle1,
-          textAlign = TextAlign.Center,
-          modifier = Modifier
-              .align(Alignment.Center)
-              .width(352.dp)
-              .padding(horizontal = 32.dp)
+        text = stringResource(R.string.chooseLocation_searchEmpty),
+        style = MaterialTheme.typography.subtitle1,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+          .align(Alignment.Center)
+          .width(352.dp)
+          .padding(horizontal = 32.dp)
       )
     }
   } else {
@@ -186,13 +186,13 @@ private fun SearchLoading() {
 private fun SearchError() {
   Box(modifier = Modifier.fillMaxSize()) {
     Text(
-        text = stringResource(R.string.chooseLocation_searchError),
-        style = MaterialTheme.typography.subtitle1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .align(Alignment.Center)
-            .width(352.dp)
-            .padding(horizontal = 32.dp)
+      text = stringResource(R.string.chooseLocation_searchError),
+      style = MaterialTheme.typography.subtitle1,
+      textAlign = TextAlign.Center,
+      modifier = Modifier
+        .align(Alignment.Center)
+        .width(352.dp)
+        .padding(horizontal = 32.dp)
     )
   }
 }
@@ -202,12 +202,12 @@ private fun SubmittingLocationChoice() {
   Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
     Text(
-        text = stringResource(R.string.chooseLocation_submitting),
-        style = MaterialTheme.typography.subtitle1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .padding(top = 16.dp)
+      text = stringResource(R.string.chooseLocation_submitting),
+      style = MaterialTheme.typography.subtitle1,
+      textAlign = TextAlign.Center,
+      modifier = Modifier
+        .align(Alignment.CenterHorizontally)
+        .padding(top = 16.dp)
     )
   }
 }
@@ -218,13 +218,13 @@ fun ChooseLocationPreview() {
   SocketWeatherTheme {
     ProvideWindowInsets {
       ChooseLocationUi(
-          ChooseLocationState(
-              showCloseButton = true,
-              showFollowMe = true,
-              query = "",
-              results = emptyList(),
-              loadingStatus = Idle
-          )
+        ChooseLocationState(
+          showCloseButton = true,
+          showFollowMe = true,
+          query = "",
+          results = emptyList(),
+          loadingStatus = Idle
+        )
       ) {
         // Don't handle events in Preview.
       }

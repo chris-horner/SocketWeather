@@ -42,9 +42,9 @@ class HomeForecastPresenter(view: View) {
       if (uvProtection.isVisible) {
         val zoneId = forecast.location.timezone
         uvProtection.text = context.getString(
-            R.string.home_uvProtection,
-            start_time!!.localTimeAtZone(zoneId),
-            end_time!!.localTimeAtZone(zoneId)
+          R.string.home_uvProtection,
+          start_time!!.localTimeAtZone(zoneId),
+          end_time!!.localTimeAtZone(zoneId)
         )
       }
     }

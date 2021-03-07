@@ -42,18 +42,18 @@ class RealDeviceLocator(private val app: Application) : DeviceLocator {
 
   override fun observeDeviceLocation(): Flow<DeviceLocation> {
     return enabledFlow
-        .flatMapLatest { enabled -> if (enabled) getDeviceLocationUpdates(app) else emptyFlow() }
-        .distinctUntilChanged()
-        .conflate()
+      .flatMapLatest { enabled -> if (enabled) getDeviceLocationUpdates(app) else emptyFlow() }
+      .distinctUntilChanged()
+      .conflate()
   }
 }
 
 private val request = LocationRequest()
-    .setPriority(PRIORITY_HIGH_ACCURACY)
-    .setFastestInterval(1000)
-    .setMaxWaitTime(3000)
-    .setInterval(2000)
-    .setSmallestDisplacement(50f)
+  .setPriority(PRIORITY_HIGH_ACCURACY)
+  .setFastestInterval(1000)
+  .setMaxWaitTime(3000)
+  .setInterval(2000)
+  .setSmallestDisplacement(50f)
 
 private var cachedLocation: DeviceLocation? = null
 

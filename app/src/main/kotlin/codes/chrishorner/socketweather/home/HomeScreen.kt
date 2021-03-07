@@ -76,13 +76,13 @@ fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
 private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
   Surface(color = MaterialTheme.colors.background) {
     Scaffold(
-        topBar = {
-          InsetAwareTopAppBar(
-              title = { LocationDropdown(state) },
-              backgroundColor = MaterialTheme.colors.background,
-              actions = { Menu(eventHandler) }
-          )
-        }
+      topBar = {
+        InsetAwareTopAppBar(
+          title = { LocationDropdown(state) },
+          backgroundColor = MaterialTheme.colors.background,
+          actions = { Menu(eventHandler) }
+        )
+      }
     ) {
       Content(state.forecasterState)
     }
@@ -96,9 +96,9 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
     Icon(Icons.Default.MoreVert, contentDescription = null)
   }
   DropdownMenu(
-      expanded = expanded,
-      onDismissRequest = { expanded = false },
-      offset = DpOffset(0.dp, (-56).dp),
+    expanded = expanded,
+    onDismissRequest = { expanded = false },
+    offset = DpOffset(0.dp, (-56).dp),
   ) {
     DropdownMenuItem(onClick = {
       eventHandler(Refresh)
@@ -119,10 +119,10 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
 private fun LocationDropdown(state: HomeState) {
   var expanded by remember { mutableStateOf(false) }
   Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-          .fillMaxHeight()
-          .clickable { }
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = Modifier
+      .fillMaxHeight()
+      .clickable { }
   ) {
     Column {
       Text(getToolbarTitle(state.forecasterState), style = MaterialTheme.typography.h5)
@@ -131,8 +131,8 @@ private fun LocationDropdown(state: HomeState) {
     Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
   }
   DropdownMenu(
-      expanded = expanded,
-      onDismissRequest = { expanded = false }
+    expanded = expanded,
+    onDismissRequest = { expanded = false }
   ) {
     // TODO: Show location picker.
   }
@@ -151,9 +151,9 @@ private fun Content(state: Forecaster.State) {
 @Composable
 private fun Loading() {
   Column(
-      modifier = Modifier.fillMaxSize(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
+    modifier = Modifier.fillMaxSize(),
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     CircularProgressIndicator(modifier = Modifier.padding(bottom = 16.dp))
     Text(stringResource(R.string.home_loading), style = MaterialTheme.typography.subtitle1)
@@ -190,18 +190,18 @@ private fun Error(type: ErrorType) {
   }
 
   Column(
-      modifier = Modifier.fillMaxHeight(),
-      verticalArrangement = Arrangement.Center,
-      horizontalAlignment = Alignment.CenterHorizontally
+    modifier = Modifier.fillMaxHeight(),
+    verticalArrangement = Arrangement.Center,
+    horizontalAlignment = Alignment.CenterHorizontally
   ) {
     Text(title, style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
     Text(
-        message,
-        style = MaterialTheme.typography.body1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .width(280.dp)
-            .padding(top = 8.dp, bottom = 16.dp)
+      message,
+      style = MaterialTheme.typography.body1,
+      textAlign = TextAlign.Center,
+      modifier = Modifier
+        .width(280.dp)
+        .padding(top = 8.dp, bottom = 16.dp)
     )
     Icon(image, contentDescription = null)
     Button(modifier = Modifier.width(200.dp), onClick = { /*TODO*/ }) {

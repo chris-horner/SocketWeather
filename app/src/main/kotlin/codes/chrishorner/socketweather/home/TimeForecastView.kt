@@ -150,7 +150,7 @@ class TimeForecastView(context: Context, attrs: AttributeSet) : View(context, at
     val timeTextHeight = timeTextPaint.textHeight()
     val temperatureTextHeight = temperatureTextPaint.textHeight()
     val graphHeight =
-        height - timeTextHeight - rainTotalHeight - temperatureTextHeight - (dotRadius * 2) - temperatureGap - (verticalPadding * 2)
+      height - timeTextHeight - rainTotalHeight - temperatureTextHeight - (dotRadius * 2) - temperatureGap - (verticalPadding * 2)
     val graphBottom = height - verticalPadding - timeTextHeight - graphTimeGap
     val timeTextBaseline = height - verticalPadding.toFloat()
     val rainTextBaseline = verticalPadding + ((rainTextHeight - rainTextHeight) / 2) + rainTextHeight + dpToPx(1)

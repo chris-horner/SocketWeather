@@ -32,9 +32,9 @@ class SwitchLocationPresenter(view: View, selections: List<LocationSelection>) {
     cardContainer.updatePaddingWithInsets(left = true, top = true, right = true, bottom = true)
 
     events = merge(
-        container.clicks().map { DismissClicked },
-        addButton.clicks().map { AddLocationClicked },
-        adapter.clicks().map { LocationClicked(it) }
+      container.clicks().map { DismissClicked },
+      addButton.clicks().map { AddLocationClicked },
+      adapter.clicks().map { LocationClicked(it) }
     )
   }
 

@@ -15,8 +15,8 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
 class HomeViewModel(
-    private val forecaster: Forecaster,
-    private val clock: Clock = Clock.systemDefaultZone()
+  private val forecaster: Forecaster,
+  private val clock: Clock = Clock.systemDefaultZone()
 ) : ViewModel() {
 
   init {
@@ -26,11 +26,11 @@ class HomeViewModel(
   val states: StateFlow<State> = forecaster.states
 
   val states2: StateFlow<HomeState> = forecaster.states
-      .combine(tickerFlow(10_000, emitImmediately = true)) { forecasterState, _ ->
-        // Map to a new home state every 10 seconds to update the refresh time indicator.
-        forecasterState.toHomeState()
-      }
-      .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = forecaster.states.value.toHomeState())
+    .combine(tickerFlow(10_000, emitImmediately = true)) { forecasterState, _ ->
+      // Map to a new home state every 10 seconds to update the refresh time indicator.
+      forecasterState.toHomeState()
+    }
+    .stateIn(viewModelScope, started = SharingStarted.Eagerly, initialValue = forecaster.states.value.toHomeState())
 
   fun forceRefresh() {
     forecaster.refresh()

@@ -108,8 +108,8 @@
       <option name="PACKAGES_TO_USE_STAR_IMPORTS">
         <value />
       </option>
-      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="999" />
-      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="999" />
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT" value="2147483647" />
+      <option name="NAME_COUNT_TO_USE_STAR_IMPORT_FOR_MEMBERS" value="2147483647" />
       <option name="IMPORT_NESTED_CLASSES" value="true" />
       <option name="CONTINUATION_INDENT_IN_PARAMETER_LISTS" value="true" />
       <option name="CONTINUATION_INDENT_IN_ARGUMENT_LISTS" value="true" />
@@ -620,7 +620,7 @@
       <option name="FIELD_ANNOTATION_WRAP" value="1" />
       <indentOptions>
         <option name="INDENT_SIZE" value="2" />
-        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
         <option name="TAB_SIZE" value="2" />
       </indentOptions>
     </codeStyleSettings>

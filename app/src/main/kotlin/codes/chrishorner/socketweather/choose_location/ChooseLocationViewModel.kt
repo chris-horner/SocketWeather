@@ -35,9 +35,9 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ChooseLocationViewModel(
-    showCloseButton: Boolean,
-    private val api: WeatherApi,
-    private val locationChoices: LocationChoices
+  showCloseButton: Boolean,
+  private val api: WeatherApi,
+  private val locationChoices: LocationChoices
 ) : ViewModel() {
 
   private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationChoices.hasFollowMeSaved)
@@ -50,19 +50,19 @@ class ChooseLocationViewModel(
 
   init {
     searchQueryFlow
-        .map { query ->
-          idleState.copy(query = query, loadingStatus = if (query.isBlank()) Idle else Searching)
+      .map { query ->
+        idleState.copy(query = query, loadingStatus = if (query.isBlank()) Idle else Searching)
+      }
+      .transformLatest { state ->
+        emit(state)
+        if (state.loadingStatus == Searching && state.query.length > 2) {
+          delay(300)
+          emit(search(state.query))
         }
-        .transformLatest { state ->
-          emit(state)
-          if (state.loadingStatus == Searching && state.query.length > 2) {
-            delay(300)
-            emit(search(state.query))
-          }
-        }
-        .distinctUntilChanged()
-        .onEach { statesFlow.value = it }
-        .launchIn(viewModelScope)
+      }
+      .distinctUntilChanged()
+      .onEach { statesFlow.value = it }
+      .launchIn(viewModelScope)
   }
 
   fun handle(uiEvent: ChooseLocationUiEvent) {

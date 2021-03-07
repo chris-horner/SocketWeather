@@ -19,12 +19,12 @@ object DataConfig {
   const val API_ENDPOINT = "https://api.weather.bom.gov.au/v1/"
 
   val moshi: Moshi = Moshi.Builder()
-      .add(InstantAdapter)
-      .add(ZoneIdAdapter)
-      .add(LocationSelectionAdapter)
-      .add(SkipBadElementsListAdapterFactory)
-      .add(KotlinJsonAdapterFactory())
-      .build()
+    .add(InstantAdapter)
+    .add(ZoneIdAdapter)
+    .add(LocationSelectionAdapter)
+    .add(SkipBadElementsListAdapterFactory)
+    .add(KotlinJsonAdapterFactory())
+    .build()
 
   private object InstantAdapter {
     @ToJson fun toJson(value: Instant) = value.toString()
@@ -44,10 +44,10 @@ object DataConfig {
   private object LocationSelectionAdapter {
 
     @ToJson fun toJson(
-        writer: JsonWriter,
-        value: LocationSelection,
-        stringAdapter: JsonAdapter<String>,
-        staticAdapter: JsonAdapter<LocationSelection.Static>
+      writer: JsonWriter,
+      value: LocationSelection,
+      stringAdapter: JsonAdapter<String>,
+      staticAdapter: JsonAdapter<LocationSelection.Static>
     ) {
       when (value) {
         is LocationSelection.None -> stringAdapter.toJson(writer, "None")
@@ -57,8 +57,8 @@ object DataConfig {
     }
 
     @FromJson fun fromJson(
-        reader: JsonReader,
-        staticAdapter: JsonAdapter<LocationSelection.Static>
+      reader: JsonReader,
+      staticAdapter: JsonAdapter<LocationSelection.Static>
     ): LocationSelection {
 
       val selection: LocationSelection? = when {
@@ -88,7 +88,7 @@ object DataConfig {
     }
 
     private class SkipBadElementsListAdapter(
-        private val elementAdapter: JsonAdapter<Any>
+      private val elementAdapter: JsonAdapter<Any>
     ) : JsonAdapter<List<Any>>() {
 
       override fun fromJson(reader: JsonReader): List<Any> {

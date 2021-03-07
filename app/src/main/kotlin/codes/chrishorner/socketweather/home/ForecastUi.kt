@@ -5,28 +5,29 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ConstraintLayout
-import androidx.compose.foundation.layout.Dimension
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.R.string
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
@@ -57,11 +58,11 @@ private fun Observations(forecast: Forecast) {
     val (icon, currentTemp, feelsLikeTitle, feelsLikeTemp, highTemp, lowTemp, tempLine, description) = createRefs()
 
     Image(
-        imageVector = vectorResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
-        contentDescription = stringResource(R.string.home_currentIconDesc),
+        painter = painterResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
+        contentDescription = stringResource(string.home_currentIconDesc),
         colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
         modifier = Modifier
-            .preferredSize(72.dp)
+            .size(72.dp)
             .constrainAs(icon) {
               start.linkTo(parent.start)
               top.linkTo(parent.top)
@@ -78,9 +79,9 @@ private fun Observations(forecast: Forecast) {
         }
     )
 
-    Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
       Text(
-          text = stringResource(R.string.home_feelsLike),
+          text = stringResource(string.home_feelsLike),
           style = MaterialTheme.typography.h5,
           modifier = Modifier.constrainAs(feelsLikeTitle) {
             start.linkTo(parent.start)

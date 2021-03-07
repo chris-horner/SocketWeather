@@ -2,10 +2,10 @@ package codes.chrishorner.socketweather
 
 import android.content.Context
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.AmbientContext
-import androidx.compose.ui.viewinterop.viewModel
+import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -73,7 +73,7 @@ fun NavGraph(currentSelection: LocationSelection) {
 @Composable
 @Suppress("UNCHECKED_CAST")
 private inline fun <reified VM : ViewModel> createVm(crossinline creator: (context: Context) -> VM): VM {
-  val context = AmbientContext.current
+  val context = LocalContext.current
   return viewModel(factory = object : ViewModelProvider.Factory {
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
       return creator(context) as T

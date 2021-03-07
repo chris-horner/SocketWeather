@@ -1,11 +1,11 @@
 package codes.chrishorner.socketweather
 
 import android.os.Bundle
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.setContent
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets

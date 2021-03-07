@@ -2,24 +2,24 @@ package codes.chrishorner.socketweather.styles
 
 import androidx.compose.material.Typography
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.font.font
-import androidx.compose.ui.text.font.fontFamily
 import androidx.compose.ui.unit.sp
 import codes.chrishorner.socketweather.R.font
 
-private val Rubik = fontFamily(
-    font(font.rubik_regular),
-    font(font.rubik_medium, weight = FontWeight.Medium)
+private val Rubik = FontFamily(
+    Font(font.rubik_regular),
+    Font(font.rubik_medium, weight = FontWeight.Medium)
 )
 
-private val ZillaSlab = fontFamily(
-    font(font.zilla_slab_medium, weight = FontWeight.Medium)
+private val ZillaSlab = FontFamily(
+    Font(font.zilla_slab_medium, weight = FontWeight.Medium)
 )
 
-private val RobotoSlab = fontFamily(
-    font(font.roboto_slab_regular),
-    font(font.roboto_slab_medium, weight = FontWeight.Medium)
+private val RobotoSlab = FontFamily(
+    Font(font.roboto_slab_regular),
+    Font(font.roboto_slab_medium, weight = FontWeight.Medium)
 )
 
 val SocketWeatherTypography = Typography(

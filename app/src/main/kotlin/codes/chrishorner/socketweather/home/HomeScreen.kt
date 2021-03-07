@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
@@ -31,9 +31,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
@@ -92,17 +92,13 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
 @Composable
 private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
   var expanded by remember { mutableStateOf(false) }
-  val menuButton = @Composable {
-    IconButton(onClick = { expanded = true }) {
-      Icon(Icons.Default.MoreVert, contentDescription = null)
-    }
+  IconButton(onClick = { expanded = true }) {
+    Icon(Icons.Default.MoreVert, contentDescription = null)
   }
-
   DropdownMenu(
       expanded = expanded,
       onDismissRequest = { expanded = false },
-      toggle = menuButton,
-      dropdownOffset = DpOffset(0.dp, (-56).dp),
+      offset = DpOffset(0.dp, (-56).dp),
   ) {
     DropdownMenuItem(onClick = {
       eventHandler(Refresh)
@@ -122,22 +118,21 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
 @Composable
 private fun LocationDropdown(state: HomeState) {
   var expanded by remember { mutableStateOf(false) }
-
-  DropdownMenu(
-      toggle = {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxHeight()) {
-          Column {
-            Text(getToolbarTitle(state.forecasterState), style = MaterialTheme.typography.h5)
-            state.refreshTime.asText()?.let { Text(it, style = MaterialTheme.typography.caption) }
-          }
-          Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
-        }
-      },
-      expanded = expanded,
-      onDismissRequest = { expanded = false },
-      toggleModifier = Modifier
+  Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
           .fillMaxHeight()
           .clickable { }
+  ) {
+    Column {
+      Text(getToolbarTitle(state.forecasterState), style = MaterialTheme.typography.h5)
+      state.refreshTime.asText()?.let { Text(it, style = MaterialTheme.typography.caption) }
+    }
+    Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
+  }
+  DropdownMenu(
+      expanded = expanded,
+      onDismissRequest = { expanded = false }
   ) {
     // TODO: Show location picker.
   }
@@ -169,28 +164,28 @@ private fun Loading() {
 private fun Error(type: ErrorType) {
   val title: String
   val message: String
-  val image: ImageVector
+  val image: Painter
 
   when (type) {
     ErrorType.DATA -> {
       title = stringResource(R.string.home_error_data_title)
       message = stringResource(R.string.home_error_data_message)
-      image = vectorResource(R.drawable.gfx_data_error)
+      image = painterResource(R.drawable.gfx_data_error)
     }
     ErrorType.NETWORK -> {
       title = stringResource(R.string.home_error_network_title)
       message = stringResource(R.string.home_error_network_message)
-      image = vectorResource(R.drawable.gfx_network_error)
+      image = painterResource(R.drawable.gfx_network_error)
     }
     ErrorType.LOCATION -> {
       title = stringResource(R.string.home_error_location_title)
       message = stringResource(R.string.home_error_location_message)
-      image = vectorResource(R.drawable.gfx_location_error)
+      image = painterResource(R.drawable.gfx_location_error)
     }
     ErrorType.NOT_AUSTRALIA -> {
       title = stringResource(R.string.home_error_unknownLocation_title)
       message = stringResource(R.string.home_error_unknownLocation_message)
-      image = vectorResource(R.drawable.gfx_unknown_location)
+      image = painterResource(R.drawable.gfx_unknown_location)
     }
   }
 
@@ -205,11 +200,11 @@ private fun Error(type: ErrorType) {
         style = MaterialTheme.typography.body1,
         textAlign = TextAlign.Center,
         modifier = Modifier
-            .preferredWidth(280.dp)
+            .width(280.dp)
             .padding(top = 8.dp, bottom = 16.dp)
     )
     Icon(image, contentDescription = null)
-    Button(modifier = Modifier.preferredWidth(200.dp), onClick = { /*TODO*/ }) {
+    Button(modifier = Modifier.width(200.dp), onClick = { /*TODO*/ }) {
       Text(stringResource(R.string.home_error_retryButton))
     }
   }

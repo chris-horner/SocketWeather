@@ -14,15 +14,14 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.preferredHeight
-import androidx.compose.foundation.layout.preferredWidth
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.AmbientContentAlpha
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Surface
@@ -31,7 +30,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Providers
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -87,7 +86,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
       if (state.showCloseButton) {
         AnimatedVisibility(visible = currentlyIdle) {
           IconButton(onClick = { eventHandler(CloseClicked) }) {
-            Providers(AmbientContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
               Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.chooseLocation_closeDesc))
             }
           }
@@ -115,7 +114,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
               .padding(horizontal = 32.dp)
               .fillMaxWidth()
       )
-      Crossfade(modifier = Modifier.weight(2f), current = state.loadingStatus) { loadingStatus ->
+      Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
         when (loadingStatus) {
           Searching -> SearchLoading()
           Submitting -> SubmittingLocationChoice()
@@ -135,7 +134,7 @@ private fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
   Row(
       modifier = Modifier
           .fillMaxWidth()
-          .preferredHeight(64.dp)
+          .height(64.dp)
           .clickable(onClick = onClick)
           .padding(horizontal = 32.dp)
   ) {
@@ -163,7 +162,7 @@ private fun SearchResults(results: List<SearchResult>, onClick: (item: SearchRes
           textAlign = TextAlign.Center,
           modifier = Modifier
               .align(Alignment.Center)
-              .preferredWidth(352.dp)
+              .width(352.dp)
               .padding(horizontal = 32.dp)
       )
     }
@@ -192,7 +191,7 @@ private fun SearchError() {
         textAlign = TextAlign.Center,
         modifier = Modifier
             .align(Alignment.Center)
-            .preferredWidth(352.dp)
+            .width(352.dp)
             .padding(horizontal = 32.dp)
     )
   }

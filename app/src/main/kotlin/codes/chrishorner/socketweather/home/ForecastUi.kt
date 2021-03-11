@@ -44,6 +44,18 @@ fun ForecastUi(forecast: Forecast) {
         .padding(horizontal = 16.dp)
         .fillMaxWidth()
     )
+
+    TimeForecastGraph(
+      entries = listOf(
+        TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
+        TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),
+        TimeForecastGraphItem(18, "18°", "1 PM", 20, "20%"),
+        TimeForecastGraphItem(16, "16°", "4 PM", 80, "80%"),
+        TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
+        TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
+        TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
+      )
+    )
   }
 }
 

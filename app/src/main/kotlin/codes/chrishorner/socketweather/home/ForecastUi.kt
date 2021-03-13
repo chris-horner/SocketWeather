@@ -54,6 +54,9 @@ fun ForecastUi(forecast: Forecast) {
         TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
         TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
         TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
+        TimeForecastGraphItem(9, "9°", "4 AM", 0, ""),
+        TimeForecastGraphItem(13, "13°", "7 AM", 0, ""),
+        TimeForecastGraphItem(22, "22°", "10 AM", 0, ""),
       )
     )
   }

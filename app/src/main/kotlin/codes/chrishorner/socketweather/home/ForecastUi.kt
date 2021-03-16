@@ -21,6 +21,8 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.FirstBaseline
+import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -45,6 +47,24 @@ fun ForecastUi(forecast: Forecast) {
         .fillMaxWidth()
     )
 
+    Observations2(
+      FormattedConditions(
+        iconDescriptor = "hazy",
+        isNight = false,
+        currentTemperature = "17°",
+        highTemperature = "22°",
+        lowTemperature = "22°",
+        feelsLikeTemperature = "15.8°",
+        description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
+      )
+    )
+
+    ThickDivider(
+      modifier = Modifier
+        .padding(horizontal = 16.dp)
+        .fillMaxWidth()
+    )
+
     TimeForecastGraph(
       entries = listOf(
         TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
@@ -59,6 +79,84 @@ fun ForecastUi(forecast: Forecast) {
         TimeForecastGraphItem(22, "22°", "10 AM", 0, ""),
       )
     )
+  }
+}
+
+data class FormattedConditions(
+  val iconDescriptor: String,
+  val isNight: Boolean,
+  val currentTemperature: String,
+  val highTemperature: String,
+  val lowTemperature: String,
+  val feelsLikeTemperature: String,
+  val description: String,
+)
+
+@Composable
+private fun Observations2(conditions: FormattedConditions) {
+  Layout(
+    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+    content = {
+      Image(
+        painter = painterResource(weatherIconRes(conditions.iconDescriptor, conditions.isNight)),
+        contentDescription = stringResource(string.home_currentIconDesc),
+        colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+        modifier = Modifier.size(72.dp),
+      )
+      Text(
+        text = conditions.currentTemperature,
+        style = LargeTempTextStyle,
+      )
+      Text(
+        text = stringResource(string.home_feelsLike),
+        style = MaterialTheme.typography.h5,
+        color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
+      )
+      Text(
+        text = conditions.feelsLikeTemperature,
+        style = MediumTempTextStyle,
+      )
+      Text(
+        text = conditions.highTemperature,
+        style = MediumTempTextStyle,
+      )
+      Text(
+        text = conditions.lowTemperature,
+        style = MediumTempTextStyle,
+      )
+      Box(
+        modifier = Modifier
+          .width(4.dp)
+          .clip(RoundedCornerShape(2.dp))
+          .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+      )
+    }
+  ) { measurables, constraints ->
+
+    val icon = measurables[0].measure(constraints)
+    val currentTemperature = measurables[1].measure(constraints)
+    val feelsLikeTitle = measurables[2].measure(constraints)
+    val feelsLikeTemperature = measurables[3].measure(constraints)
+    val highTemperature = measurables[4].measure(constraints)
+    val lowTemperature = measurables[5].measure(constraints)
+    val highLowLine = measurables[6].measure(constraints)
+
+    val height = currentTemperature.height + 16.dp.roundToPx() + feelsLikeTitle.height
+
+    layout(width = constraints.maxWidth, height = height) {
+
+      val iconY = (currentTemperature.height - icon.height) / 2
+
+      icon.place(x = 0, y = iconY)
+      currentTemperature.place(x = icon.width + 12.dp.roundToPx(), y = 0)
+      highTemperature.place(x = constraints.maxWidth - highTemperature.width, y = 12.dp.roundToPx())
+      feelsLikeTitle.place(x = 0, y = height - feelsLikeTitle[FirstBaseline])
+      feelsLikeTemperature.place(
+        x = feelsLikeTitle.width + 8.dp.roundToPx(),
+        y = height - feelsLikeTemperature[FirstBaseline]
+      )
+      lowTemperature.place(x = constraints.maxWidth - lowTemperature.width, y = height - lowTemperature[FirstBaseline])
+    }
   }
 }
 

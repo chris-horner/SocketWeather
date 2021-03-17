@@ -27,7 +27,7 @@ buildscript {
                   'threetenbp'              : '1.5.0',
                   'flowbinding'             : '1.0.0-beta02',
                   'junit'                   : '4.13.1',
-                  'turbine'                 : '0.3.0',
+                  'turbine'                 : '0.4.1',
                   'truth'                   : '1.1']
 
   repositories {

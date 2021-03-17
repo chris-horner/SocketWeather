@@ -5,7 +5,11 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -18,50 +22,44 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.FirstBaseline
-import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.constraintlayout.compose.ConstraintLayout
-import androidx.constraintlayout.compose.Dimension
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.R.string
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.util.ThickDivider
-import codes.chrishorner.socketweather.util.formatAsDegrees
 
 @Composable
 fun ForecastUi(forecast: Forecast) {
+
+  val testConditions = FormattedConditions(
+    iconDescriptor = "hazy",
+    isNight = false,
+    currentTemperature = "17°",
+    highTemperature = "22°",
+    lowTemperature = "14°",
+    feelsLikeTemperature = "15.8°",
+    description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
+  )
+
   Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
-    Observations(forecast)
+    Observations(testConditions)
 
-    ThickDivider(
-      modifier = Modifier
-        .padding(horizontal = 16.dp)
-        .fillMaxWidth()
-    )
-
-    Observations2(
-      FormattedConditions(
-        iconDescriptor = "hazy",
-        isNight = false,
-        currentTemperature = "17°",
-        highTemperature = "22°",
-        lowTemperature = "22°",
-        feelsLikeTemperature = "15.8°",
-        description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
-      )
+    Text(
+      text = testConditions.description,
+      style = MaterialTheme.typography.body1,
+      modifier = Modifier.padding(horizontal = 16.dp)
     )
 
     ThickDivider(
       modifier = Modifier
-        .padding(horizontal = 16.dp)
+        .padding(vertical = 16.dp)
         .fillMaxWidth()
     )
 
@@ -93,166 +91,60 @@ data class FormattedConditions(
 )
 
 @Composable
-private fun Observations2(conditions: FormattedConditions) {
-  Layout(
-    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-    content = {
+private fun Observations(conditions: FormattedConditions) {
+  Box(modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)) {
+
+    Row(verticalAlignment = Alignment.CenterVertically) {
       Image(
         painter = painterResource(weatherIconRes(conditions.iconDescriptor, conditions.isNight)),
-        contentDescription = stringResource(string.home_currentIconDesc),
+        contentDescription = stringResource(R.string.home_currentIconDesc),
         colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
         modifier = Modifier.size(72.dp),
       )
+      Spacer(modifier = Modifier.width(12.dp))
       Text(
         text = conditions.currentTemperature,
         style = LargeTempTextStyle,
       )
-      Text(
-        text = stringResource(string.home_feelsLike),
-        style = MaterialTheme.typography.h5,
-        color = MaterialTheme.colors.onBackground.copy(alpha = 0.2f),
-      )
-      Text(
-        text = conditions.feelsLikeTemperature,
-        style = MediumTempTextStyle,
-      )
+    }
+
+    Column(horizontalAlignment = Alignment.End) {
+      Spacer(modifier = Modifier.height(12.dp))
       Text(
         text = conditions.highTemperature,
         style = MediumTempTextStyle,
       )
-      Text(
-        text = conditions.lowTemperature,
-        style = MediumTempTextStyle,
-      )
+      Spacer(modifier = Modifier.height(12.dp))
       Box(
         modifier = Modifier
           .width(4.dp)
+          .height(28.dp)
+          .offset(x = (-16).dp)
           .clip(RoundedCornerShape(2.dp))
           .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
       )
-    }
-  ) { measurables, constraints ->
-
-    val icon = measurables[0].measure(constraints)
-    val currentTemperature = measurables[1].measure(constraints)
-    val feelsLikeTitle = measurables[2].measure(constraints)
-    val feelsLikeTemperature = measurables[3].measure(constraints)
-    val highTemperature = measurables[4].measure(constraints)
-    val lowTemperature = measurables[5].measure(constraints)
-    val highLowLine = measurables[6].measure(constraints)
-
-    val height = currentTemperature.height + 16.dp.roundToPx() + feelsLikeTitle.height
-
-    layout(width = constraints.maxWidth, height = height) {
-
-      val iconY = (currentTemperature.height - icon.height) / 2
-
-      icon.place(x = 0, y = iconY)
-      currentTemperature.place(x = icon.width + 12.dp.roundToPx(), y = 0)
-      highTemperature.place(x = constraints.maxWidth - highTemperature.width, y = 12.dp.roundToPx())
-      feelsLikeTitle.place(x = 0, y = height - feelsLikeTitle[FirstBaseline])
-      feelsLikeTemperature.place(
-        x = feelsLikeTitle.width + 8.dp.roundToPx(),
-        y = height - feelsLikeTemperature[FirstBaseline]
-      )
-      lowTemperature.place(x = constraints.maxWidth - lowTemperature.width, y = height - lowTemperature[FirstBaseline])
-    }
-  }
-}
-
-@Composable
-private fun Observations(forecast: Forecast) {
-  ConstraintLayout(
-    modifier = Modifier
-      .padding(horizontal = 16.dp)
-      .padding(top = 8.dp, bottom = 16.dp)
-      .fillMaxWidth()
-  ) {
-    val (icon, currentTemp, feelsLikeTitle, feelsLikeTemp, highTemp, lowTemp, tempLine, description) = createRefs()
-
-    Image(
-      painter = painterResource(weatherIconRes(forecast.iconDescriptor, forecast.night)),
-      contentDescription = stringResource(string.home_currentIconDesc),
-      colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
-      modifier = Modifier
-        .size(72.dp)
-        .constrainAs(icon) {
-          start.linkTo(parent.start)
-          top.linkTo(parent.top)
-          bottom.linkTo(currentTemp.bottom)
+      Spacer(modifier = Modifier.height(12.dp))
+      Row {
+        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+          Text(
+            text = stringResource(R.string.home_feelsLike),
+            style = MaterialTheme.typography.h5,
+            modifier = Modifier.alignByBaseline()
+          )
         }
-    )
-
-    Text(
-      text = forecast.currentTemp.formatAsDegrees(),
-      style = LargeTempTextStyle,
-      modifier = Modifier.constrainAs(currentTemp) {
-        start.linkTo(icon.end, margin = 12.dp)
-        top.linkTo(parent.top)
+        Spacer(modifier = Modifier.width(8.dp))
+        Text(
+          text = conditions.feelsLikeTemperature,
+          style = MediumTempTextStyle,
+          modifier = Modifier.alignByBaseline()
+        )
+        Spacer(modifier = Modifier.weight(1f))
+        Text(
+          text = conditions.lowTemperature,
+          style = MediumTempTextStyle,
+          modifier = Modifier.alignByBaseline()
+        )
       }
-    )
-
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-      Text(
-        text = stringResource(string.home_feelsLike),
-        style = MaterialTheme.typography.h5,
-        modifier = Modifier.constrainAs(feelsLikeTitle) {
-          start.linkTo(parent.start)
-          top.linkTo(currentTemp.bottom, margin = 16.dp)
-        }
-      )
-    }
-
-    Text(
-      text = forecast.tempFeelsLike?.formatAsDegrees() ?: "--",
-      style = MediumTempTextStyle,
-      modifier = Modifier.constrainAs(feelsLikeTemp) {
-        start.linkTo(feelsLikeTitle.end, margin = 8.dp)
-        baseline.linkTo(feelsLikeTitle.baseline)
-      }
-    )
-
-    Text(
-      text = forecast.highTemp.formatAsDegrees(),
-      style = MediumTempTextStyle,
-      modifier = Modifier.constrainAs(highTemp) {
-        end.linkTo(parent.end)
-        top.linkTo(parent.top, margin = 12.dp)
-      }
-    )
-
-    Text(
-      text = forecast.lowTemp.formatAsDegrees(),
-      style = MediumTempTextStyle,
-      modifier = Modifier.constrainAs(lowTemp) {
-        end.linkTo(parent.end)
-        baseline.linkTo(feelsLikeTemp.baseline)
-      }
-    )
-
-    Box(
-      modifier = Modifier
-        .width(4.dp)
-        .constrainAs(tempLine) {
-          centerHorizontallyTo(highTemp)
-          top.linkTo(highTemp.bottom, margin = 12.dp)
-          bottom.linkTo(lowTemp.top, margin = 12.dp)
-          height = Dimension.fillToConstraints
-        }
-        .clip(RoundedCornerShape(2.dp))
-        .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
-    )
-
-    val descriptionText = forecast.todayForecast.extended_text ?: forecast.todayForecast.short_text
-    if (descriptionText != null) {
-      Text(
-        text = descriptionText,
-        modifier = Modifier
-          .constrainAs(description) {
-            top.linkTo(feelsLikeTitle.bottom, margin = 16.dp)
-          }
-          .fillMaxWidth()
-      )
     }
   }
 }

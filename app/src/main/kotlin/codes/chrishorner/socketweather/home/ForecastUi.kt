@@ -59,7 +59,7 @@ fun ForecastUi(forecast: Forecast) {
 
     ThickDivider(
       modifier = Modifier
-        .padding(vertical = 16.dp)
+        .padding(16.dp)
         .fillMaxWidth()
     )
 

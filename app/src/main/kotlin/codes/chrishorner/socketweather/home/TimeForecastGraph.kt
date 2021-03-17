@@ -89,7 +89,7 @@ fun TimeForecastGraph(entries: List<TimeForecastGraphItem>) {
   val fadedColour = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
   with(LocalDensity.current) {
-    topSectionHeight = if (showChanceOfRain) 40.dp else 16.dp
+    topSectionHeight = if (showChanceOfRain) 40.dp else 0.dp
     listGraphHeight = totalGraphHeight - topSectionHeight - bottomSectionHeight
     temperatureTextHeight = SmallTempTextStyle.fontSize.toDp() + 8.dp // Add 8dp to approximate the actual height.
     lineGraphHeight = listGraphHeight - temperatureTextHeight
@@ -116,7 +116,7 @@ fun TimeForecastGraph(entries: List<TimeForecastGraphItem>) {
               Row(
                 modifier = Modifier
                   .height(topSectionHeight)
-                  .padding(bottom = 8.dp),
+                  .padding(bottom = 16.dp),
                 verticalAlignment = Alignment.Bottom
               ) {
                 Icon(

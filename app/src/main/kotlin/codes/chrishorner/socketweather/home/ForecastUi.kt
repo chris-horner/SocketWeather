@@ -1,6 +1,5 @@
 package codes.chrishorner.socketweather.home
 
-import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -30,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
@@ -75,6 +75,20 @@ fun ForecastUi(forecast: Forecast) {
         TimeForecastGraphItem(9, "9°", "4 AM", 0, ""),
         TimeForecastGraphItem(13, "13°", "7 AM", 0, ""),
         TimeForecastGraphItem(22, "22°", "10 AM", 0, ""),
+      )
+    )
+
+    ThickDivider(
+      modifier = Modifier
+        .padding(16.dp)
+        .fillMaxWidth()
+    )
+
+    UpcomingForecasts(
+      listOf(
+        UpcomingForecast("Tomorrow", 0, "", "partly_cloudy", "15°", "27°"),
+        UpcomingForecast("Friday", 0, "", "partly_cloudy", "14°", "27°"),
+        UpcomingForecast("Saturday", 50, "50%", "shower", "17°", "26°"),
       )
     )
   }
@@ -147,23 +161,4 @@ private fun Observations(conditions: FormattedConditions) {
       }
     }
   }
-}
-
-@DrawableRes
-private fun weatherIconRes(descriptor: String, night: Boolean): Int = when (descriptor) {
-  "sunny" -> R.drawable.ic_weather_sunny_24dp
-  "clear" -> if (night) R.drawable.ic_weather_clear_night_24dp else R.drawable.ic_weather_sunny_24dp
-  "mostly_sunny", "partly_cloudy" -> if (night) R.drawable.ic_weather_partly_cloudy_night_24dp else R.drawable.ic_weather_partly_cloudy_24dp
-  "cloudy" -> R.drawable.ic_weather_cloudy_24dp
-  "hazy" -> if (night) R.drawable.ic_weather_hazy_night_24dp else R.drawable.ic_weather_hazy_24dp
-  "light_rain", "light_shower" -> R.drawable.ic_weather_light_rain_24dp
-  "windy" -> R.drawable.ic_weather_windy_24dp
-  "fog" -> R.drawable.ic_weather_fog_24dp
-  "shower", "rain", "heavy_shower" -> R.drawable.ic_weather_rain_24dp
-  "dusty" -> R.drawable.ic_weather_dusty_24dp
-  "frost" -> R.drawable.ic_weather_frost_24dp
-  "snow" -> R.drawable.ic_weather_snow_24dp
-  "storm" -> R.drawable.ic_weather_storm_24dp
-  "cyclone" -> R.drawable.ic_weather_cyclone_24dp
-  else -> R.drawable.ic_weather_unknown_24dp
 }

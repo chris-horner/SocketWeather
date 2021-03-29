@@ -125,6 +125,7 @@ dependencies {
   implementation "androidx.core:core-ktx:${versions.androidx_core}"
   implementation "androidx.activity:activity-compose:${versions.androidx_activity}"
   implementation "com.google.android.material:material:${versions.material}"
+  implementation "androidx.datastore:datastore:${versions.datastore}"
   implementation "androidx.constraintlayout:constraintlayout:${versions.constraintlayout}"
   implementation "com.bluelinelabs:conductor:${versions.conductor}"
   implementation "com.bluelinelabs:conductor-androidx-transition:${versions.conductor}"

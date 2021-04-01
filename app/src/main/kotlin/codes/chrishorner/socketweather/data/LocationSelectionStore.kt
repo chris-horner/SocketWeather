@@ -15,9 +15,10 @@ interface LocationSelectionStore {
   val savedSelections: Flow<Set<LocationSelection>>
   fun saveAndSelect(selection: LocationSelection)
   fun select(selection: LocationSelection)
+  fun clear()
 }
 
-class LocationSelectionDataStore(
+class LocationSelectionDiskStore(
   private val app: Application,
   moshi: Moshi
 ) : LocationSelectionStore {
@@ -50,6 +51,13 @@ class LocationSelectionDataStore(
   override fun select(selection: LocationSelection) {
     scope.launch {
       currentSelectionStore.updateData { selection }
+    }
+  }
+
+  override fun clear() {
+    scope.launch {
+      currentSelectionStore.updateData { LocationSelection.None }
+      savedSelectionsStore.updateData { emptySet() }
     }
   }
 }

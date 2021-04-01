@@ -33,8 +33,8 @@ val Context.appSingletons
   get() = checkNotNull(singletons) { "initialiseSingletons() must be called in Application." }
 
 @MainThread
-fun initialiseSingletons(app: Application) {
-  singletons = SingletonCache(app)
+fun Application.initialiseSingletons() {
+  singletons = SingletonCache(this)
 }
 
 private class SingletonCache(app: Application) : Singletons {

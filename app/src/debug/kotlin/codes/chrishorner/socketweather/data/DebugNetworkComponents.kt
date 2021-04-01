@@ -4,6 +4,7 @@ import android.app.Application
 import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
 import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
 import au.com.gridstone.debugdrawer.retrofit.Endpoint
+import com.squareup.moshi.Moshi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import okhttp3.OkHttpClient
@@ -13,7 +14,11 @@ import retrofit2.create
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 
-class DebugNetworkComponents(app: Application) : NetworkComponents {
+class DebugNetworkComponents(
+  app: Application,
+  apiEndpoint: String,
+  moshi: Moshi
+) : NetworkComponents {
 
   private val endpointChanges = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
@@ -26,7 +31,7 @@ class DebugNetworkComponents(app: Application) : NetworkComponents {
   init {
     val endpoints = listOf(
       Endpoint("Mock", "https://localhost/mock/", isMock = true),
-      Endpoint("Production", DataConfig.API_ENDPOINT)
+      Endpoint("Production", apiEndpoint)
     )
     val networkBehavior = NetworkBehavior.create()
     debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
@@ -43,7 +48,7 @@ class DebugNetworkComponents(app: Application) : NetworkComponents {
       .baseUrl(currentEndpoint.url)
       .client(httpClient)
       .addConverterFactory(EnvelopeConverter)
-      .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
+      .addConverterFactory(MoshiConverterFactory.create(moshi))
       .build()
 
     api = if (currentEndpoint.isMock) {

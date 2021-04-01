@@ -4,6 +4,7 @@ import android.app.Activity
 import android.app.Application
 import android.view.ViewGroup
 import androidx.annotation.MainThread
+import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.RealDeviceLocator
@@ -29,6 +30,6 @@ private object ReleaseBuildComponents : BuildTypeComponents {
 
   @MainThread
   override fun createNetworkComponents(app: Application): NetworkComponents {
-    return ReleaseNetworkComponents()
+    return ReleaseNetworkComponents(DataConfig.API_ENDPOINT, DataConfig.moshi)
   }
 }

@@ -33,7 +33,7 @@ class SocketWeatherApp : Application() {
     // needed for the whole app to do its thing.
     allowMainThreadDiskOperations {
       AndroidThreeTen.init(this)
-      initialiseSingletons(this)
+      initialiseSingletons()
     }
 
     // If our API environment ever changes, remove all saved location selections.

@@ -10,6 +10,7 @@ import au.com.gridstone.debugdrawer.leakcanary.LeakCanaryModule
 import au.com.gridstone.debugdrawer.okhttplogs.OkHttpLoggerModule
 import au.com.gridstone.debugdrawer.retrofit.RetrofitModule
 import au.com.gridstone.debugdrawer.timber.TimberModule
+import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DebugDeviceLocator
 import codes.chrishorner.socketweather.data.DebugNetworkComponents
 import codes.chrishorner.socketweather.data.DeviceLocator
@@ -60,6 +61,6 @@ private object DebugBuildComponents : BuildTypeComponents {
 
   override fun createNetworkComponents(app: Application): NetworkComponents {
     networkComponents?.let { return it }
-    return DebugNetworkComponents(app).also { networkComponents = it }
+    return DebugNetworkComponents(app, DataConfig.API_ENDPOINT, DataConfig.moshi).also { networkComponents = it }
   }
 }

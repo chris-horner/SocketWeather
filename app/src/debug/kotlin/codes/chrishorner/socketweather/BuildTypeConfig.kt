@@ -11,6 +11,7 @@ import au.com.gridstone.debugdrawer.okhttplogs.OkHttpLoggerModule
 import au.com.gridstone.debugdrawer.retrofit.RetrofitModule
 import au.com.gridstone.debugdrawer.timber.TimberModule
 import codes.chrishorner.socketweather.data.DebugDeviceLocator
+import codes.chrishorner.socketweather.data.DebugNetworkComponents
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.debug.DebugDeviceLocatorModule
@@ -26,7 +27,7 @@ object BuildTypeConfig {
     // Temporarily allow disk operations on main thread to allow debug drawer
     // modules to do their thing.
     allowMainThreadDiskOperations {
-      val networkComponents: NetworkComponents = activity.appSingletons.networkComponents
+      val networkComponents: DebugNetworkComponents = activity.appSingletons.networkComponents as DebugNetworkComponents
       val deviceLocator = getDeviceLocator(activity.app) as DebugDeviceLocator
       drawerBuilder
         .addSectionTitle("Device location")
@@ -52,5 +53,10 @@ object BuildTypeConfig {
   fun getDeviceLocator(app: Application): DeviceLocator {
     deviceLocator?.let { return it }
     return DebugDeviceLocator(app).also { deviceLocator = it }
+  }
+
+  @MainThread
+  fun createNetworkComponents(app: Application): NetworkComponents {
+    return DebugNetworkComponents(app)
   }
 }

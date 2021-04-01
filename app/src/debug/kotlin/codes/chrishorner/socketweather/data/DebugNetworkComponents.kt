@@ -4,7 +4,8 @@ import android.app.Application
 import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
 import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
 import au.com.gridstone.debugdrawer.retrofit.Endpoint
-import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
@@ -12,11 +13,15 @@ import retrofit2.create
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.NetworkBehavior
 
-class NetworkComponents(app: Application, locationChoices: LocationChoices) {
+class DebugNetworkComponents(app: Application) : NetworkComponents {
 
-  val api: WeatherApi
+  private val endpointChanges = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+
   val debugRetrofitConfig: DebugRetrofitConfig
   val httpLogger = HttpLogger(app, prettyPrintJson = true)
+
+  override val api: WeatherApi
+  override val environmentChanges: Flow<Unit> = endpointChanges
 
   init {
     val endpoints = listOf(
@@ -26,9 +31,7 @@ class NetworkComponents(app: Application, locationChoices: LocationChoices) {
     val networkBehavior = NetworkBehavior.create()
     debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
     debugRetrofitConfig.doOnEndpointChange { _, _ ->
-      allowMainThreadDiskOperations {
-        locationChoices.clear()
-      }
+      endpointChanges.tryEmit(Unit)
     }
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()

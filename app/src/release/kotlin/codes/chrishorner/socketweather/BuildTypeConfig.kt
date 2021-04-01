@@ -5,7 +5,9 @@ import android.app.Application
 import android.view.ViewGroup
 import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.DeviceLocator
+import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.RealDeviceLocator
+import codes.chrishorner.socketweather.data.ReleaseNetworkComponents
 import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
 
 object BuildTypeConfig {
@@ -24,5 +26,10 @@ object BuildTypeConfig {
   fun getDeviceLocator(app: Application): DeviceLocator {
     deviceLocator?.let { return it }
     return RealDeviceLocator(app).also { deviceLocator = it }
+  }
+
+  @MainThread
+  fun createNetworkComponents(app: Application): NetworkComponents {
+    return ReleaseNetworkComponents()
   }
 }

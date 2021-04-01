@@ -15,7 +15,7 @@ interface LocationSelectionStore {
   val savedSelections: Flow<Set<LocationSelection>>
   fun saveAndSelect(selection: LocationSelection)
   fun select(selection: LocationSelection)
-  fun clear()
+  suspend fun clear()
 }
 
 class LocationSelectionDiskStore(
@@ -54,10 +54,8 @@ class LocationSelectionDiskStore(
     }
   }
 
-  override fun clear() {
-    scope.launch {
-      currentSelectionStore.updateData { LocationSelection.None }
-      savedSelectionsStore.updateData { emptySet() }
-    }
+  override suspend fun clear() {
+    currentSelectionStore.updateData { LocationSelection.None }
+    savedSelectionsStore.updateData { emptySet() }
   }
 }

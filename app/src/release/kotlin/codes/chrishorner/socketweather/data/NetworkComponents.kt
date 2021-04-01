@@ -1,17 +1,20 @@
 package codes.chrishorner.socketweather.data
 
-import android.app.Application
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emptyFlow
 import retrofit2.Retrofit
 import retrofit2.converter.moshi.MoshiConverterFactory
 import retrofit2.create
 
-@Suppress("UNUSED_PARAMETER") // Match signature of debug variant.
-class NetworkComponents(app: Application, locationChoices: LocationChoices) {
+class ReleaseNetworkComponents : NetworkComponents {
 
-  val api: WeatherApi = Retrofit.Builder()
+  override val api: WeatherApi = Retrofit.Builder()
     .baseUrl(DataConfig.API_ENDPOINT)
     .addConverterFactory(EnvelopeConverter)
     .addConverterFactory(MoshiConverterFactory.create(DataConfig.moshi))
     .build()
     .create()
+
+  // Environment never changes in release builds.
+  override val environmentChanges: Flow<Unit> = emptyFlow()
 }

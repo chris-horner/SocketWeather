@@ -19,16 +19,18 @@ import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import codes.chrishorner.socketweather.util.app
 import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
 
-object BuildTypeConfig {
+object CurrentBuildTypeComponents : BuildTypeComponents by DebugBuildComponents
 
-  @MainThread
-  fun getRootContainerFor(activity: Activity): ViewGroup {
+@MainThread
+private object DebugBuildComponents : BuildTypeComponents {
+
+  override fun createRootContainerFor(activity: Activity): ViewGroup {
     val drawerBuilder: DebugDrawer.Builder = DebugDrawer.with(activity)
     // Temporarily allow disk operations on main thread to allow debug drawer
     // modules to do their thing.
     allowMainThreadDiskOperations {
-      val networkComponents: DebugNetworkComponents = activity.appSingletons.networkComponents as DebugNetworkComponents
-      val deviceLocator = getDeviceLocator(activity.app) as DebugDeviceLocator
+      val networkComponents: DebugNetworkComponents = createNetworkComponents(activity.app) as DebugNetworkComponents
+      val deviceLocator = createDeviceLocator(activity.app) as DebugDeviceLocator
       drawerBuilder
         .addSectionTitle("Device location")
         .addModule(DebugDeviceLocatorModule(deviceLocator))
@@ -49,14 +51,15 @@ object BuildTypeConfig {
 
   private var deviceLocator: DebugDeviceLocator? = null
 
-  @MainThread
-  fun getDeviceLocator(app: Application): DeviceLocator {
+  override fun createDeviceLocator(app: Application): DeviceLocator {
     deviceLocator?.let { return it }
     return DebugDeviceLocator(app).also { deviceLocator = it }
   }
 
-  @MainThread
-  fun createNetworkComponents(app: Application): NetworkComponents {
-    return DebugNetworkComponents(app)
+  private var networkComponents: DebugNetworkComponents? = null
+
+  override fun createNetworkComponents(app: Application): NetworkComponents {
+    networkComponents?.let { return it }
+    return DebugNetworkComponents(app).also { networkComponents = it }
   }
 }

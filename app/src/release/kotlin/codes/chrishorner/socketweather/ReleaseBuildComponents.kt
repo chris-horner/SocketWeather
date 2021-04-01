@@ -10,26 +10,25 @@ import codes.chrishorner.socketweather.data.RealDeviceLocator
 import codes.chrishorner.socketweather.data.ReleaseNetworkComponents
 import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
 
-object BuildTypeConfig {
+object CurrentBuildTypeComponents : BuildTypeComponents by ReleaseBuildComponents
+
+private object ReleaseBuildComponents : BuildTypeComponents {
 
   @MainThread
-  fun getRootContainerFor(activity: Activity): ViewGroup {
+  override fun createRootContainerFor(activity: Activity): ViewGroup {
     val content = activity.findViewById(android.R.id.content) as ViewGroup
     val container = ChangeHandlerFrameLayout(activity)
     content.addView(container)
     return container
   }
 
-  private var deviceLocator: DeviceLocator? = null
-
   @MainThread
-  fun getDeviceLocator(app: Application): DeviceLocator {
-    deviceLocator?.let { return it }
-    return RealDeviceLocator(app).also { deviceLocator = it }
+  override fun createDeviceLocator(app: Application): DeviceLocator {
+    return RealDeviceLocator(app)
   }
 
   @MainThread
-  fun createNetworkComponents(app: Application): NetworkComponents {
+  override fun createNetworkComponents(app: Application): NetworkComponents {
     return ReleaseNetworkComponents()
   }
 }

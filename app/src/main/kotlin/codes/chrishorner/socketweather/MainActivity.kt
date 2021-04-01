@@ -23,7 +23,7 @@ class MainActivity : AppCompatActivity() {
     // Render under the status and navigation bars.
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    val rootContainer: ViewGroup = BuildTypeConfig.getRootContainerFor(this)
+    val rootContainer: ViewGroup = CurrentBuildTypeComponents.createRootContainerFor(this)
     router = Conductor.attachRouter(this, rootContainer, savedInstanceState)
     router.addChangeListener(ControllerLeakListener)
 

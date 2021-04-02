@@ -59,7 +59,7 @@ fun NavGraph(currentSelection: LocationSelection) {
         ChooseLocationViewModel(
           showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
           api = context.appSingletons.networkComponents.api,
-          locationChoices = context.appSingletons.locationChoices
+          locationSelectionStore = context.appSingletons.locationSelectionStore
         )
       }
       ChooseLocationScreen(navController, viewModel)

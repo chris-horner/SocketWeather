@@ -6,7 +6,6 @@ import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelectionDiskStore
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
@@ -18,7 +17,6 @@ import org.threeten.bp.Clock
  */
 interface Singletons {
   val deviceLocator: DeviceLocator
-  val locationChoices: LocationChoices
   val locationSelectionStore: LocationSelectionStore
   val networkComponents: NetworkComponents
   val forecaster: Forecaster
@@ -39,13 +37,12 @@ fun Application.initialiseSingletons() {
 
 private class SingletonCache(app: Application) : Singletons {
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
-  override val locationChoices = LocationChoices(app)
   override val locationSelectionStore = LocationSelectionDiskStore(app, DataConfig.moshi)
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
   override val forecaster = Forecaster(
     clock = Clock.systemDefaultZone(),
     api = networkComponents.api,
-    locationSelections = locationChoices.observeCurrentSelection(),
+    locationSelections = locationSelectionStore.currentSelection,
     deviceLocations = deviceLocator.observeDeviceLocation()
   )
 }

@@ -15,8 +15,8 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Clo
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
-import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
 import kotlinx.coroutines.Dispatchers
@@ -37,10 +37,10 @@ import timber.log.Timber
 class ChooseLocationViewModel(
   showCloseButton: Boolean,
   private val api: WeatherApi,
-  private val locationChoices: LocationChoices
+  private val locationSelectionStore: LocationSelectionStore
 ) : ViewModel() {
 
-  private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationChoices.hasFollowMeSaved)
+  private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationSelectionStore.hasFollowMeSaved)
   private val statesFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
   private val eventsFlow = MutableSharedFlow<ChooseLocationDataEvent>(extraBufferCapacity = 1)
@@ -86,7 +86,7 @@ class ChooseLocationViewModel(
 
       try {
         val location = api.getLocation(result.geohash)
-        locationChoices.saveAndSelect(LocationSelection.Static(location))
+        locationSelectionStore.saveAndSelect(LocationSelection.Static(location))
         eventsFlow.emit(SubmissionSuccess)
         statesFlow.value = statesFlow.value.copy(loadingStatus = Submitted)
       } catch (e: Exception) {
@@ -100,7 +100,7 @@ class ChooseLocationViewModel(
   fun selectFollowMe(locationPermissionGranted: Boolean) {
     if (locationPermissionGranted) {
       viewModelScope.launch {
-        locationChoices.saveAndSelect(LocationSelection.FollowMe)
+        locationSelectionStore.saveAndSelect(LocationSelection.FollowMe)
         eventsFlow.emit(SubmissionSuccess)
       }
     } else {
@@ -117,4 +117,7 @@ class ChooseLocationViewModel(
       statesFlow.value.copy(loadingStatus = SearchingError)
     }
   }
+
+  private val LocationSelectionStore.hasFollowMeSaved
+    get() = savedSelections.value.contains(LocationSelection.FollowMe)
 }

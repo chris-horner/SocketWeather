@@ -19,7 +19,7 @@ import kotlinx.coroutines.flow.onEach
 
 class SwitchLocationController : ScopedController<SwitchLocationViewModel, SwitchLocationPresenter>() {
 
-  override fun onCreateViewModel(context: Context) = SwitchLocationViewModel(context.appSingletons.locationChoices)
+  override fun onCreateViewModel(context: Context) = SwitchLocationViewModel(context.appSingletons.locationSelectionStore)
 
   override fun onCreateView(container: ViewGroup): View = container.inflate(R.layout.switch_location)
 

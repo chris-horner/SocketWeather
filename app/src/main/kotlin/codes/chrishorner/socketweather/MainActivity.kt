@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.choose_location.ChooseLocationController
-import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeController
 import codes.chrishorner.socketweather.util.ControllerLeakListener
@@ -28,9 +27,9 @@ class MainActivity : AppCompatActivity() {
     router.addChangeListener(ControllerLeakListener)
 
     if (!router.hasRootController()) {
-      val locationChoices: LocationChoices = appSingletons.locationChoices
+      val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
 
-      if (locationChoices.currentSelection == LocationSelection.None) {
+      if (locationSelection == LocationSelection.None) {
         router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
       } else {
         router.setRoot(HomeController().asTransaction())

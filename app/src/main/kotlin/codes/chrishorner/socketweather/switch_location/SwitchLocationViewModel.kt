@@ -1,14 +1,14 @@
 package codes.chrishorner.socketweather.switch_location
 
-import codes.chrishorner.socketweather.data.LocationChoices
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.LocationSelectionStore
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
 
-class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
+class SwitchLocationViewModel(private val locationSelectionStore: LocationSelectionStore) {
 
   private val closeEvents = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
   private val scope = MainScope()
@@ -17,8 +17,8 @@ class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
    * Create a list where the current selection is at the beginning.
    */
   fun getOrderedSelections(): List<LocationSelection> {
-    val selections: Set<LocationSelection> = locationChoices.savedSelections
-    val currentSelection: LocationSelection = locationChoices.currentSelection
+    val selections: Set<LocationSelection> = locationSelectionStore.savedSelections.value
+    val currentSelection: LocationSelection = locationSelectionStore.currentSelection.value
     return selections.sortedByDescending { it == currentSelection }
   }
 
@@ -26,7 +26,7 @@ class SwitchLocationViewModel(private val locationChoices: LocationChoices) {
 
   fun select(selection: LocationSelection) {
     scope.launch {
-      locationChoices.select(selection)
+      locationSelectionStore.select(selection)
       closeEvents.emit(Unit)
     }
   }

@@ -40,7 +40,6 @@ class SocketWeatherApp : Application() {
     GlobalScope.launch {
       appSingletons.networkComponents.environmentChanges.collect {
         allowMainThreadDiskOperations {
-          appSingletons.locationChoices.clear()
           appSingletons.locationSelectionStore.clear()
         }
       }

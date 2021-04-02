@@ -38,7 +38,7 @@ class ChooseLocationController(
   override fun onCreateViewModel(context: Context) = ChooseLocationViewModel(
     args.getBoolean("displayAsRoot"),
     context.appSingletons.networkComponents.api,
-    context.appSingletons.locationChoices
+    context.appSingletons.locationSelectionStore
   )
 
   override fun onCreatePresenter(view: View, viewModel: ChooseLocationViewModel) = ChooseLocationPresenter(view)

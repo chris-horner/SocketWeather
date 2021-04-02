@@ -23,7 +23,8 @@ class ComposeActivity : AppCompatActivity() {
       ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
         SocketWeatherTheme {
           Box(modifier = Modifier.fillMaxSize()) {
-            NavGraph(currentSelection = appSingletons.locationChoices.currentSelection)
+            val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
+            NavGraph(currentSelection = locationSelection)
           }
         }
       }

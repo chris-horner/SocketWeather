@@ -12,6 +12,7 @@ fun ComposeDebugDrawer(modifier: Modifier = Modifier, content: @Composable () ->
     enableShake = false,
     modifier = modifier.systemBarsPadding(),
     drawerModules = {
+      NetworkModule()
       LeakCanaryModule()
       LogsModule()
       DeviceModule()

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 
 val Context.debugPreferences: DataStore<Preferences> get() = applicationContext.nonLeakingPreferences
@@ -13,4 +14,5 @@ private val Context.nonLeakingPreferences: DataStore<Preferences> by preferences
 
 object DebugPreferenceKeys {
   val ENABLE_HEAP_DUMPS = booleanPreferencesKey("enableHeapDumps")
+  val HTTP_LOG_LEVEL = intPreferencesKey("httpLogLevel")
 }

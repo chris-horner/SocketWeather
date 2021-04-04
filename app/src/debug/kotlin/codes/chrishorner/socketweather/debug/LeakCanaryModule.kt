@@ -21,10 +21,11 @@ fun LeakCanaryModule() {
 
   val scope = rememberCoroutineScope()
   val context = LocalContext.current
-  val preferences = context.applicationContext.debugPreferences
-  val heapDumpsEnabled: Boolean = runBlocking {  preferences.data
-    .map { it[DebugPreferenceKeys.ENABLE_HEAP_DUMPS] ?: true }
-    .first()
+  val preferences = context.debugPreferences
+  val heapDumpsEnabled: Boolean = runBlocking {
+    preferences.data
+      .map { it[DebugPreferenceKeys.ENABLE_HEAP_DUMPS] ?: true }
+      .first()
   }
 
   ActionsModule(

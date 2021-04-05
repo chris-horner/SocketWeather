@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences.Key
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -45,4 +46,6 @@ object DebugPreferenceKeys {
   val MOCK_HTTP_FAIL_RATE = intPreferencesKey("mockHttpFailRate")
   val MOCK_HTTP_ERROR_RATE = intPreferencesKey("mockHttpErrorRate")
   val MOCK_HTTP_ERROR_CODE = intPreferencesKey("mockHttpErrorCode")
+  val DEVICE_LOCATION_MODE = intPreferencesKey("deviceLocationMode")
+  val DEVICE_LOCATION = stringPreferencesKey("deviceLocation")
 }

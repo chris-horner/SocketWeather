@@ -7,18 +7,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
 
-private val mockLocations = mapOf(
-  "Melbourne" to DeviceLocation(-37.817691, 144.967311),
-  "Canberra" to DeviceLocation(-35.306129, 149.126262),
-  "Sydney" to DeviceLocation(-33.857808, 151.214608),
-  "Brisbane" to DeviceLocation(-27.460755, 153.032066),
-  "Darwin" to DeviceLocation(-12.463112, 130.841628),
-  "Perth" to DeviceLocation(-31.956895, 115.859991),
-  "Adelaide" to DeviceLocation(-34.928395, 138.599915),
-  "Hobart" to DeviceLocation(-42.883274, 147.330152),
-  "Tokyo" to DeviceLocation(35.680349, 139.769060)
-)
-
 class DebugDeviceLocator(app: Application) : DeviceLocator {
 
   enum class Mode { REAL, MOCK }
@@ -28,7 +16,7 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
   private val modeFlow: MutableStateFlow<Mode>
   private val locationNameFlow: MutableStateFlow<String>
 
-  val locationNames: List<String> = mockLocations.keys.toList()
+  val locationNames: List<String> = MOCK_LOCATIONS.keys.toList()
 
   var mode: Mode
     get() = modeFlow.value
@@ -69,8 +57,22 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
     return modeFlow.flatMapLatest { mode ->
       when (mode) {
         Mode.REAL -> realLocator.observeDeviceLocation()
-        Mode.MOCK -> locationNameFlow.map { mockLocations.getValue(it) }
+        Mode.MOCK -> locationNameFlow.map { MOCK_LOCATIONS.getValue(it) }
       }
     }
+  }
+
+  companion object {
+    val MOCK_LOCATIONS = mapOf(
+      "Melbourne" to DeviceLocation(-37.817691, 144.967311),
+      "Canberra" to DeviceLocation(-35.306129, 149.126262),
+      "Sydney" to DeviceLocation(-33.857808, 151.214608),
+      "Brisbane" to DeviceLocation(-27.460755, 153.032066),
+      "Darwin" to DeviceLocation(-12.463112, 130.841628),
+      "Perth" to DeviceLocation(-31.956895, 115.859991),
+      "Adelaide" to DeviceLocation(-34.928395, 138.599915),
+      "Hobart" to DeviceLocation(-42.883274, 147.330152),
+      "Tokyo" to DeviceLocation(35.680349, 139.769060)
+    )
   }
 }

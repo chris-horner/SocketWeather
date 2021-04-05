@@ -7,11 +7,13 @@ import au.com.gridstone.debugdrawer.retrofit.Endpoint
 import codes.chrishorner.socketweather.debug.DebugEndpoint
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENDPOINT
+import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_DELAY
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_ERROR_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_FAIL_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_VARIANCE
 import codes.chrishorner.socketweather.debug.debugPreferences
+import codes.chrishorner.socketweather.debug.getEnum
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
@@ -25,6 +27,7 @@ import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
+import okhttp3.logging.HttpLoggingInterceptor.Level
 import okhttp3.logging.HttpLoggingInterceptor.Logger
 import org.json.JSONArray
 import org.json.JSONException
@@ -114,6 +117,7 @@ class DebugNetworkComponents(
 
     preferenceStore.data
       .onEach { preferences ->
+        httpLogger2.level = preferences.getEnum<Level>(HTTP_LOG_LEVEL) ?: Level.BASIC
         networkBehavior.setDelay(preferences[MOCK_HTTP_DELAY] ?: 1_000, TimeUnit.MILLISECONDS)
         networkBehavior.setVariancePercent(preferences[MOCK_HTTP_VARIANCE] ?: 40)
         networkBehavior.setFailurePercent(preferences[MOCK_HTTP_FAIL_RATE] ?: 0)

@@ -15,32 +15,20 @@ import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_FAIL_
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_VARIANCE
 import com.alorma.drawer_modules.ActionsModule
 import com.alorma.drawer_modules.actions.DropdownSelectorAction
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 @Composable
 fun NetworkModule() {
 
   val scope = rememberCoroutineScope()
   val preferenceStore = LocalContext.current.debugPreferences
-  val endpoint: DebugEndpoint
-  val delay: Long
-  val variance: Int
-  val failRate: Int
-  val errorRate: Int
-  val errorCode: Int
-
-  runBlocking {
-    val preferences = preferenceStore.data.first()
-    val endpointIndex = preferences[ENDPOINT] ?: DebugEndpoint.MOCK.ordinal
-    endpoint = DebugEndpoint.values()[endpointIndex]
-    delay = preferences[MOCK_HTTP_DELAY] ?: 1_000L
-    variance = preferences[MOCK_HTTP_VARIANCE] ?: 40
-    failRate = preferences[MOCK_HTTP_FAIL_RATE] ?: 0
-    errorRate = preferences[MOCK_HTTP_ERROR_RATE] ?: 0
-    errorCode = preferences[MOCK_HTTP_ERROR_CODE] ?: 500
-  }
+  val preferences = preferenceStore.blockingGet()
+  val endpoint = preferences.getEnum(ENDPOINT) ?: DebugEndpoint.MOCK
+  val delay = preferences[MOCK_HTTP_DELAY] ?: 1_000L
+  val variance = preferences[MOCK_HTTP_VARIANCE] ?: 40
+  val failRate = preferences[MOCK_HTTP_FAIL_RATE] ?: 0
+  val errorRate = preferences[MOCK_HTTP_ERROR_RATE] ?: 0
+  val errorCode = preferences[MOCK_HTTP_ERROR_CODE] ?: 500
 
   ActionsModule(
     title = "Network",

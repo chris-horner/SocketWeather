@@ -7,14 +7,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.datastore.preferences.core.edit
-import codes.chrishorner.socketweather.appSingletons
-import codes.chrishorner.socketweather.data.DebugNetworkComponents
+import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
 import com.alorma.drawer_modules.ActionsModule
 import com.alorma.drawer_modules.actions.DropdownSelectorAction
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okhttp3.logging.HttpLoggingInterceptor.Level
 
 @Composable
@@ -22,13 +18,8 @@ fun LogsModule() {
 
   val scope = rememberCoroutineScope()
   val context = LocalContext.current
-  val preferences = context.debugPreferences
-  val level: Level = runBlocking {
-    preferences.data
-      .map { it[DebugPreferenceKeys.HTTP_LOG_LEVEL] ?: Level.BASIC.ordinal }
-      .map { index -> Level.values()[index] }
-      .first()
-  }
+  val preferenceStore = context.debugPreferences
+  val level = preferenceStore.blockingGet().getEnum(HTTP_LOG_LEVEL) ?: Level.BASIC
 
   ActionsModule(
     title = "Logs",
@@ -40,9 +31,9 @@ fun LogsModule() {
       defaultValue = level
     ) { selectedLevel ->
       scope.launch {
-        preferences.edit { it[DebugPreferenceKeys.HTTP_LOG_LEVEL] = selectedLevel.ordinal }
-        val networkComponents = context.appSingletons.networkComponents as DebugNetworkComponents
-        networkComponents.httpLogger2.level = selectedLevel
+        preferenceStore.edit { preferences ->
+          preferences[HTTP_LOG_LEVEL] = selectedLevel.ordinal
+        }
       }
     }
   }

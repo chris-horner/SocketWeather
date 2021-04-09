@@ -23,6 +23,7 @@ buildscript {
                   'moshi'                   : '1.11.0',
                   'okhttp'                  : '4.10.0-RC1',
                   'retrofit'                : '2.9.0',
+                  'process_phoenix'         : '2.0.0',
                   'play_services_location'  : '18.0.0',
                   'play_publisher'          : '3.2.0-agp4.2-2',
                   'threetenbp'              : '1.5.0',

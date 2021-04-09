@@ -138,6 +138,7 @@ dependencies {
   implementation "io.github.reactivecircus.flowbinding:flowbinding-android:${versions.flowbinding}"
   implementation "io.github.reactivecircus.flowbinding:flowbinding-appcompat:${versions.flowbinding}"
   implementation "com.google.android.gms:play-services-location:${versions.play_services_location}"
+  debugImplementation "com.jakewharton:process-phoenix:${versions.process_phoenix}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-leakcanary:${versions.debugdrawer}"
   debugImplementation "au.com.gridstone.debugdrawer:debugdrawer-timber:${versions.debugdrawer}"

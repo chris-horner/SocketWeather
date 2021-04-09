@@ -5,24 +5,27 @@ import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
 import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
 import au.com.gridstone.debugdrawer.retrofit.Endpoint
 import codes.chrishorner.socketweather.debug.DebugEndpoint
-import codes.chrishorner.socketweather.debug.DebugPreferenceKeys
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENDPOINT
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_DELAY
+import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_ERROR_CODE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_ERROR_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_FAIL_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_VARIANCE
 import codes.chrishorner.socketweather.debug.debugPreferences
 import codes.chrishorner.socketweather.debug.getEnum
+import com.jakewharton.processphoenix.ProcessPhoenix
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
@@ -52,7 +55,7 @@ class DebugNetworkComponents(
   @Deprecated("Delete once migration to Compose is complete.")
   val httpLogger = HttpLogger(app, prettyPrintJson = true)
 
-  val httpLogger2 = HttpLoggingInterceptor(object : Logger {
+  private val httpLogger2 = HttpLoggingInterceptor(object : Logger {
     override fun log(message: String) {
       val formattedMessage: String = try {
         when {
@@ -68,13 +71,10 @@ class DebugNetworkComponents(
     }
   })
 
+  private val environmentChangeFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
   private val preferenceStore = app.debugPreferences
   override val api: WeatherApi
-  override val environmentChanges: Flow<Unit> = preferenceStore.data
-    .map { it[ENDPOINT] }
-    .distinctUntilChanged()
-    .drop(1)
-    .map { }
+  override val environmentChanges: Flow<Unit> = environmentChangeFlow
 
   init {
     val endpoints = listOf(
@@ -115,6 +115,9 @@ class DebugNetworkComponents(
       DebugEndpoint.PRODUCTION -> retrofit.create()
     }
 
+    // Create a never ending scope for this component. It lives for the duration of the process.
+    val scope = MainScope()
+
     preferenceStore.data
       .onEach { preferences ->
         httpLogger2.level = preferences.getEnum<Level>(HTTP_LOG_LEVEL) ?: Level.BASIC
@@ -123,10 +126,25 @@ class DebugNetworkComponents(
         networkBehavior.setFailurePercent(preferences[MOCK_HTTP_FAIL_RATE] ?: 0)
         networkBehavior.setErrorPercent(preferences[MOCK_HTTP_ERROR_RATE] ?: 0)
         networkBehavior.setErrorFactory {
-          val errorCode = preferences[DebugPreferenceKeys.MOCK_HTTP_ERROR_CODE] ?: 500
+          val errorCode = preferences[MOCK_HTTP_ERROR_CODE] ?: 500
           return@setErrorFactory Response.error<Any?>(errorCode, ByteArray(0).toResponseBody(null))
         }
       }
-      .launchIn(MainScope())
+      .launchIn(scope)
+
+    scope.launch {
+      // Await the endpoint changing.
+      preferenceStore.data
+        .map { it[ENDPOINT] }
+        .distinctUntilChanged()
+        .drop(1)
+        .first()
+
+      // Notify any listeners.
+      environmentChangeFlow.emit(Unit)
+
+      // Restart the app.
+      ProcessPhoenix.triggerRebirth(app)
+    }
   }
 }

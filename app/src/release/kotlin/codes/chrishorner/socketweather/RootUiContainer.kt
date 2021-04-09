@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
-import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 
 @Composable
 @ExperimentalAnimatedInsets

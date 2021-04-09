@@ -55,9 +55,9 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Clo
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
-import dev.chrisbanes.accompanist.insets.navigationBarsWithImePadding
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsWithImePadding
+import com.google.accompanist.insets.statusBarsPadding
 
 @Composable
 fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavController) {

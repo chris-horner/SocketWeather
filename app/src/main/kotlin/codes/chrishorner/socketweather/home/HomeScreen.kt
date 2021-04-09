@@ -56,7 +56,7 @@ import codes.chrishorner.socketweather.home.HomeState.RefreshTime.JustNow
 import codes.chrishorner.socketweather.home.HomeState.RefreshTime.TimeAgo
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
-import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.ProvideWindowInsets
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {

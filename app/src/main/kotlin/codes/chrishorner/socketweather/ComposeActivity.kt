@@ -4,7 +4,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import dev.chrisbanes.accompanist.insets.ExperimentalAnimatedInsets
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
 
 @ExperimentalAnimatedInsets
 class ComposeActivity : AppCompatActivity() {

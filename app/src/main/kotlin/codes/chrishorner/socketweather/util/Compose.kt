@@ -16,7 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import dev.chrisbanes.accompanist.insets.statusBarsPadding
+import com.google.accompanist.insets.statusBarsPadding
 
 /**
  * A wrapper around [TopAppBar] which uses [Modifier.statusBarsPadding] to shift the app bar's

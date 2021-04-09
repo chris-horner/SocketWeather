@@ -49,7 +49,7 @@ fun NavGraph(currentSelection: LocationSelection) {
   ) {
     composable(Screen.Home.routeDefinition) {
       val viewModel = createVm { context -> HomeViewModel(context.appSingletons.forecaster) }
-      HomeScreen(navController, viewModel)
+      HomeScreen(viewModel, navController)
     }
     composable(
       route = Screen.ChooseLocation.routeDefinition,
@@ -62,7 +62,7 @@ fun NavGraph(currentSelection: LocationSelection) {
           locationSelectionStore = context.appSingletons.locationSelectionStore
         )
       }
-      ChooseLocationScreen(navController, viewModel)
+      ChooseLocationScreen(viewModel, navController)
     }
   }
 }

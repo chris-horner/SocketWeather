@@ -59,7 +59,7 @@ import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import dev.chrisbanes.accompanist.insets.ProvideWindowInsets
 
 @Composable
-fun HomeScreen(navController: NavController, viewModel: HomeViewModel) {
+fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
   val state: HomeState by viewModel.states2.collectAsState()
   HomeUi(state) { event ->
     when (event) {

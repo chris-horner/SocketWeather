@@ -60,7 +60,7 @@ import dev.chrisbanes.accompanist.insets.navigationBarsWithImePadding
 import dev.chrisbanes.accompanist.insets.statusBarsPadding
 
 @Composable
-fun ChooseLocationScreen(navController: NavController, viewModel: ChooseLocationViewModel) {
+fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavController) {
   val state: ChooseLocationState by viewModel.states.collectAsState()
 
   if (state.loadingStatus == Submitted) navController.navigate(Screen.Home.getRoute()) {

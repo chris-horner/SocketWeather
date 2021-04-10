@@ -78,9 +78,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 
   Surface(
     color = MaterialTheme.colors.background,
-    modifier = Modifier
-      .statusBarsPadding()
-      .navigationBarsWithImePadding()
+    modifier = Modifier.statusBarsPadding()
   ) {
     Column {
       if (state.showCloseButton) {
@@ -115,7 +113,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
           .fillMaxWidth()
       )
       Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
-        when (loadingStatus) {
+        when (state.loadingStatus) {
           Searching -> SearchLoading()
           Submitting -> SubmittingLocationChoice()
           SearchingError -> SearchError()
@@ -125,6 +123,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
           }
         }
       }
+      Spacer(modifier = Modifier.navigationBarsWithImePadding())
     }
   }
 }

@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -28,6 +30,7 @@ import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
+import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -99,21 +102,40 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
         Text(
           text = stringResource(R.string.chooseLocation_title),
           style = MaterialTheme.typography.h4,
-          modifier = Modifier.padding(horizontal = 32.dp)
+          modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
         )
+      }
+      AnimatedVisibility(visible = currentlyIdle) {
+        Button(
+          modifier = Modifier
+            .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
+            .fillMaxWidth()
+            .height(48.dp),
+          onClick = { /*TODO*/ }
+        ) {
+          Icon(Icons.Rounded.MyLocation, contentDescription = null)
+          Spacer(Modifier.size(12.dp))
+          Text(stringResource(R.string.chooseLocation_myLocationButton), modifier = Modifier.fillMaxWidth())
+        }
       }
       OutlinedTextField(
         value = state.query,
         label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
         onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
-        leadingIcon = { Icon(Icons.Rounded.Search, contentDescription = null) },
+        leadingIcon = {
+          Icon(
+            Icons.Rounded.Search,
+            contentDescription = null,
+            modifier = Modifier.padding(start = 2.dp)
+          )
+        },
         singleLine = true,
         modifier = Modifier
           .padding(horizontal = 32.dp)
           .fillMaxWidth()
       )
       Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
-        when (state.loadingStatus) {
+        when (loadingStatus) {
           Searching -> SearchLoading()
           Submitting -> SubmittingLocationChoice()
           SearchingError -> SearchError()

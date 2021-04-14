@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.choose_location
 
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -38,6 +39,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -54,7 +56,9 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Loadi
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitted
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ClearInput
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
@@ -77,7 +81,12 @@ fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavC
 @Composable
 fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLocationUiEvent) -> Unit) {
 
+  val focusManager = LocalFocusManager.current
   val currentlyIdle = state.loadingStatus == Idle
+  BackHandler(enabled = !currentlyIdle) {
+    focusManager.clearFocus()
+    eventHandler(ClearInput)
+  }
 
   Surface(
     color = MaterialTheme.colors.background,
@@ -105,13 +114,13 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
           modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
         )
       }
-      AnimatedVisibility(visible = currentlyIdle) {
+      AnimatedVisibility(visible = currentlyIdle && state.showFollowMe) {
         Button(
           modifier = Modifier
             .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
             .fillMaxWidth()
             .height(48.dp),
-          onClick = { /*TODO*/ }
+          onClick = { eventHandler(FollowMeClicked) }
         ) {
           Icon(Icons.Rounded.MyLocation, contentDescription = null)
           Spacer(Modifier.size(12.dp))

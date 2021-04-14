@@ -11,6 +11,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Loadi
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitted
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ClearInput
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
@@ -69,6 +70,7 @@ class ChooseLocationViewModel(
     when (uiEvent) {
       is InputSearch -> searchQueryFlow.value = uiEvent.query
       is ResultSelected -> selectResult(uiEvent.result)
+      ClearInput -> searchQueryFlow.value = ""
       FollowMeClicked -> TODO()
       CloseClicked -> TODO()
     }

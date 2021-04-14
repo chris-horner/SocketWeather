@@ -20,6 +20,7 @@ enum class ChooseLocationDataEvent {
 sealed class ChooseLocationUiEvent {
   data class ResultSelected(val result: SearchResult) : ChooseLocationUiEvent()
   data class InputSearch(val query: String) : ChooseLocationUiEvent()
+  object ClearInput : ChooseLocationUiEvent()
   object FollowMeClicked : ChooseLocationUiEvent()
   object CloseClicked : ChooseLocationUiEvent()
 }

@@ -20,6 +20,7 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -38,21 +39,23 @@ import timber.log.Timber
 class ChooseLocationViewModel(
   showCloseButton: Boolean,
   private val api: WeatherApi,
-  private val locationSelectionStore: LocationSelectionStore
+  private val locationSelectionStore: LocationSelectionStore,
+  overrideScope: CoroutineScope? = null
 ) : ViewModel() {
 
+  private val scope = overrideScope ?: viewModelScope
   private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationSelectionStore.hasFollowMeSaved)
-  private val statesFlow = MutableStateFlow(idleState)
+  private val stateFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
   private val eventsFlow = MutableSharedFlow<ChooseLocationDataEvent>(extraBufferCapacity = 1)
 
-  val states: StateFlow<ChooseLocationState> = statesFlow
+  val states: StateFlow<ChooseLocationState> = stateFlow
   val events: Flow<ChooseLocationDataEvent> = eventsFlow
 
   init {
     searchQueryFlow
       .map { query ->
-        idleState.copy(query = query, loadingStatus = if (query.isBlank()) Idle else Searching)
+        stateFlow.value.copy(query = query, loadingStatus = if (query.isBlank()) Idle else Searching)
       }
       .transformLatest { state ->
         emit(state)
@@ -62,46 +65,48 @@ class ChooseLocationViewModel(
         }
       }
       .distinctUntilChanged()
-      .onEach { statesFlow.value = it }
-      .launchIn(viewModelScope)
+      .onEach { stateFlow.value = it }
+      .launchIn(scope)
   }
 
-  fun handle(uiEvent: ChooseLocationUiEvent) {
-    when (uiEvent) {
-      is InputSearch -> searchQueryFlow.value = uiEvent.query
-      is ResultSelected -> selectResult(uiEvent.result)
-      ClearInput -> searchQueryFlow.value = ""
-      FollowMeClicked -> TODO()
-      CloseClicked -> TODO()
-    }
+  fun handle(uiEvent: ChooseLocationUiEvent) = when (uiEvent) {
+    is InputSearch -> searchQueryFlow.value = uiEvent.query
+    is ResultSelected -> selectResult(uiEvent.result)
+    ClearInput -> searchQueryFlow.value = ""
+    FollowMeClicked -> TODO()
+    CloseClicked -> TODO()
   }
 
+  // TODO: Remove once compose migration is complete.
   fun observeEvents(): Flow<ChooseLocationDataEvent> = events
 
+  // TODO: Remove once compose migration is complete.
   fun inputSearchQuery(query: String) {
     searchQueryFlow.value = query
   }
 
+  // TODO: Make private once compose migration is complete.
   fun selectResult(result: SearchResult) {
-    viewModelScope.launch {
-      statesFlow.value = statesFlow.value.copy(loadingStatus = Submitting)
+    scope.launch {
+      stateFlow.value = stateFlow.value.copy(loadingStatus = Submitting)
 
       try {
         val location = api.getLocation(result.geohash)
         locationSelectionStore.saveAndSelect(LocationSelection.Static(location))
         eventsFlow.emit(SubmissionSuccess)
-        statesFlow.value = statesFlow.value.copy(loadingStatus = Submitted)
+        stateFlow.value = stateFlow.value.copy(loadingStatus = Submitted)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
         eventsFlow.emit(SubmissionError)
-        statesFlow.value = statesFlow.value.copy(loadingStatus = SearchingError)
+        stateFlow.value = stateFlow.value.copy(loadingStatus = SearchingError)
       }
     }
   }
 
+  // TODO: Make private once compose migration is complete.
   fun selectFollowMe(locationPermissionGranted: Boolean) {
     if (locationPermissionGranted) {
-      viewModelScope.launch {
+      scope.launch {
         locationSelectionStore.saveAndSelect(LocationSelection.FollowMe)
         eventsFlow.emit(SubmissionSuccess)
       }
@@ -113,10 +118,10 @@ class ChooseLocationViewModel(
   private suspend fun search(query: String): ChooseLocationState {
     return try {
       val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
-      statesFlow.value.copy(results = results, loadingStatus = SearchingDone)
+      stateFlow.value.copy(results = results, loadingStatus = SearchingDone)
     } catch (e: Exception) {
       Timber.e(e, "Search failed with query %s", query)
-      statesFlow.value.copy(loadingStatus = SearchingError)
+      stateFlow.value.copy(loadingStatus = SearchingError)
     }
   }
 

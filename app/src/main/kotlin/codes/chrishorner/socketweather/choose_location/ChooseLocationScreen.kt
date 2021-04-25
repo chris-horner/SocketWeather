@@ -84,7 +84,10 @@ fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavC
     popUpTo(Screen.ChooseLocation.routeDefinition) { inclusive = true }
   }
 
-  ChooseLocationUi(state) { event -> viewModel.handle(event) }
+  ChooseLocationUi(state) { event ->
+    viewModel.handle(event)
+    if (event == CloseClicked) navController.popBackStack()
+  }
 }
 
 @Composable

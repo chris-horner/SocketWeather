@@ -75,7 +75,7 @@ class ChooseLocationViewModel(
     is ResultSelected -> selectResult(uiEvent.result)
     ClearInput -> searchQueryFlow.value = ""
     is FollowMeClicked -> selectFollowMe(uiEvent.hasLocationPermission)
-    CloseClicked -> TODO()
+    CloseClicked -> { /* Not handled by ViewModel. */ }
   }
 
   // TODO: Remove once compose migration is complete.
@@ -99,7 +99,9 @@ class ChooseLocationViewModel(
         eventsFlow.emit(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
-        stateFlow.value = stateFlow.value.copy(loadingStatus = Searching, error = Error.Submission)
+        stateFlow.value = stateFlow.value.copy(loadingStatus = SearchingDone, error = Error.Submission)
+        delay(1_500L)
+        stateFlow.value = stateFlow.value.copy(error = null)
         // TODO: Remove once compose migration is complete.
         eventsFlow.emit(SubmissionError)
       }

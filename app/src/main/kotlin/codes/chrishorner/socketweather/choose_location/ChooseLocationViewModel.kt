@@ -73,7 +73,7 @@ class ChooseLocationViewModel(
     is InputSearch -> searchQueryFlow.value = uiEvent.query
     is ResultSelected -> selectResult(uiEvent.result)
     ClearInput -> searchQueryFlow.value = ""
-    FollowMeClicked -> TODO()
+    is FollowMeClicked -> TODO()
     CloseClicked -> TODO()
   }
 

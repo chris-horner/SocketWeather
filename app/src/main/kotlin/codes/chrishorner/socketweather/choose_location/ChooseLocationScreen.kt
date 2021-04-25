@@ -1,7 +1,9 @@
 package codes.chrishorner.socketweather.choose_location
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateContentSize
@@ -58,10 +60,10 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Loadi
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ClearInput
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
-import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.util.permissionState
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
@@ -83,6 +85,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 
   val focusManager = LocalFocusManager.current
   val currentlyIdle = state.loadingStatus == Idle
+
   BackHandler(enabled = !currentlyIdle) {
     focusManager.clearFocus()
     eventHandler(ClearInput)
@@ -115,16 +118,8 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
         )
       }
       AnimatedVisibility(visible = currentlyIdle && state.showFollowMe) {
-        Button(
-          modifier = Modifier
-            .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
-            .fillMaxWidth()
-            .height(48.dp),
-          onClick = { eventHandler(FollowMeClicked) }
-        ) {
-          Icon(Icons.Rounded.MyLocation, contentDescription = null)
-          Spacer(Modifier.size(12.dp))
-          Text(stringResource(R.string.chooseLocation_myLocationButton), modifier = Modifier.fillMaxWidth())
+        FollowMeButton { hasLocationPermission ->
+          eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
         }
       }
       OutlinedTextField(
@@ -239,6 +234,32 @@ private fun SubmittingLocationChoice() {
         .align(Alignment.CenterHorizontally)
         .padding(top = 16.dp)
     )
+  }
+}
+
+@Composable
+private fun FollowMeButton(onClick: (hasLocationPermission: Boolean) -> Unit) {
+  val activityResultRegistry = LocalActivityResultRegistryOwner.current?.activityResultRegistry
+  val locationPermissionState = activityResultRegistry?.permissionState(ACCESS_COARSE_LOCATION) { granted ->
+    onClick(granted)
+  }
+
+  Button(
+    modifier = Modifier
+      .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
+      .fillMaxWidth()
+      .height(48.dp),
+    onClick = {
+      if (locationPermissionState?.hasPermission == true) {
+        onClick(true)
+      } else {
+        locationPermissionState?.launchPermissionRequest()
+      }
+    }
+  ) {
+    Icon(Icons.Rounded.MyLocation, contentDescription = null)
+    Spacer(Modifier.size(12.dp))
+    Text(stringResource(R.string.chooseLocation_myLocationButton), modifier = Modifier.fillMaxWidth())
   }
 }
 

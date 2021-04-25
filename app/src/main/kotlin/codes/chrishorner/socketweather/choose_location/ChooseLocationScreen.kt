@@ -172,24 +172,6 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 }
 
 @Composable
-private fun ErrorMessagesSnackbar2(
-  error: ChooseLocationState.Error?,
-  modifier: Modifier = Modifier,
-) {
-  val message = when (error) {
-    Permission -> stringResource(R.string.chooseLocation_permissionError)
-    Submission -> stringResource(R.string.chooseLocation_submissionError)
-    else -> ""
-  }
-
-  AnimatedVisibility(visible = error != null, modifier = modifier) {
-    Snackbar {
-      Text(text = message)
-    }
-  }
-}
-
-@Composable
 private fun ErrorMessagesSnackbar(
   error: ChooseLocationState.Error?,
   modifier: Modifier = Modifier,

@@ -24,7 +24,7 @@ private fun <I, O> ActivityResultRegistry.activityResultLauncher(
     register(key, requestContract, onResult)
   }
 
-  DisposableEffect(launcher) {
+  DisposableEffect(Unit) {
     onDispose { launcher.unregister() }
   }
 

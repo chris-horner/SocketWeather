@@ -29,6 +29,9 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Snackbar
+import androidx.compose.material.SnackbarHost
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -37,8 +40,10 @@ import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -52,6 +57,8 @@ import androidx.navigation.compose.navigate
 import androidx.navigation.compose.popUpTo
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Permission
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
@@ -95,62 +102,112 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
     color = MaterialTheme.colors.background,
     modifier = Modifier.statusBarsPadding()
   ) {
-    Column {
-      if (state.showCloseButton) {
-        AnimatedVisibility(visible = currentlyIdle) {
-          IconButton(onClick = { eventHandler(CloseClicked) }) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-              Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.chooseLocation_closeDesc))
+    Box {
+      Column {
+        if (state.showCloseButton) {
+          AnimatedVisibility(visible = currentlyIdle) {
+            IconButton(onClick = { eventHandler(CloseClicked) }) {
+              CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.chooseLocation_closeDesc))
+              }
             }
           }
         }
-      }
-      Spacer(
-        modifier = Modifier
-          .animateContentSize()
-          .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
-      )
-      AnimatedVisibility(visible = currentlyIdle) {
-        Text(
-          text = stringResource(R.string.chooseLocation_title),
-          style = MaterialTheme.typography.h4,
-          modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
+        Spacer(
+          modifier = Modifier
+            .animateContentSize()
+            .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
         )
-      }
-      AnimatedVisibility(visible = currentlyIdle && state.showFollowMe) {
-        FollowMeButton { hasLocationPermission ->
-          eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
-        }
-      }
-      OutlinedTextField(
-        value = state.query,
-        label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
-        onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
-        leadingIcon = {
-          Icon(
-            Icons.Rounded.Search,
-            contentDescription = null,
-            modifier = Modifier.padding(start = 2.dp)
+        AnimatedVisibility(visible = currentlyIdle) {
+          Text(
+            text = stringResource(R.string.chooseLocation_title),
+            style = MaterialTheme.typography.h4,
+            modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
           )
-        },
-        singleLine = true,
-        modifier = Modifier
-          .padding(horizontal = 32.dp)
-          .fillMaxWidth()
-      )
-      Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
-        when (loadingStatus) {
-          Searching -> SearchLoading()
-          Submitting -> SubmittingLocationChoice()
-          SearchingError -> SearchError()
-          SearchingDone -> SearchResults(state.results) { eventHandler(ResultSelected(it)) }
-          else -> {
-            // Don't display anything when Idle or Submitted.
+        }
+        AnimatedVisibility(visible = currentlyIdle && state.showFollowMe) {
+          FollowMeButton { hasLocationPermission ->
+            eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
           }
         }
+        OutlinedTextField(
+          value = state.query,
+          label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
+          onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
+          leadingIcon = {
+            Icon(
+              Icons.Rounded.Search,
+              contentDescription = null,
+              modifier = Modifier.padding(start = 2.dp)
+            )
+          },
+          singleLine = true,
+          modifier = Modifier
+            .padding(horizontal = 32.dp)
+            .fillMaxWidth()
+        )
+        Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
+          when (loadingStatus) {
+            Searching -> SearchLoading()
+            Submitting -> SubmittingLocationChoice()
+            SearchingError -> SearchError()
+            SearchingDone -> SearchResults(state.results) { eventHandler(ResultSelected(it)) }
+            else -> {
+              // Don't display anything when Idle or Submitted.
+            }
+          }
+        }
+        Spacer(modifier = Modifier.navigationBarsWithImePadding())
       }
-      Spacer(modifier = Modifier.navigationBarsWithImePadding())
+
+      ErrorMessagesSnackbar(
+        error = state.error,
+        modifier = Modifier
+          .align(Alignment.BottomStart)
+          .navigationBarsWithImePadding()
+          .padding(16.dp)
+      )
     }
+  }
+}
+
+@Composable
+private fun ErrorMessagesSnackbar2(
+  error: ChooseLocationState.Error?,
+  modifier: Modifier = Modifier,
+) {
+  val message = when (error) {
+    Permission -> stringResource(R.string.chooseLocation_permissionError)
+    Submission -> stringResource(R.string.chooseLocation_submissionError)
+    else -> ""
+  }
+
+  AnimatedVisibility(visible = error != null, modifier = modifier) {
+    Snackbar {
+      Text(text = message)
+    }
+  }
+}
+
+@Composable
+private fun ErrorMessagesSnackbar(
+  error: ChooseLocationState.Error?,
+  modifier: Modifier = Modifier,
+) {
+  val hostState = remember { SnackbarHostState() }
+
+  val message = when (error) {
+    Permission -> stringResource(R.string.chooseLocation_permissionError)
+    Submission -> stringResource(R.string.chooseLocation_submissionError)
+    else -> null
+  }
+
+  if (message != null) {
+    LaunchedEffect(message) { hostState.showSnackbar(message) }
+  }
+
+  SnackbarHost(hostState = hostState, modifier = modifier) {
+    Snackbar { Text(it.message) }
   }
 }
 

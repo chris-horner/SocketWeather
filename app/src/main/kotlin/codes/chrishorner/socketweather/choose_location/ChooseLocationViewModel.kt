@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionSuccess
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
@@ -73,7 +74,7 @@ class ChooseLocationViewModel(
     is InputSearch -> searchQueryFlow.value = uiEvent.query
     is ResultSelected -> selectResult(uiEvent.result)
     ClearInput -> searchQueryFlow.value = ""
-    is FollowMeClicked -> TODO()
+    is FollowMeClicked -> selectFollowMe(uiEvent.hasLocationPermission)
     CloseClicked -> TODO()
   }
 
@@ -93,25 +94,32 @@ class ChooseLocationViewModel(
       try {
         val location = api.getLocation(result.geohash)
         locationSelectionStore.saveAndSelect(LocationSelection.Static(location))
-        eventsFlow.emit(SubmissionSuccess)
         stateFlow.value = stateFlow.value.copy(loadingStatus = Submitted)
+        // TODO: Remove once compose migration is complete.
+        eventsFlow.emit(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
+        stateFlow.value = stateFlow.value.copy(loadingStatus = Searching, error = Error.Submission)
+        // TODO: Remove once compose migration is complete.
         eventsFlow.emit(SubmissionError)
-        stateFlow.value = stateFlow.value.copy(loadingStatus = SearchingError)
       }
     }
   }
 
   // TODO: Make private once compose migration is complete.
   fun selectFollowMe(locationPermissionGranted: Boolean) {
-    if (locationPermissionGranted) {
-      scope.launch {
+    scope.launch {
+      if (locationPermissionGranted) {
         locationSelectionStore.saveAndSelect(LocationSelection.FollowMe)
+        // TODO: Remove once compose migration is complete.
         eventsFlow.emit(SubmissionSuccess)
+      } else {
+        stateFlow.value = stateFlow.value.copy(error = Error.Permission)
+        delay(1_500L)
+        stateFlow.value = stateFlow.value.copy(error = null)
+        // TODO: Remove once compose migration is complete.
+        eventsFlow.emit(PermissionError)
       }
-    } else {
-      eventsFlow.tryEmit(PermissionError)
     }
   }
 

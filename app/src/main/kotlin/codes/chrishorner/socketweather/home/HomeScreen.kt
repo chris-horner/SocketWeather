@@ -2,6 +2,8 @@ package codes.chrishorner.socketweather.home
 
 import android.content.res.Configuration
 import android.text.format.DateUtils
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -10,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.DropdownMenu
@@ -74,17 +77,22 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
 
 @Composable
 private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
+
+  val scrollState = rememberScrollState()
+  val toolbarElevation by animateDpAsState(targetValue = if (scrollState.value > 0) 4.dp else 0.dp)
+
   Surface(color = MaterialTheme.colors.background) {
     Scaffold(
       topBar = {
         InsetAwareTopAppBar(
           title = { LocationDropdown(state) },
           backgroundColor = MaterialTheme.colors.background,
+          elevation = toolbarElevation,
           actions = { Menu(eventHandler) }
         )
       }
     ) {
-      Content(state.forecasterState)
+      Content(state.forecasterState, scrollState)
     }
   }
 }
@@ -139,11 +147,11 @@ private fun LocationDropdown(state: HomeState) {
 }
 
 @Composable
-private fun Content(state: Forecaster.State) {
+private fun Content(state: Forecaster.State, scrollState: ScrollState) {
   when (state) {
     is Forecaster.State.Error -> Error(state.type)
-    is Forecaster.State.Refreshing -> ForecastUi(state.previousForecast)
-    is Forecaster.State.Loaded -> ForecastUi(state.forecast)
+    is Forecaster.State.Refreshing -> ForecastUi(state.previousForecast, scrollState)
+    is Forecaster.State.Loaded -> ForecastUi(state.forecast, scrollState)
     else -> Loading()
   }
 }

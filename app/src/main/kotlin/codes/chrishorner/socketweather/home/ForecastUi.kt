@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.home
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,7 +13,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
@@ -36,7 +36,7 @@ import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.util.ThickDivider
 
 @Composable
-fun ForecastUi(forecast: Forecast) {
+fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
 
   val testConditions = FormattedConditions(
     iconDescriptor = "hazy",
@@ -48,7 +48,7 @@ fun ForecastUi(forecast: Forecast) {
     description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
   )
 
-  Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
+  Column(modifier = Modifier.verticalScroll(scrollState)) {
     Observations(testConditions)
 
     Text(

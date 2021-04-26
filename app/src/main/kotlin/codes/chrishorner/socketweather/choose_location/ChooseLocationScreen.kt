@@ -72,6 +72,7 @@ import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.permissionState
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
 
@@ -103,7 +104,9 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 
   Surface(
     color = MaterialTheme.colors.background,
-    modifier = Modifier.statusBarsPadding()
+    modifier = Modifier
+      .statusBarsPadding()
+      .navigationBarsPadding(left = true, right = true, bottom = false)
   ) {
     Box {
       Column {

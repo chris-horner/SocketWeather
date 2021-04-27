@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.statusBarsPadding
 
 /**
@@ -46,7 +47,9 @@ fun InsetAwareTopAppBar(
       backgroundColor = Color.Transparent,
       contentColor = contentColor,
       elevation = 0.dp,
-      modifier = Modifier.statusBarsPadding()
+      modifier = Modifier
+        .statusBarsPadding()
+        .navigationBarsPadding(left = true, right = true, bottom = false)
     )
   }
 }

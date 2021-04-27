@@ -34,6 +34,7 @@ import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.util.ThickDivider
+import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
 fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
@@ -48,7 +49,7 @@ fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
     description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
   )
 
-  Column(modifier = Modifier.verticalScroll(scrollState)) {
+  Column(modifier = Modifier.verticalScroll(scrollState).navigationBarsWithImePadding()) {
     Observations(testConditions)
 
     Text(

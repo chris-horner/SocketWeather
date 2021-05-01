@@ -2,7 +2,6 @@ package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.test
 import codes.chrishorner.socketweather.data.Forecaster.State.Error
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import codes.chrishorner.socketweather.data.Forecaster.State.FindingLocation
 import codes.chrishorner.socketweather.data.Forecaster.State.Loaded
 import codes.chrishorner.socketweather.data.Forecaster.State.LoadingForecast
@@ -118,7 +117,7 @@ class ForecasterTest {
 
     forecaster.states.test {
       // Our first state should be failure.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ErrorType.LOCATION)
+      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.LOCATION)
 
       // Next, reconfigure location updates to succeed and request a refresh.
       failDeviceLocation = false
@@ -143,7 +142,7 @@ class ForecasterTest {
 
     forecaster.states.test {
       // With network requests failing, our initial state should be `Error` with type `NETWORK`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ErrorType.NETWORK)
+      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.NETWORK)
 
       // Next, reconfigure network requests to succeed and request a refresh.
       testApi.responseMode = ResponseMode.SUCCESS
@@ -165,7 +164,7 @@ class ForecasterTest {
 
     forecaster.states.test {
       // The state emitted should be `Error` with type `NOT_AUSTRALIA`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ErrorType.NOT_AUSTRALIA)
+      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.NOT_AUSTRALIA)
     }
   }
 
@@ -181,7 +180,7 @@ class ForecasterTest {
 
     forecaster.states.test {
       // With network requests failing, our initial state should be `Error` with type `DATA`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ErrorType.DATA)
+      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.DATA)
 
       // Next, reconfigure network requests to succeed and request a refresh.
       testApi.responseMode = ResponseMode.SUCCESS

@@ -1,7 +1,6 @@
 package codes.chrishorner.socketweather.data
 
 import codes.chrishorner.socketweather.data.Forecaster.State
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
 import codes.chrishorner.socketweather.data.Forecaster.State.Idle
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.CoroutineScope
@@ -37,9 +36,7 @@ class Forecaster(
     data class LoadingForecast(override val selection: LocationSelection, val location: Location) : State(selection)
     data class Loaded(override val selection: LocationSelection, val forecast: Forecast) : State(selection)
     data class Refreshing(override val selection: LocationSelection, val previousForecast: Forecast) : State(selection)
-    data class Error(override val selection: LocationSelection, val type: ErrorType) : State(selection)
-
-    enum class ErrorType { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
+    data class Error(override val selection: LocationSelection, val type: ForecastError) : State(selection)
   }
 
   private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
@@ -95,17 +92,17 @@ private fun createFlowOfStates(
 
       is LocationResolution.DeviceLocationError -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ErrorType.LOCATION))
+        emit(State.Error(locationState.selection, type = ForecastError.LOCATION))
       }
 
       is LocationResolution.NetworkError -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ErrorType.NETWORK))
+        emit(State.Error(locationState.selection, type = ForecastError.NETWORK))
       }
 
       is LocationResolution.NotInAustralia -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ErrorType.NOT_AUSTRALIA))
+        emit(State.Error(locationState.selection, type = ForecastError.NOT_AUSTRALIA))
       }
 
       is LocationResolution.Resolved -> {
@@ -121,10 +118,10 @@ private fun createFlowOfStates(
           emit(State.Loaded(locationState.selection, forecast))
         } catch (e: JsonDataException) {
           Timber.e(e, "API returned unexpected data.")
-          emit(State.Error(locationState.selection, ErrorType.DATA))
+          emit(State.Error(locationState.selection, ForecastError.DATA))
         } catch (e: Exception) {
           Timber.e(e, "Failed to load forecast.")
-          emit(State.Error(locationState.selection, ErrorType.NETWORK))
+          emit(State.Error(locationState.selection, ForecastError.NETWORK))
         }
       }
     }

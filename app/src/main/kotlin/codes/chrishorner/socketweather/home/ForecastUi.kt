@@ -30,14 +30,13 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
-import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.util.ThickDivider
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
-fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
+fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
 
   val testConditions = FormattedConditions(
     iconDescriptor = "hazy",
@@ -52,11 +51,13 @@ fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
   Column(modifier = Modifier.verticalScroll(scrollState).navigationBarsWithImePadding()) {
     Observations(testConditions)
 
-    Text(
-      text = testConditions.description,
-      style = MaterialTheme.typography.body1,
-      modifier = Modifier.padding(horizontal = 16.dp)
-    )
+    if (testConditions.description != null) {
+      Text(
+        text = testConditions.description,
+        style = MaterialTheme.typography.body1,
+        modifier = Modifier.padding(horizontal = 16.dp)
+      )
+    }
 
     ThickDivider(
       modifier = Modifier
@@ -94,16 +95,6 @@ fun ForecastUi(forecast: Forecast, scrollState: ScrollState) {
     )
   }
 }
-
-data class FormattedConditions(
-  val iconDescriptor: String,
-  val isNight: Boolean,
-  val currentTemperature: String,
-  val highTemperature: String,
-  val lowTemperature: String,
-  val feelsLikeTemperature: String,
-  val description: String,
-)
 
 @Composable
 private fun Observations(conditions: FormattedConditions) {

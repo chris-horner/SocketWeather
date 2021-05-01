@@ -1,7 +1,6 @@
 package codes.chrishorner.socketweather.home
 
 import android.content.res.Configuration
-import android.text.format.DateUtils
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
@@ -46,24 +45,20 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.navigate
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
-import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType
-import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.home.HomeEvent.ChooseLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
-import codes.chrishorner.socketweather.home.HomeState.RefreshTime
-import codes.chrishorner.socketweather.home.HomeState.RefreshTime.Failed
-import codes.chrishorner.socketweather.home.HomeState.RefreshTime.InProgress
-import codes.chrishorner.socketweather.home.HomeState.RefreshTime.JustNow
-import codes.chrishorner.socketweather.home.HomeState.RefreshTime.TimeAgo
+import codes.chrishorner.socketweather.home.HomeState2.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import com.google.accompanist.insets.ProvideWindowInsets
+import codes.chrishorner.socketweather.home.HomeState2 as HomeState
+import codes.chrishorner.socketweather.home.HomeViewModel2 as HomeViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
-  val state: HomeState by viewModel.states2.collectAsState()
+  val state: HomeState by viewModel.states.collectAsState()
   HomeUi(state) { event ->
     when (event) {
       Refresh -> viewModel.forceRefresh()
@@ -92,7 +87,7 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
         )
       }
     ) {
-      Content(state.forecasterState, scrollState)
+      Content(state.content, scrollState)
     }
   }
 }
@@ -133,8 +128,8 @@ private fun LocationDropdown(state: HomeState) {
       .clickable { }
   ) {
     Column {
-      Text(getToolbarTitle(state.forecasterState), style = MaterialTheme.typography.h5)
-      state.refreshTime.asText()?.let { Text(it, style = MaterialTheme.typography.caption) }
+      Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
+      state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
     }
     Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
   }
@@ -147,11 +142,11 @@ private fun LocationDropdown(state: HomeState) {
 }
 
 @Composable
-private fun Content(state: Forecaster.State, scrollState: ScrollState) {
+private fun Content(state: Content, scrollState: ScrollState) {
   when (state) {
-    is Forecaster.State.Error -> Error(state.type)
-    is Forecaster.State.Refreshing -> ForecastUi(state.previousForecast, scrollState)
-    is Forecaster.State.Loaded -> ForecastUi(state.forecast, scrollState)
+    is Content.Error -> Error(state.type)
+    is Content.Refreshing -> ForecastUi(state.conditions, scrollState)
+    is Content.Loaded -> ForecastUi(state.conditions, scrollState)
     else -> Loading()
   }
 }
@@ -169,28 +164,28 @@ private fun Loading() {
 }
 
 @Composable
-private fun Error(type: ErrorType) {
+private fun Error(type: ForecastError) {
   val title: String
   val message: String
   val image: Painter
 
   when (type) {
-    ErrorType.DATA -> {
+    ForecastError.DATA -> {
       title = stringResource(R.string.home_error_data_title)
       message = stringResource(R.string.home_error_data_message)
       image = painterResource(R.drawable.gfx_data_error)
     }
-    ErrorType.NETWORK -> {
+    ForecastError.NETWORK -> {
       title = stringResource(R.string.home_error_network_title)
       message = stringResource(R.string.home_error_network_message)
       image = painterResource(R.drawable.gfx_network_error)
     }
-    ErrorType.LOCATION -> {
+    ForecastError.LOCATION -> {
       title = stringResource(R.string.home_error_location_title)
       message = stringResource(R.string.home_error_location_message)
       image = painterResource(R.drawable.gfx_location_error)
     }
-    ErrorType.NOT_AUSTRALIA -> {
+    ForecastError.NOT_AUSTRALIA -> {
       title = stringResource(R.string.home_error_unknownLocation_title)
       message = stringResource(R.string.home_error_unknownLocation_message)
       image = painterResource(R.drawable.gfx_unknown_location)
@@ -218,36 +213,10 @@ private fun Error(type: ErrorType) {
   }
 }
 
-@Composable
-private fun getToolbarTitle(state: Forecaster.State): String = when (state) {
-  is Forecaster.State.FindingLocation -> stringResource(R.string.home_findingLocation)
-  is Forecaster.State.Refreshing -> state.previousForecast.location.name
-  is Forecaster.State.Loaded -> state.forecast.location.name
-  is Forecaster.State.Error -> {
-    when (val selection = state.selection) {
-      is LocationSelection.Static -> selection.location.name
-      is LocationSelection.FollowMe -> stringResource(R.string.home_findingLocation)
-      is LocationSelection.None -> throw IllegalStateException("Cannot display LocationSelection of None.")
-    }
-  }
-  else -> stringResource(R.string.home_loading)
-}
-
-@Composable
-private fun RefreshTime.asText(): String? = when (this) {
-  InProgress -> stringResource(R.string.home_updatingNow)
-  JustNow -> stringResource(R.string.home_justUpdated)
-  Failed -> null
-  is TimeAgo -> {
-    val timeAgoText = DateUtils.getRelativeTimeSpanString(time.toEpochMilli()).toString()
-    stringResource(R.string.home_lastUpdated, timeAgoText)
-  }
-}
-
 @Preview(device = Devices.NEXUS_5, showBackground = true)
 @Composable
 private fun ErrorPreview() {
-  Error(ErrorType.NOT_AUSTRALIA)
+  Error(ForecastError.NOT_AUSTRALIA)
 }
 
 @Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, device = Devices.NEXUS_5)
@@ -255,7 +224,13 @@ private fun ErrorPreview() {
 private fun HomePreview() {
   SocketWeatherTheme {
     ProvideWindowInsets {
-      HomeUi(HomeState(RefreshTime.InProgress, Forecaster.State.Idle)) { /* Don't handle events in preview. */ }
+      HomeUi(
+        HomeState(
+          "Melbourne",
+          "Just now",
+          Content.Loading
+        )
+      ) { /* Don't handle events in preview. */ }
     }
   }
 }

@@ -7,10 +7,10 @@ import android.widget.TextView
 import androidx.core.view.isVisible
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType.DATA
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType.LOCATION
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType.NETWORK
-import codes.chrishorner.socketweather.data.Forecaster.State.ErrorType.NOT_AUSTRALIA
+import codes.chrishorner.socketweather.data.ForecastError.DATA
+import codes.chrishorner.socketweather.data.ForecastError.LOCATION
+import codes.chrishorner.socketweather.data.ForecastError.NETWORK
+import codes.chrishorner.socketweather.data.ForecastError.NOT_AUSTRALIA
 
 class HomeErrorPresenter(view: View) {
 

@@ -40,4 +40,23 @@ data class FormattedConditions(
   val lowTemperature: String,
   val feelsLikeTemperature: String,
   val description: String?,
+  val graphItems: List<TimeForecastGraphItem>,
+  val upcomingForecasts: List<UpcomingForecast>,
+)
+
+data class TimeForecastGraphItem(
+  val temperatureC: Int,
+  val formattedTemperature: String,
+  val time: String,
+  val rainChancePercent: Int,
+  val formattedRainChance: String
+)
+
+data class UpcomingForecast(
+  val day: String,
+  val percentChanceOfRain: Int,
+  val formattedChanceOfRain: String,
+  val iconDescriptor: String,
+  val lowTemperature: String,
+  val highTemperature: String,
 )

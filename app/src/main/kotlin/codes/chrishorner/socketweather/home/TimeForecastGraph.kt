@@ -40,14 +40,6 @@ import kotlin.math.sqrt
  */
 private const val MIN_RANGE_OF_DEGREES = 8
 
-data class TimeForecastGraphItem(
-  val temperatureC: Int,
-  val formattedTemperature: String,
-  val time: String,
-  val rainChancePercent: Int,
-  val formattedRainChance: String
-)
-
 private data class TemperatureScale(val min: Int, val max: Int) {
   val range = abs(min - max)
 }

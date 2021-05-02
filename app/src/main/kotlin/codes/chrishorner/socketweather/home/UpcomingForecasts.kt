@@ -28,15 +28,6 @@ import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.styles.SmallTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 
-data class UpcomingForecast(
-  val day: String,
-  val percentChanceOfRain: Int,
-  val formattedChanceOfRain: String,
-  val iconDescriptor: String,
-  val lowTemperature: String,
-  val highTemperature: String,
-)
-
 @Composable
 fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
   Column(Modifier.padding(horizontal = 16.dp)) {

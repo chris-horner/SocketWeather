@@ -15,6 +15,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
+import org.threeten.bp.LocalDate
+import org.threeten.bp.format.DateTimeFormatter
+import org.threeten.bp.format.TextStyle
+import java.util.Locale
 import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 
 class HomeViewModel2(
@@ -22,8 +26,9 @@ class HomeViewModel2(
   private val stringResources: StringResources,
   private val clock: Clock = Clock.systemDefaultZone(),
   overrideScope: CoroutineScope? = null
-): ViewModel() {
+) : ViewModel() {
 
+  private val timeFormatter = DateTimeFormatter.ofPattern("h a")
   private val scope = overrideScope ?: viewModelScope
 
   val states: StateFlow<HomeState> = forecaster.states
@@ -74,6 +79,36 @@ class HomeViewModel2(
   }
 
   private fun Forecast.format(): FormattedConditions {
+
+    val graphItems = hourlyForecasts.map { hourlyForecast ->
+      TimeForecastGraphItem(
+        temperatureC = hourlyForecast.temp,
+        formattedTemperature = stringResources.formatDegrees(hourlyForecast.temp),
+        time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).toUpperCase(Locale.getDefault()),
+        rainChancePercent = hourlyForecast.rain.chance,
+        formattedRainChance = stringResources.formatPercent(hourlyForecast.rain.chance),
+      )
+    }
+
+    val currentDate = LocalDate.now(location.timezone)
+    val upcomingForecasts = upcomingForecasts.map { dateForecast ->
+      val date = dateForecast.date.atZone(location.timezone)
+      val dayText = if (date.toLocalDate() == currentDate.plusDays(1)) {
+        stringResources[R.string.home_dateForecastTomorrow]
+      } else {
+        date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
+      }
+
+      return@map UpcomingForecast(
+        day = dayText,
+        percentChanceOfRain = dateForecast.rain.chance,
+        formattedChanceOfRain = stringResources.formatPercent(dateForecast.rain.chance),
+        iconDescriptor = dateForecast.icon_descriptor,
+        lowTemperature = dateForecast.temp_min?.let { stringResources.formatDegrees(it) } ?: "--",
+        highTemperature = stringResources.formatDegrees(dateForecast.temp_max)
+      )
+    }
+
     return FormattedConditions(
       iconDescriptor = iconDescriptor,
       isNight = night,
@@ -81,7 +116,9 @@ class HomeViewModel2(
       highTemperature = stringResources.formatDegrees(highTemp),
       lowTemperature = stringResources.formatDegrees(lowTemp),
       feelsLikeTemperature = tempFeelsLike?.let { stringResources.formatDegrees(it) } ?: "--",
-      description = todayForecast.extended_text ?: todayForecast.short_text
+      description = todayForecast.extended_text ?: todayForecast.short_text,
+      graphItems = graphItems,
+      upcomingForecasts = upcomingForecasts
     )
   }
 }

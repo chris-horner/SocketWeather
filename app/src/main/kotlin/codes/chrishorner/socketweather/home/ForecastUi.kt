@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
@@ -27,33 +28,30 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
+import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.ThickDivider
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
 fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
 
-  val testConditions = FormattedConditions(
-    iconDescriptor = "hazy",
-    isNight = false,
-    currentTemperature = "17°",
-    highTemperature = "22°",
-    lowTemperature = "14°",
-    feelsLikeTemperature = "15.8°",
-    description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening."
-  )
+  Column(
+    modifier = Modifier
+      .verticalScroll(scrollState)
+      .navigationBarsWithImePadding()
+  ) {
 
-  Column(modifier = Modifier.verticalScroll(scrollState).navigationBarsWithImePadding()) {
-    Observations(testConditions)
+    Observations(conditions)
 
-    if (testConditions.description != null) {
+    if (conditions.description != null) {
       Text(
-        text = testConditions.description,
+        text = conditions.description,
         style = MaterialTheme.typography.body1,
         modifier = Modifier.padding(horizontal = 16.dp)
       )
@@ -65,20 +63,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
         .fillMaxWidth()
     )
 
-    TimeForecastGraph(
-      entries = listOf(
-        TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
-        TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),
-        TimeForecastGraphItem(18, "18°", "1 PM", 20, "20%"),
-        TimeForecastGraphItem(16, "16°", "4 PM", 80, "80%"),
-        TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
-        TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
-        TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
-        TimeForecastGraphItem(9, "9°", "4 AM", 0, ""),
-        TimeForecastGraphItem(13, "13°", "7 AM", 0, ""),
-        TimeForecastGraphItem(22, "22°", "10 AM", 0, ""),
-      )
-    )
+    TimeForecastGraph(entries = conditions.graphItems)
 
     ThickDivider(
       modifier = Modifier
@@ -86,13 +71,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
         .fillMaxWidth()
     )
 
-    UpcomingForecasts(
-      listOf(
-        UpcomingForecast("Tomorrow", 0, "", "partly_cloudy", "15°", "27°"),
-        UpcomingForecast("Friday", 0, "", "partly_cloudy", "14°", "27°"),
-        UpcomingForecast("Saturday", 50, "50%", "shower", "17°", "26°"),
-      )
-    )
+    UpcomingForecasts(forecasts = conditions.upcomingForecasts)
   }
 }
 
@@ -152,5 +131,41 @@ private fun Observations(conditions: FormattedConditions) {
         )
       }
     }
+  }
+}
+
+@Composable
+@Preview(showBackground = true, backgroundColor = 0xFFFFFF)
+private fun ForecastUiPreview() {
+  SocketWeatherTheme {
+    ForecastUi(
+      scrollState = rememberScrollState(),
+      conditions = FormattedConditions(
+        iconDescriptor = "hazy",
+        isNight = false,
+        currentTemperature = "17°",
+        highTemperature = "22°",
+        lowTemperature = "14°",
+        feelsLikeTemperature = "15.8°",
+        description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
+        graphItems = listOf(
+          TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
+          TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),
+          TimeForecastGraphItem(18, "18°", "1 PM", 20, "20%"),
+          TimeForecastGraphItem(16, "16°", "4 PM", 80, "80%"),
+          TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
+          TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
+          TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
+          TimeForecastGraphItem(9, "9°", "4 AM", 0, ""),
+          TimeForecastGraphItem(13, "13°", "7 AM", 0, ""),
+          TimeForecastGraphItem(22, "22°", "10 AM", 0, ""),
+        ),
+        upcomingForecasts = listOf(
+          UpcomingForecast("Tomorrow", 0, "", "partly_cloudy", "15°", "27°"),
+          UpcomingForecast("Friday", 0, "", "partly_cloudy", "14°", "27°"),
+          UpcomingForecast("Saturday", 50, "50%", "shower", "17°", "26°"),
+        )
+      )
+    )
   }
 }

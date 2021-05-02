@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
-import org.threeten.bp.Instant
 import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 
 class HomeViewModel2(
@@ -35,22 +34,6 @@ class HomeViewModel2(
 
   fun forceRefresh() {
     forecaster.refresh()
-  }
-
-  fun refreshIfNecessary() {
-    // Refresh the forecast if we don't currently have one, or if the current forecast
-    // is more than 1 minute old.
-    when (val state = forecaster.states.value) {
-
-      is Forecaster.State.Idle -> forecaster.refresh()
-
-      is Forecaster.State.Loaded -> {
-        val elapsedTime = Duration.between(state.forecast.updateTime, Instant.now(clock))
-        if (elapsedTime.toMinutes() > 1) {
-          forecaster.refresh()
-        }
-      }
-    }
   }
 
   private fun Forecaster.State.toHomeState(): HomeState {

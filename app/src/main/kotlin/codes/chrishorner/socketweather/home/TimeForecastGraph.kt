@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -44,26 +45,8 @@ private data class TemperatureScale(val min: Int, val max: Int) {
   val range = abs(min - max)
 }
 
-@Preview(showBackground = true)
 @Composable
-private fun GraphPreview() {
-  SocketWeatherTheme {
-    TimeForecastGraph(
-      entries = listOf(
-        TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
-        TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),
-        TimeForecastGraphItem(18, "18°", "1 PM", 20, "20%"),
-        TimeForecastGraphItem(16, "16°", "4 PM", 80, "80%"),
-        TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
-        TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
-        TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
-      )
-    )
-  }
-}
-
-@Composable
-fun TimeForecastGraph(entries: List<TimeForecastGraphItem>) {
+fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastGraphItem>) {
   val totalGraphHeight = 208.dp
   val topSectionHeight: Dp // Top area that contains chance of rain (if applicable).
   val temperatureTextHeight: Dp
@@ -87,11 +70,7 @@ fun TimeForecastGraph(entries: List<TimeForecastGraphItem>) {
     lineGraphHeight = listGraphHeight - temperatureTextHeight
   }
 
-  Box(
-    modifier = Modifier
-      .fillMaxWidth()
-      .height(totalGraphHeight)
-  ) {
+  Box(modifier = modifier.requiredHeight(totalGraphHeight)) {
 
     // Start by drawing chance of rain, temperature, and time as LazyRow items.
 
@@ -113,7 +92,7 @@ fun TimeForecastGraph(entries: List<TimeForecastGraphItem>) {
               ) {
                 Icon(
                   painter = rainIconPainter,
-                  contentDescription = "", // Not important for accessibility.
+                  contentDescription = null, // Not important for accessibility.
                   tint = fadedColour
                 )
                 Text(entry.formattedRainChance, style = MaterialTheme.typography.overline)
@@ -229,4 +208,22 @@ private fun getTemperatureScale(items: List<TimeForecastGraphItem>): Temperature
   }
 
   return TemperatureScale(min, max)
+}
+
+@Preview(showBackground = true, backgroundColor = 0xFFFFFF)
+@Composable
+private fun GraphPreview() {
+  SocketWeatherTheme {
+    TimeForecastGraph(
+      entries = listOf(
+        TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
+        TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),
+        TimeForecastGraphItem(18, "18°", "1 PM", 20, "20%"),
+        TimeForecastGraphItem(16, "16°", "4 PM", 80, "80%"),
+        TimeForecastGraphItem(12, "12°", "7 PM", 70, "70%"),
+        TimeForecastGraphItem(9, "9°", "10 PM", 20, "20%"),
+        TimeForecastGraphItem(8, "8°", "1 AM", 0, ""),
+      )
+    )
+  }
 }

@@ -63,7 +63,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
         .fillMaxWidth()
     )
 
-    TimeForecastGraph(entries = conditions.graphItems)
+    TimeForecastGraph(entries = conditions.graphItems, modifier = Modifier.fillMaxWidth())
 
     ThickDivider(
       modifier = Modifier

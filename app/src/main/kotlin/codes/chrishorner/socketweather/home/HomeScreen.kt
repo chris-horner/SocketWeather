@@ -121,18 +121,17 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
 @Composable
 private fun LocationDropdown(state: HomeState) {
   var expanded by remember { mutableStateOf(false) }
-  Row(
-    verticalAlignment = Alignment.CenterVertically,
-    modifier = Modifier
-      .fillMaxHeight()
-      .clickable { }
+
+  Column(
+    modifier = Modifier.clickable { }
   ) {
-    Column {
+    Row(verticalAlignment = Alignment.CenterVertically) {
       Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
-      state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
+      Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
     }
-    Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
+    state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
   }
+
   DropdownMenu(
     expanded = expanded,
     onDismissRequest = { expanded = false }

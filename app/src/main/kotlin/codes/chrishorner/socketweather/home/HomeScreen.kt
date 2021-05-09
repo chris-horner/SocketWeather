@@ -5,10 +5,13 @@ import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
@@ -30,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -75,20 +79,27 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
 
   val scrollState = rememberScrollState()
   val toolbarElevation by animateDpAsState(targetValue = if (scrollState.value > 0) 4.dp else 0.dp)
+  var locationChooserVisible by rememberSaveable { mutableStateOf(false) }
 
-  Surface(color = MaterialTheme.colors.background) {
-    Scaffold(
-      topBar = {
-        InsetAwareTopAppBar(
-          title = { LocationDropdown(state) },
-          backgroundColor = MaterialTheme.colors.background,
-          elevation = toolbarElevation,
-          actions = { Menu(eventHandler) }
-        )
+  Box {
+    Surface(color = MaterialTheme.colors.background) {
+      Scaffold(
+        topBar = {
+          InsetAwareTopAppBar(
+            title = { ToolbarTitles(state) { locationChooserVisible = true } },
+            backgroundColor = MaterialTheme.colors.background,
+            elevation = toolbarElevation,
+            actions = { Menu(eventHandler) }
+          )
+        }
+      ) {
+        Content(state.content, scrollState)
       }
-    ) {
-      Content(state.content, scrollState)
     }
+    LocationSwitcher(
+      visible = locationChooserVisible,
+      onDismissRequest = { locationChooserVisible = false }
+    )
   }
 }
 
@@ -119,24 +130,19 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
 }
 
 @Composable
-private fun LocationDropdown(state: HomeState) {
-  var expanded by remember { mutableStateOf(false) }
-
+private fun ToolbarTitles(state: HomeState, onClick: () -> Unit) {
   Column(
-    modifier = Modifier.clickable { }
+    modifier = Modifier
+      .fillMaxWidth()
+      .height(56.dp)
+      .clickable { onClick() },
+    verticalArrangement = Arrangement.Center
   ) {
     Row(verticalAlignment = Alignment.CenterVertically) {
       Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
       Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
     }
     state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
-  }
-
-  DropdownMenu(
-    expanded = expanded,
-    onDismissRequest = { expanded = false }
-  ) {
-    // TODO: Show location picker.
   }
 }
 

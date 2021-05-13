@@ -98,6 +98,8 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
     }
     LocationSwitcher(
       visible = locationChooserVisible,
+      currentLocation = state.currentLocation,
+      savedLocations = state.savedLocations,
       onDismissRequest = { locationChooserVisible = false }
     )
   }
@@ -233,6 +235,8 @@ private fun HomePreview() {
         HomeState(
           "Melbourne",
           "Just now",
+          LocationEntry("preview", "Melbourne", "VIC"),
+          emptyList(),
           Content.Loading
         )
       ) { /* Don't handle events in preview. */ }

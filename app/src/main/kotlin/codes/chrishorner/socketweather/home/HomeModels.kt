@@ -19,6 +19,8 @@ data class HomeState(
 data class HomeState2(
   val toolbarTitle: String,
   val toolbarSubtitle: String?,
+  val currentLocation: LocationEntry,
+  val savedLocations: List<LocationEntry>,
   val content: Content,
 ) {
   sealed class Content {
@@ -29,6 +31,8 @@ data class HomeState2(
     data class Error(val type: ForecastError) : Content()
   }
 }
+
+data class LocationEntry(val id: String, val title: String, val subtitle: String)
 
 enum class HomeEvent { ChooseLocation, Refresh, ViewAbout }
 

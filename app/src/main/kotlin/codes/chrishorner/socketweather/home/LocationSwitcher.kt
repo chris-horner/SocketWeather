@@ -30,6 +30,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.ScrimColor
@@ -38,6 +39,8 @@ import com.google.accompanist.insets.systemBarsPadding
 @Composable
 fun LocationSwitcher(
   visible: Boolean,
+  currentLocation: LocationEntry,
+  savedLocations: List<LocationEntry>,
   onDismissRequest: () -> Unit,
 ) {
 
@@ -101,30 +104,37 @@ fun LocationSwitcher(
             transformOrigin = TransformOrigin(0.5f, 0.1f)
           }
       ) {
-        LocationSwitcherContent()
+        LocationSwitcherContent(currentLocation, savedLocations)
       }
     }
   }
 }
 
 @Composable
-private fun LocationSwitcherContent() {
-  LazyColumn {
-    item {
-      Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.fillMaxWidth()
-      ) {
-        Icon(painterResource(R.drawable.ic_check_circle_outline_24dp), contentDescription = null)
-        Column {
-          Text("Melbourne")
-          Text("VIC")
-        }
-        Icon(painterResource(R.drawable.ic_arrow_drop_up_24dp), contentDescription = null)
+private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocations: List<LocationEntry>) {
+  Column {
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier.fillMaxWidth()
+    ) {
+      Icon(painterResource(R.drawable.ic_check_circle_outline_24dp), contentDescription = null)
+      Column {
+        Text(currentLocation.title)
+        Text(currentLocation.subtitle)
       }
+      Icon(painterResource(R.drawable.ic_arrow_drop_up_24dp), contentDescription = null)
     }
+    LazyColumn {
+      item {
 
-    items(6) { Text("Hello") }
+      }
+
+      items(6) { Text("Hello") }
+    }
+    Row {
+      Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = null)
+      Text(stringResource(R.string.switchLocation_add))
+    }
   }
 }
 

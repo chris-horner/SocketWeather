@@ -6,12 +6,17 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
+import codes.chrishorner.socketweather.data.LocationSelection.None
+import codes.chrishorner.socketweather.data.LocationSelection.Static
+import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.util.StringResources
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
@@ -23,6 +28,7 @@ import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 
 class HomeViewModel2(
   private val forecaster: Forecaster,
+  locationStore: LocationSelectionStore,
   private val stringResources: StringResources,
   private val clock: Clock = Clock.systemDefaultZone(),
   overrideScope: CoroutineScope? = null
@@ -31,26 +37,31 @@ class HomeViewModel2(
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
   private val scope = overrideScope ?: viewModelScope
 
-  val states: StateFlow<HomeState> = forecaster.states
-    .combine(tickerFlow(10_000, emitImmediately = true)) { forecasterState, _ ->
-      forecasterState.toHomeState()
+  val states: StateFlow<HomeState> = tickerFlow(10_000, emitImmediately = true)
+    .flatMapLatest { forecaster.states }
+    .combine(locationStore.savedSelections) { forecasterState, savedSelections ->
+      forecasterState.toHomeState(savedSelections)
     }
-    .stateIn(scope, started = SharingStarted.Eagerly, initialValue = forecaster.states.value.toHomeState())
+    .stateIn(
+      scope = scope,
+      started = SharingStarted.Eagerly,
+      initialValue = forecaster.states.value.toHomeState(locationStore.savedSelections.value)
+    )
 
   fun forceRefresh() {
     forecaster.refresh()
   }
 
-  private fun Forecaster.State.toHomeState(): HomeState {
+  private fun Forecaster.State.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
     val toolbarTitle = when (this) {
       Forecaster.State.Idle -> stringResources[R.string.home_loading]
       is Forecaster.State.FindingLocation -> stringResources[R.string.home_findingLocation]
       is Forecaster.State.Refreshing -> this.previousForecast.location.name
       is Forecaster.State.Loaded -> this.forecast.location.name
       is Forecaster.State.Error -> when (val selection = this.selection) {
-        is LocationSelection.Static -> selection.location.name
-        is LocationSelection.FollowMe -> stringResources[R.string.home_findingLocation]
-        is LocationSelection.None -> throw IllegalStateException("Cannot display LocationSelection of None.")
+        is Static -> selection.location.name
+        is FollowMe -> stringResources[R.string.home_findingLocation]
+        is None -> throw IllegalStateException("Cannot display LocationSelection of None.")
       }
       else -> stringResources[R.string.home_loading]
     }
@@ -75,7 +86,13 @@ class HomeViewModel2(
       is Forecaster.State.Error -> HomeState.Content.Error(type)
     }
 
-    return HomeState(toolbarTitle, toolbarSubtitle, content)
+    return HomeState(
+      toolbarTitle = toolbarTitle,
+      toolbarSubtitle = toolbarSubtitle,
+      currentLocation = selection.toLocationEntry(),
+      savedLocations = savedSelections.map { it.toLocationEntry() },
+      content = content,
+    )
   }
 
   private fun Forecast.format(): FormattedConditions {
@@ -120,5 +137,23 @@ class HomeViewModel2(
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts
     )
+  }
+
+  private fun LocationSelection.toLocationEntry(): LocationEntry = when (this) {
+    FollowMe -> LocationEntry(
+      id = FOLLOW_ME_ID,
+      title = stringResources[R.string.switchLocation_followMeTitle],
+      subtitle = stringResources[R.string.switchLocation_followMeSubtitle]
+    )
+    is Static -> LocationEntry(
+      id = location.id,
+      title = location.name,
+      subtitle = location.state
+    )
+    None -> error("Empty location selection cannot have an entry.")
+  }
+
+  companion object {
+    private const val FOLLOW_ME_ID = "follow_me"
   }
 }

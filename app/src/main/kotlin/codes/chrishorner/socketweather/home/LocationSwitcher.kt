@@ -51,6 +51,7 @@ fun LocationSwitcher(
   currentLocation: LocationEntry,
   savedLocations: List<LocationEntry>,
   onDismissRequest: () -> Unit,
+  onEvent: (HomeEvent) -> Unit,
 ) {
 
   val visibleStates = remember { MutableTransitionState(false) }
@@ -117,19 +118,26 @@ fun LocationSwitcher(
             transformOrigin = TransformOrigin(0.5f, 0.1f)
           }
       ) {
-        LocationSwitcherContent(currentLocation, savedLocations)
+        LocationSwitcherContent(currentLocation, savedLocations, onDismissRequest, onEvent)
       }
     }
   }
 }
 
 @Composable
-private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocations: List<LocationEntry>) {
+private fun LocationSwitcherContent(
+  currentLocation: LocationEntry,
+  savedLocations: List<LocationEntry>,
+  onDismissRequest: () -> Unit,
+  onEvent: (HomeEvent) -> Unit
+) {
   Column {
 
     Row(
       verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.height(64.dp),
+      modifier = Modifier
+        .height(64.dp)
+        .clickable { onDismissRequest() },
     ) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Icon(
@@ -156,7 +164,9 @@ private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocatio
       items(savedLocations) { item ->
         Row(
           verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier.height(64.dp),
+          modifier = Modifier
+            .height(64.dp)
+            .clickable { onEvent(HomeEvent.SwitchLocation(item.selection)) },
         ) {
           if (item.showTrackingIcon) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
@@ -184,7 +194,7 @@ private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocatio
       modifier = Modifier
         .fillMaxWidth()
         .height(64.dp)
-        .clickable { /* TODO */ },
+        .clickable { onEvent(HomeEvent.AddLocation) },
     ) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Icon(

@@ -50,7 +50,8 @@ import androidx.navigation.compose.navigate
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.data.ForecastError
-import codes.chrishorner.socketweather.home.HomeEvent.ChooseLocation
+import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeState2.Content
@@ -65,17 +66,17 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
   val state: HomeState by viewModel.states.collectAsState()
   HomeUi(state) { event ->
     when (event) {
-      Refresh -> viewModel.forceRefresh()
-      ChooseLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
+      AddLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
       ViewAbout -> {
         // TODO: Navigate to About screen.
       }
+      else -> viewModel.handleEvent(event)
     }
   }
 }
 
 @Composable
-private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
+private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 
   val scrollState = rememberScrollState()
   val toolbarElevation by animateDpAsState(targetValue = if (scrollState.value > 0) 4.dp else 0.dp)
@@ -89,7 +90,7 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
             title = { ToolbarTitles(state) { locationChooserVisible = true } },
             backgroundColor = MaterialTheme.colors.background,
             elevation = toolbarElevation,
-            actions = { Menu(eventHandler) }
+            actions = { Menu(onEvent) }
           )
         }
       ) {
@@ -100,7 +101,11 @@ private fun HomeUi(state: HomeState, eventHandler: (event: HomeEvent) -> Unit) {
       visible = locationChooserVisible,
       currentLocation = state.currentLocation,
       savedLocations = state.savedLocations,
-      onDismissRequest = { locationChooserVisible = false }
+      onDismissRequest = { locationChooserVisible = false },
+      onEvent = {
+        locationChooserVisible = false
+        onEvent(it)
+      }
     )
   }
 }
@@ -235,7 +240,7 @@ private fun HomePreview() {
         HomeState(
           "Melbourne",
           "Just now",
-          LocationEntry("preview", "Melbourne", "VIC"),
+          LocationEntry(LocationSelection.FollowMe, "Melbourne", "VIC"),
           emptyList(),
           Content.Loading
         )

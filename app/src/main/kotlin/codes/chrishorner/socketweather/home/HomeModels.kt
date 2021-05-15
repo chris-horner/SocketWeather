@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.home
 
 import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.Forecaster
+import codes.chrishorner.socketweather.data.LocationSelection
 import org.threeten.bp.Instant
 
 data class HomeState(
@@ -33,13 +34,18 @@ data class HomeState2(
 }
 
 data class LocationEntry(
-  val id: String,
+  val selection: LocationSelection,
   val title: String,
   val subtitle: String,
   val showTrackingIcon: Boolean = false
 )
 
-enum class HomeEvent { ChooseLocation, Refresh, ViewAbout }
+sealed class HomeEvent {
+  data class SwitchLocation(val selection: LocationSelection) : HomeEvent()
+  object AddLocation : HomeEvent()
+  object Refresh : HomeEvent()
+  object ViewAbout : HomeEvent()
+}
 
 data class FormattedConditions(
   val iconDescriptor: String,

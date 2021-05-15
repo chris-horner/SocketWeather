@@ -10,6 +10,8 @@ import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.LocationSelectionStore
+import codes.chrishorner.socketweather.home.HomeEvent.Refresh
+import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
 import codes.chrishorner.socketweather.util.StringResources
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +20,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import org.threeten.bp.Clock
 import org.threeten.bp.Duration
 import org.threeten.bp.LocalDate
@@ -28,7 +31,7 @@ import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 
 class HomeViewModel2(
   private val forecaster: Forecaster,
-  locationStore: LocationSelectionStore,
+  private val locationStore: LocationSelectionStore,
   private val stringResources: StringResources,
   private val clock: Clock = Clock.systemDefaultZone(),
   overrideScope: CoroutineScope? = null
@@ -48,8 +51,17 @@ class HomeViewModel2(
       initialValue = forecaster.states.value.toHomeState(locationStore.savedSelections.value)
     )
 
-  fun forceRefresh() {
-    forecaster.refresh()
+  fun handleEvent(event: HomeEvent) = when (event) {
+    Refresh -> forecaster.refresh()
+    is SwitchLocation -> switchLocation(event.selection)
+    else -> error("Unhandled home event.")
+  }
+
+  private fun switchLocation(selection: LocationSelection) {
+    scope.launch {
+      locationStore.select(selection)
+
+    }
   }
 
   private fun Forecaster.State.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
@@ -141,20 +153,16 @@ class HomeViewModel2(
 
   private fun LocationSelection.toLocationEntry(): LocationEntry = when (this) {
     FollowMe -> LocationEntry(
-      id = FOLLOW_ME_ID,
+      selection = this,
       title = stringResources[R.string.switchLocation_followMeTitle],
       subtitle = stringResources[R.string.switchLocation_followMeSubtitle],
       showTrackingIcon = true
     )
     is Static -> LocationEntry(
-      id = location.id,
+      selection = this,
       title = location.name,
       subtitle = location.state
     )
     None -> error("Empty location selection cannot have an entry.")
-  }
-
-  companion object {
-    private const val FOLLOW_ME_ID = "follow_me"
   }
 }

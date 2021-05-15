@@ -143,7 +143,8 @@ class HomeViewModel2(
     FollowMe -> LocationEntry(
       id = FOLLOW_ME_ID,
       title = stringResources[R.string.switchLocation_followMeTitle],
-      subtitle = stringResources[R.string.switchLocation_followMeSubtitle]
+      subtitle = stringResources[R.string.switchLocation_followMeSubtitle],
+      showTrackingIcon = true
     )
     is Static -> LocationEntry(
       id = location.id,

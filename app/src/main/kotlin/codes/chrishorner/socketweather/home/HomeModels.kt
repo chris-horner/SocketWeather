@@ -32,7 +32,12 @@ data class HomeState2(
   }
 }
 
-data class LocationEntry(val id: String, val title: String, val subtitle: String)
+data class LocationEntry(
+  val id: String,
+  val title: String,
+  val subtitle: String,
+  val showTrackingIcon: Boolean = false
+)
 
 enum class HomeEvent { ChooseLocation, Refresh, ViewAbout }
 

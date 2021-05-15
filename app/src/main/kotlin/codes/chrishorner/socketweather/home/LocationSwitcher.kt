@@ -13,13 +13,19 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -55,13 +61,16 @@ fun LocationSwitcher(
 
   val transition = updateTransition(targetState = visible, label = "LocationChooser")
 
-  val scale by transition.animateFloat(transitionSpec = {
-    if (false isTransitioningTo true) {
-      tween(durationMillis = EnterDurationMs, easing = LinearOutSlowInEasing)
-    } else {
-      tween(durationMillis = ExitDurationMs, easing = FastOutLinearInEasing)
-    }
-  }, label = "LocationChooser.scale") {
+  val scale by transition.animateFloat(
+    transitionSpec = {
+      if (false isTransitioningTo true) {
+        tween(durationMillis = EnterDurationMs, easing = LinearOutSlowInEasing)
+      } else {
+        tween(durationMillis = ExitDurationMs, easing = FastOutLinearInEasing)
+      }
+    },
+    label = "LocationChooser.scale"
+  ) {
     if (it) 1f else 0.8f
   }
 
@@ -72,7 +81,8 @@ fun LocationSwitcher(
       } else {
         tween(durationMillis = ExitDurationMs)
       }
-    }, label = "LocationChooser.scale"
+    },
+    label = "LocationChooser.scale"
   ) {
     if (it) 1f else 0f
   }
@@ -113,27 +123,68 @@ fun LocationSwitcher(
 @Composable
 private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocations: List<LocationEntry>) {
   Column {
+
     Row(
       verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier.fillMaxWidth()
+      modifier = Modifier.height(64.dp),
     ) {
-      Icon(painterResource(R.drawable.ic_check_circle_outline_24dp), contentDescription = null)
+      Icon(
+        painterResource(R.drawable.ic_check_circle_outline_24dp),
+        contentDescription = null,
+        modifier = Modifier.padding(horizontal = 20.dp)
+      )
       Column {
-        Text(currentLocation.title)
-        Text(currentLocation.subtitle)
+        Text(currentLocation.title, style = MaterialTheme.typography.h6)
+        Text(currentLocation.subtitle, style = MaterialTheme.typography.subtitle2)
       }
-      Icon(painterResource(R.drawable.ic_arrow_drop_up_24dp), contentDescription = null)
+      Spacer(modifier = Modifier.weight(1f))
+      Icon(
+        painterResource(R.drawable.ic_arrow_drop_up_24dp),
+        contentDescription = null,
+        Modifier.padding(horizontal = 16.dp)
+      )
     }
+
+    Divider()
+
     LazyColumn {
-      item {
-
+      items(savedLocations) { item ->
+        Row(
+          verticalAlignment = Alignment.CenterVertically,
+          modifier = Modifier.height(64.dp),
+        ) {
+          if (item.showTrackingIcon) {
+            Icon(
+              painterResource(R.drawable.ic_my_location_24dp),
+              contentDescription = null,
+              Modifier.padding(horizontal = 20.dp)
+            )
+          } else {
+            Spacer(modifier = Modifier.width(64.dp))
+          }
+          Column {
+            Text(item.title, style = MaterialTheme.typography.h6)
+            Text(item.subtitle, style = MaterialTheme.typography.subtitle2)
+          }
+        }
       }
-
-      items(6) { Text("Hello") }
     }
-    Row {
-      Icon(painterResource(R.drawable.ic_add_24dp), contentDescription = null)
-      Text(stringResource(R.string.switchLocation_add))
+
+    Divider()
+
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(64.dp)
+        .clickable { /* TODO */ },
+    ) {
+      Icon(
+        painterResource(R.drawable.ic_add_24dp),
+        contentDescription = null,
+        modifier = Modifier.padding(horizontal = 20.dp)
+      )
+      Text(stringResource(R.string.switchLocation_add), style = MaterialTheme.typography.button)
     }
   }
 }

@@ -90,7 +90,7 @@ class HomeViewModel2(
       toolbarTitle = toolbarTitle,
       toolbarSubtitle = toolbarSubtitle,
       currentLocation = selection.toLocationEntry(),
-      savedLocations = savedSelections.map { it.toLocationEntry() },
+      savedLocations = savedSelections.minus(selection).map { it.toLocationEntry() },
       content = content,
     )
   }

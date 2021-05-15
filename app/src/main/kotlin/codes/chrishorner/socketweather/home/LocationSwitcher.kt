@@ -23,11 +23,14 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -128,11 +131,13 @@ private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocatio
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier.height(64.dp),
     ) {
-      Icon(
-        painterResource(R.drawable.ic_check_circle_outline_24dp),
-        contentDescription = null,
-        modifier = Modifier.padding(horizontal = 20.dp)
-      )
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Icon(
+          painterResource(R.drawable.ic_check_circle_outline_24dp),
+          contentDescription = null,
+          modifier = Modifier.padding(horizontal = 20.dp)
+        )
+      }
       Column {
         Text(currentLocation.title, style = MaterialTheme.typography.h6)
         Text(currentLocation.subtitle, style = MaterialTheme.typography.subtitle2)
@@ -154,11 +159,13 @@ private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocatio
           modifier = Modifier.height(64.dp),
         ) {
           if (item.showTrackingIcon) {
-            Icon(
-              painterResource(R.drawable.ic_my_location_24dp),
-              contentDescription = null,
-              Modifier.padding(horizontal = 20.dp)
-            )
+            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+              Icon(
+                painterResource(R.drawable.ic_my_location_24dp),
+                contentDescription = null,
+                Modifier.padding(horizontal = 20.dp)
+              )
+            }
           } else {
             Spacer(modifier = Modifier.width(64.dp))
           }
@@ -179,11 +186,13 @@ private fun LocationSwitcherContent(currentLocation: LocationEntry, savedLocatio
         .height(64.dp)
         .clickable { /* TODO */ },
     ) {
-      Icon(
-        painterResource(R.drawable.ic_add_24dp),
-        contentDescription = null,
-        modifier = Modifier.padding(horizontal = 20.dp)
-      )
+      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        Icon(
+          painterResource(R.drawable.ic_add_24dp),
+          contentDescription = null,
+          modifier = Modifier.padding(horizontal = 20.dp)
+        )
+      }
       Text(stringResource(R.string.switchLocation_add), style = MaterialTheme.typography.button)
     }
   }

@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -34,7 +35,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
     for (forecast in forecasts) {
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.height(48.dp).padding(vertical = 8.dp)
       ) {
 
         Text(
@@ -57,17 +58,18 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
 
         Icon(
           painter = painterResource(weatherIconRes(forecast.iconDescriptor)),
-          contentDescription = "", // Not important for accessibility.
-          modifier = Modifier.padding(end = 8.dp)
+          contentDescription = null, // Not important for accessibility.
+          modifier = Modifier.padding(end = 16.dp)
         )
 
         Text(
           text = forecast.highTemperature,
           style = SmallTempTextStyle,
           textAlign = TextAlign.End,
+          maxLines = 1,
           modifier = Modifier
-            .width(32.dp)
-            .padding(end = 4.dp)
+            .widthIn(min = 36.dp)
+            .padding(end = 8.dp)
         )
 
         Box(
@@ -82,7 +84,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
           text = forecast.lowTemperature,
           style = SmallTempTextStyle,
           textAlign = TextAlign.End,
-          modifier = Modifier.width(36.dp)
+          modifier = Modifier.widthIn(min = 36.dp)
         )
       }
     }

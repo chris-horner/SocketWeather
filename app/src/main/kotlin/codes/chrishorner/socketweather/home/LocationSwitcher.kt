@@ -165,6 +165,7 @@ private fun LocationSwitcherContent(
         Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
+            .fillMaxWidth()
             .height(64.dp)
             .clickable { onEvent(HomeEvent.SwitchLocation(item.selection)) },
         ) {

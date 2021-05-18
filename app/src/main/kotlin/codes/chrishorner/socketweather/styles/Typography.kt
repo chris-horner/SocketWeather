@@ -71,6 +71,12 @@ val SocketWeatherTypography = Typography(
   ),
   overline = TextStyle(
     fontSize = 15.sp
+  ),
+  body1 = TextStyle(
+    fontWeight = FontWeight.Normal,
+    fontSize = 16.sp,
+    letterSpacing = 0.8.sp,
+    lineHeight = 22.sp,
   )
 )
 

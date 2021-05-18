@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -58,6 +57,7 @@ import codes.chrishorner.socketweather.home.HomeState2.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import com.google.accompanist.insets.ProvideWindowInsets
+import com.google.accompanist.insets.navigationBarsPadding
 import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 import codes.chrishorner.socketweather.home.HomeViewModel2 as HomeViewModel
 
@@ -205,7 +205,7 @@ private fun Error(type: ForecastError) {
   }
 
   Column(
-    modifier = Modifier.fillMaxHeight(),
+    modifier = Modifier.fillMaxSize().navigationBarsPadding(),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {

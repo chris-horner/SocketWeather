@@ -41,4 +41,14 @@ class ComposeActivity : AppCompatActivity() {
       }
     }
   }
+
+  override fun onStart() {
+    super.onStart()
+    appSingletons.deviceLocator.enable()
+  }
+
+  override fun onStop() {
+    super.onStop()
+    appSingletons.deviceLocator.disable()
+  }
 }

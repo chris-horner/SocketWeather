@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.home
 
 import android.content.res.Configuration
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -93,7 +94,7 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
           )
         }
       ) {
-        Content(state.content, scrollState)
+        Content(state.content, scrollState, onEvent)
       }
     }
     LocationSwitcher(
@@ -110,7 +111,7 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 }
 
 @Composable
-private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
+private fun Menu(onEvent: (event: HomeEvent) -> Unit) {
   var expanded by remember { mutableStateOf(false) }
   IconButton(onClick = { expanded = true }) {
     Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -121,13 +122,13 @@ private fun Menu(eventHandler: (event: HomeEvent) -> Unit) {
     offset = DpOffset(0.dp, (-56).dp),
   ) {
     DropdownMenuItem(onClick = {
-      eventHandler(Refresh)
+      onEvent(Refresh)
       expanded = false
     }) {
       Text(stringResource(R.string.home_refresh))
     }
     DropdownMenuItem(onClick = {
-      eventHandler(ViewAbout)
+      onEvent(ViewAbout)
       expanded = false
     }) {
       Text(stringResource(R.string.home_about))
@@ -153,9 +154,9 @@ private fun ToolbarTitles(state: HomeState, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Content(state: Content, scrollState: ScrollState) {
+private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit) {
   when (state) {
-    is Content.Error -> Error(state.type)
+    is Content.Error -> Error(state.type) { onEvent(Refresh) }
     is Content.Refreshing -> ForecastUi(state.conditions, scrollState)
     is Content.Loaded -> ForecastUi(state.conditions, scrollState)
     else -> Loading()
@@ -175,7 +176,7 @@ private fun Loading() {
 }
 
 @Composable
-private fun Error(type: ForecastError) {
+private fun Error(type: ForecastError, onRefresh: () -> Unit) {
   val title: String
   val message: String
   val image: Painter
@@ -204,7 +205,9 @@ private fun Error(type: ForecastError) {
   }
 
   Column(
-    modifier = Modifier.fillMaxSize().navigationBarsPadding(),
+    modifier = Modifier
+      .fillMaxSize()
+      .navigationBarsPadding(),
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
@@ -217,8 +220,8 @@ private fun Error(type: ForecastError) {
         .width(280.dp)
         .padding(top = 8.dp, bottom = 16.dp)
     )
-    Icon(image, contentDescription = null)
-    Button(modifier = Modifier.width(200.dp), onClick = { /*TODO*/ }) {
+    Image(painter = image, contentDescription = null)
+    Button(modifier = Modifier.width(200.dp), onClick = onRefresh) {
       Text(stringResource(R.string.home_error_retryButton))
     }
   }
@@ -227,7 +230,7 @@ private fun Error(type: ForecastError) {
 @Preview(device = Devices.NEXUS_5, showBackground = true)
 @Composable
 private fun ErrorPreview() {
-  Error(ForecastError.NOT_AUSTRALIA)
+  Error(ForecastError.NOT_AUSTRALIA) {}
 }
 
 @Preview(showSystemUi = true, uiMode = Configuration.UI_MODE_NIGHT_NO, device = Devices.NEXUS_5)

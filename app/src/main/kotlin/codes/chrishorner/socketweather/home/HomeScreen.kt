@@ -45,7 +45,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import androidx.navigation.compose.navigate
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.data.ForecastError

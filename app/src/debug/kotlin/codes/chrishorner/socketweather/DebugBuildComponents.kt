@@ -15,7 +15,6 @@ import codes.chrishorner.socketweather.data.DebugDeviceLocator
 import codes.chrishorner.socketweather.data.DebugNetworkComponents
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.NetworkComponents
-import codes.chrishorner.socketweather.debug.DebugDeviceLocatorModule
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import codes.chrishorner.socketweather.util.app
 import com.bluelinelabs.conductor.ChangeHandlerFrameLayout
@@ -31,10 +30,7 @@ private object DebugBuildComponents : BuildTypeComponents {
     // modules to do their thing.
     allowMainThreadDiskOperations {
       val networkComponents: DebugNetworkComponents = createNetworkComponents(activity.app) as DebugNetworkComponents
-      val deviceLocator = createDeviceLocator(activity.app) as DebugDeviceLocator
       drawerBuilder
-        .addSectionTitle("Device location")
-        .addModule(DebugDeviceLocatorModule(deviceLocator))
         .addSectionTitle("Network")
         .addModule(RetrofitModule(networkComponents.debugRetrofitConfig))
         .addSectionTitle("Logs")

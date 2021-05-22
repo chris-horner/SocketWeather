@@ -51,8 +51,8 @@ fun DebugDeviceLocationModule() {
     AnimatedVisibility(visible = currentMode == Mode.MOCK) {
       DropdownSelectorAction(
         label = "Location",
-        items = DebugDeviceLocator.MOCK_LOCATIONS.keys.toList(),
-        defaultValue = preferences[DEVICE_LOCATION] ?: "Melbourne"
+        items = DebugDeviceLocator.mockLocations.keys.toList(),
+        defaultValue = preferences[DEVICE_LOCATION] ?: DebugDeviceLocator.mockLocations.entries.first().key
       ) { selectedLocation ->
         scope.launch {
           preferenceStore.edit { preferences ->

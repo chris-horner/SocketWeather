@@ -6,6 +6,8 @@
   <string name="temperatureFormat">%s°</string>
   <string name="percentFormat">%d%%</string>
 
+  <string name="common_backButtonDesc">Back</string>
+
   <string name="chooseLocation_title">Where\'s your weather?</string>
   <string name="chooseLocation_myLocationButton">Follow me</string>
   <string name="chooseLocation_searchHint">Search</string>

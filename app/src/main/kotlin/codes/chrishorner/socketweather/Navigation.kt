@@ -11,6 +11,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navArgument
 import androidx.navigation.compose.rememberNavController
+import codes.chrishorner.socketweather.about.AboutScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
 import codes.chrishorner.socketweather.data.LocationSelection
@@ -70,6 +71,9 @@ fun NavGraph(currentSelection: LocationSelection) {
         )
       }
       ChooseLocationScreen(viewModel, navController)
+    }
+    composable(route = Screen.About.routeDefinition) {
+      AboutScreen(navController)
     }
   }
 }

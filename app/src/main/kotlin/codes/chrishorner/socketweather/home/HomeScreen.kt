@@ -67,9 +67,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
   HomeUi(state) { event ->
     when (event) {
       AddLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
-      ViewAbout -> {
-        // TODO: Navigate to About screen.
-      }
+      ViewAbout -> navController.navigate(Screen.About.getRoute())
       else -> viewModel.handleEvent(event)
     }
   }

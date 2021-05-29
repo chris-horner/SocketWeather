@@ -31,6 +31,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -53,46 +55,15 @@ fun LocationSwitcher(
   onDismissRequest: () -> Unit,
   onEvent: (HomeEvent) -> Unit,
 ) {
+  val transition = updateVisibilityTransition(visible)
 
-  val visibleStates = remember { MutableTransitionState(false) }
-  visibleStates.targetState = visible
-
-  val currentlyVisibility = visibleStates.currentState || visibleStates.targetState
-
-  BackHandler(enabled = currentlyVisibility) {
+  BackHandler(enabled = transition.currentlyVisible) {
     onDismissRequest()
   }
 
-  val transition = updateTransition(targetState = visible, label = "LocationChooser")
-
-  val scale by transition.animateFloat(
-    transitionSpec = {
-      if (false isTransitioningTo true) {
-        tween(durationMillis = EnterDurationMs, easing = LinearOutSlowInEasing)
-      } else {
-        tween(durationMillis = ExitDurationMs, easing = FastOutLinearInEasing)
-      }
-    },
-    label = "LocationChooser.scale"
-  ) {
-    if (it) 1f else 0.8f
-  }
-
-  val alpha by transition.animateFloat(
-    transitionSpec = {
-      if (false isTransitioningTo true) {
-        tween(durationMillis = EnterDurationMs)
-      } else {
-        tween(durationMillis = ExitDurationMs)
-      }
-    },
-    label = "LocationChooser.scale"
-  ) {
-    if (it) 1f else 0f
-  }
-
-  if (currentlyVisibility) {
+  if (transition.currentlyVisible) {
     Box {
+      // Render scrim behind card.
       Box(
         modifier = Modifier
           .fillMaxSize()
@@ -101,8 +72,8 @@ fun LocationSwitcher(
             interactionSource = remember { MutableInteractionSource() },
             indication = null
           ) { onDismissRequest() }
+          .alpha(transition.scrimAlpha)
           .background(ScrimColor)
-          .alpha(alpha)
       )
 
       Card(
@@ -112,9 +83,9 @@ fun LocationSwitcher(
           .fillMaxWidth()
           .wrapContentHeight()
           .graphicsLayer {
-            scaleX = scale
-            scaleY = scale
-            this.alpha = alpha
+            scaleX = transition.cardScale
+            scaleY = transition.cardScale
+            alpha = transition.cardAlpha
             transformOrigin = TransformOrigin(0.5f, 0.1f)
           }
       ) {
@@ -209,5 +180,69 @@ private fun LocationSwitcherContent(
   }
 }
 
-private const val EnterDurationMs = 120
-private const val ExitDurationMs = 75
+private const val CardEnterDurationMs = 120
+private const val CardExitDurationMs = 75
+private const val ScrimEnterDurationMs = 250
+private const val ScrimExitDurationMs = 75
+
+private class TransitionData(
+  currentlyVisible: State<Boolean>,
+  cardScale: State<Float>,
+  cardAlpha: State<Float>,
+  scrimAlpha: State<Float>,
+) {
+  val currentlyVisible by currentlyVisible
+  val cardScale by cardScale
+  val cardAlpha by cardAlpha
+  val scrimAlpha by scrimAlpha
+}
+
+@Composable
+private fun updateVisibilityTransition(visible: Boolean): TransitionData {
+
+  val visibilityState = remember { MutableTransitionState(initialState = false) }
+  visibilityState.targetState = visible
+  val currentlyVisible = derivedStateOf { visibilityState.targetState || visibilityState.currentState }
+  val transition = updateTransition(visibilityState, label = "LocationChooser")
+
+  val cardScale = transition.animateFloat(
+    label = "LocationChooser.cardScale",
+    transitionSpec = {
+      if (false isTransitioningTo true) {
+        tween(durationMillis = CardEnterDurationMs, easing = LinearOutSlowInEasing)
+      } else {
+        tween(durationMillis = CardExitDurationMs, easing = FastOutLinearInEasing)
+      }
+    }
+  ) { cardVisible ->
+    if (cardVisible) 1f else 0.8f
+  }
+
+  val cardAlpha = transition.animateFloat(
+    label = "LocationChooser.cardAlpha",
+    transitionSpec = {
+      if (false isTransitioningTo true) {
+        tween(durationMillis = CardEnterDurationMs)
+      } else {
+        tween(durationMillis = CardExitDurationMs)
+      }
+    }
+  ) { cardVisible ->
+    if (cardVisible) 1f else 0f
+  }
+
+  val scrimAlpha = transition.animateFloat(
+    label = "LocationChooser.scrimAlpha",
+    transitionSpec = {
+      if (false isTransitioningTo true) {
+        tween(durationMillis = ScrimEnterDurationMs)
+      } else {
+        tween(durationMillis = ScrimExitDurationMs)
+      }
+    }
+  ) { scrimVisible ->
+    if (scrimVisible) 1f else 0f
+  }
+
+  return remember(transition) { TransitionData(currentlyVisible, cardScale, cardAlpha, scrimAlpha) }
+}

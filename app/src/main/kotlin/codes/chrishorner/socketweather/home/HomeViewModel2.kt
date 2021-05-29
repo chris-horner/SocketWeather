@@ -93,7 +93,7 @@ class HomeViewModel2(
     val content = when (this) {
       Forecaster.State.Idle -> HomeState.Content.Empty
       is Forecaster.State.FindingLocation, is Forecaster.State.LoadingForecast -> HomeState.Content.Loading
-      is Forecaster.State.Refreshing -> HomeState.Content.Loaded(previousForecast.format())
+      is Forecaster.State.Refreshing -> HomeState.Content.Refreshing(previousForecast.format())
       is Forecaster.State.Loaded -> HomeState.Content.Loaded(forecast.format())
       is Forecaster.State.Error -> HomeState.Content.Error(type)
     }

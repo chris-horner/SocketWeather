@@ -1,7 +1,10 @@
 package codes.chrishorner.socketweather.home
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.clickable
@@ -9,10 +12,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.Button
@@ -85,7 +90,7 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
       Scaffold(
         topBar = {
           InsetAwareTopAppBar(
-            title = { ToolbarTitles(state) { locationChooserVisible = true } },
+            title = { ToolbarTitle(state) { locationChooserVisible = true } },
             backgroundColor = MaterialTheme.colors.background,
             elevation = toolbarElevation,
             actions = { Menu(onEvent) }
@@ -135,19 +140,39 @@ private fun Menu(onEvent: (event: HomeEvent) -> Unit) {
 }
 
 @Composable
-private fun ToolbarTitles(state: HomeState, onClick: () -> Unit) {
-  Column(
+private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier
       .fillMaxWidth()
       .height(56.dp)
       .clickable { onClick() },
-    verticalArrangement = Arrangement.Center
   ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-      Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
-      Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
+
+    Column(
+      verticalArrangement = Arrangement.Center,
+      modifier = Modifier
+        .fillMaxHeight()
+        .weight(1f)
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
+        Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
+      }
+      state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
     }
-    state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
+
+    AnimatedVisibility(
+      visible = state.content is Content.Refreshing,
+      enter = fadeIn(),
+      exit = fadeOut()
+    ) {
+      CircularProgressIndicator(
+        modifier = Modifier
+          .padding(horizontal = 8.dp)
+          .size(24.dp)
+      )
+    }
   }
 }
 

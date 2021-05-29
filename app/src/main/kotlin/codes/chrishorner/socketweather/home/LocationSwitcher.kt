@@ -77,6 +77,7 @@ fun LocationSwitcher(
       )
 
       Card(
+        elevation = 8.dp,
         modifier = Modifier
           .systemBarsPadding()
           .padding(horizontal = 8.dp)

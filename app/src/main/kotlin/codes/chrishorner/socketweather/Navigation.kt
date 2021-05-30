@@ -17,7 +17,6 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.home.HomeViewModel2
-import codes.chrishorner.socketweather.util.StringResources
 
 private object NavArgs {
   const val SHOW_CLOSE_BUTTON = "show_close_button"
@@ -50,13 +49,7 @@ fun NavGraph(currentSelection: LocationSelection) {
     startDestination = initialRoute
   ) {
     composable(Screen.Home.routeDefinition) {
-      val viewModel = createVm { context ->
-        HomeViewModel2(
-          context.appSingletons.forecaster,
-          context.appSingletons.locationSelectionStore,
-          StringResources.Android(context)
-        )
-      }
+      val viewModel = createVm { context -> HomeViewModel2(context) }
       HomeScreen(viewModel, navController)
     }
     composable(
@@ -64,11 +57,7 @@ fun NavGraph(currentSelection: LocationSelection) {
       arguments = listOf(navArgument(NavArgs.SHOW_CLOSE_BUTTON) { type = NavType.BoolType })
     ) { entry ->
       val viewModel = createVm { context ->
-        ChooseLocationViewModel(
-          showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON),
-          api = context.appSingletons.networkComponents.api,
-          locationSelectionStore = context.appSingletons.locationSelectionStore
-        )
+        ChooseLocationViewModel(context, showCloseButton = entry.arguments!!.getBoolean(NavArgs.SHOW_CLOSE_BUTTON))
       }
       ChooseLocationScreen(viewModel, navController)
     }

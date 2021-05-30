@@ -1,8 +1,10 @@
 package codes.chrishorner.socketweather.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationSelection
@@ -164,5 +166,13 @@ class HomeViewModel2(
       subtitle = location.state
     )
     None -> error("Empty location selection cannot have an entry.")
+  }
+
+  companion object {
+    operator fun invoke(context: Context) = HomeViewModel2(
+      context.appSingletons.forecaster,
+      context.appSingletons.locationSelectionStore,
+      StringResources.Android(context)
+    )
   }
 }

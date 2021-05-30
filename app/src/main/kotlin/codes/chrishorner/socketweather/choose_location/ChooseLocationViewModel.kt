@@ -1,7 +1,9 @@
 package codes.chrishorner.socketweather.choose_location
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.PermissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionError
 import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionSuccess
@@ -137,4 +139,12 @@ class ChooseLocationViewModel(
 
   private val LocationSelectionStore.hasFollowMeSaved
     get() = savedSelections.value.contains(LocationSelection.FollowMe)
+
+  companion object {
+    operator fun invoke(context: Context, showCloseButton: Boolean) = ChooseLocationViewModel(
+      showCloseButton = showCloseButton,
+      api = context.appSingletons.networkComponents.api,
+      locationSelectionStore = context.appSingletons.locationSelectionStore
+    )
+  }
 }

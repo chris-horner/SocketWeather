@@ -1,8 +1,8 @@
 package codes.chrishorner.socketweather
 
 import android.os.Bundle
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.data.Forecaster
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
@@ -10,7 +10,7 @@ import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
 @ExperimentalAnimatedInsets
-class ComposeActivity : AppCompatActivity() {
+class ComposeActivity : ComponentActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)

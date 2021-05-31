@@ -14,7 +14,7 @@ import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
-import codes.chrishorner.socketweather.util.StringResources
+import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -34,7 +34,7 @@ import codes.chrishorner.socketweather.home.HomeState2 as HomeState
 class HomeViewModel2(
   private val forecaster: Forecaster,
   private val locationStore: LocationSelectionStore,
-  private val stringResources: StringResources,
+  private val strings: Strings,
   private val clock: Clock = Clock.systemDefaultZone(),
   overrideScope: CoroutineScope? = null
 ) : ViewModel() {
@@ -68,25 +68,25 @@ class HomeViewModel2(
 
   private fun Forecaster.State.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
     val toolbarTitle = when (this) {
-      Forecaster.State.Idle -> stringResources[R.string.home_loading]
-      is Forecaster.State.FindingLocation -> stringResources[R.string.home_findingLocation]
+      Forecaster.State.Idle -> strings[R.string.home_loading]
+      is Forecaster.State.FindingLocation -> strings[R.string.home_findingLocation]
       is Forecaster.State.Refreshing -> this.previousForecast.location.name
       is Forecaster.State.Loaded -> this.forecast.location.name
       is Forecaster.State.Error -> when (val selection = this.selection) {
         is Static -> selection.location.name
-        is FollowMe -> stringResources[R.string.home_findingLocation]
+        is FollowMe -> strings[R.string.home_findingLocation]
         is None -> throw IllegalStateException("Cannot display LocationSelection of None.")
       }
-      else -> stringResources[R.string.home_loading]
+      else -> strings[R.string.home_loading]
     }
 
     val toolbarSubtitle = when (this) {
-      is Forecaster.State.Refreshing -> stringResources[R.string.home_updatingNow]
+      is Forecaster.State.Refreshing -> strings[R.string.home_updatingNow]
       is Forecaster.State.Loaded -> {
         if (Duration.between(forecast.updateTime, clock.instant()).toMinutes() > 0) {
-          stringResources.get(R.string.home_lastUpdated, stringResources.getRelativeTimeSpanString(forecast.updateTime))
+          strings.get(R.string.home_lastUpdated, strings.getRelativeTimeSpanString(forecast.updateTime))
         } else {
-          stringResources[R.string.home_justUpdated]
+          strings[R.string.home_justUpdated]
         }
       }
       else -> null
@@ -114,10 +114,10 @@ class HomeViewModel2(
     val graphItems = hourlyForecasts.map { hourlyForecast ->
       TimeForecastGraphItem(
         temperatureC = hourlyForecast.temp,
-        formattedTemperature = stringResources.formatDegrees(hourlyForecast.temp),
+        formattedTemperature = strings.formatDegrees(hourlyForecast.temp),
         time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).toUpperCase(Locale.getDefault()),
         rainChancePercent = hourlyForecast.rain.chance,
-        formattedRainChance = stringResources.formatPercent(hourlyForecast.rain.chance),
+        formattedRainChance = strings.formatPercent(hourlyForecast.rain.chance),
       )
     }
 
@@ -125,7 +125,7 @@ class HomeViewModel2(
     val upcomingForecasts = upcomingForecasts.map { dateForecast ->
       val date = dateForecast.date.atZone(location.timezone)
       val dayText = if (date.toLocalDate() == currentDate.plusDays(1)) {
-        stringResources[R.string.home_dateForecastTomorrow]
+        strings[R.string.home_dateForecastTomorrow]
       } else {
         date.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
       }
@@ -133,20 +133,20 @@ class HomeViewModel2(
       return@map UpcomingForecast(
         day = dayText,
         percentChanceOfRain = dateForecast.rain.chance,
-        formattedChanceOfRain = stringResources.formatPercent(dateForecast.rain.chance),
+        formattedChanceOfRain = strings.formatPercent(dateForecast.rain.chance),
         iconDescriptor = dateForecast.icon_descriptor,
-        lowTemperature = dateForecast.temp_min?.let { stringResources.formatDegrees(it) } ?: "--",
-        highTemperature = stringResources.formatDegrees(dateForecast.temp_max)
+        lowTemperature = dateForecast.temp_min?.let { strings.formatDegrees(it) } ?: "--",
+        highTemperature = strings.formatDegrees(dateForecast.temp_max)
       )
     }
 
     return FormattedConditions(
       iconDescriptor = iconDescriptor,
       isNight = night,
-      currentTemperature = stringResources.formatDegrees(currentTemp),
-      highTemperature = stringResources.formatDegrees(highTemp),
-      lowTemperature = stringResources.formatDegrees(lowTemp),
-      feelsLikeTemperature = tempFeelsLike?.let { stringResources.formatDegrees(it) } ?: "--",
+      currentTemperature = strings.formatDegrees(currentTemp),
+      highTemperature = strings.formatDegrees(highTemp),
+      lowTemperature = strings.formatDegrees(lowTemp),
+      feelsLikeTemperature = tempFeelsLike?.let { strings.formatDegrees(it) } ?: "--",
       description = todayForecast.extended_text ?: todayForecast.short_text,
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts
@@ -156,8 +156,8 @@ class HomeViewModel2(
   private fun LocationSelection.toLocationEntry(): LocationEntry = when (this) {
     FollowMe -> LocationEntry(
       selection = this,
-      title = stringResources[R.string.switchLocation_followMeTitle],
-      subtitle = stringResources[R.string.switchLocation_followMeSubtitle],
+      title = strings[R.string.switchLocation_followMeTitle],
+      subtitle = strings[R.string.switchLocation_followMeSubtitle],
       showTrackingIcon = true
     )
     is Static -> LocationEntry(
@@ -172,7 +172,7 @@ class HomeViewModel2(
     operator fun invoke(context: Context) = HomeViewModel2(
       context.appSingletons.forecaster,
       context.appSingletons.locationSelectionStore,
-      StringResources.Android(context)
+      Strings.AndroidStrings(context)
     )
   }
 }

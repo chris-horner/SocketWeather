@@ -7,7 +7,7 @@ import codes.chrishorner.socketweather.R
 import org.threeten.bp.Instant
 import java.text.DecimalFormat
 
-interface StringResources {
+interface Strings {
 
   operator fun get(@StringRes key: Int): String
   fun get(@StringRes key: Int, vararg formatArgs: Any?): String
@@ -16,7 +16,7 @@ interface StringResources {
   fun formatDegrees(value: Int): String
   fun formatPercent(value: Int): String
 
-  class Android(context: Context) : StringResources {
+  class AndroidStrings(context: Context) : Strings {
 
     private val res = context.applicationContext.resources
     private val decimalFormat = DecimalFormat("0.#")

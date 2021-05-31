@@ -96,3 +96,9 @@ val SmallTempTextStyle = SocketWeatherTypography.body1.copy(
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Medium
 )
+
+val TinyTempTextStyle = SocketWeatherTypography.body1.copy(
+  fontSize = 16.sp,
+  fontFamily = RobotoSlab,
+  fontWeight = FontWeight.Medium
+)

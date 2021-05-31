@@ -1,8 +1,10 @@
 package codes.chrishorner.socketweather.home
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +19,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -35,6 +38,7 @@ import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.styles.TinyTempTextStyle
 import codes.chrishorner.socketweather.util.ThickDivider
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
@@ -48,6 +52,8 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
   ) {
 
     Observations(conditions)
+
+    HumidityWindUvSection(conditions.humidityPercent, conditions.windSpeed, conditions.uvWarningTimes)
 
     if (conditions.description != null) {
       Text(
@@ -135,6 +141,49 @@ private fun Observations(conditions: FormattedConditions) {
 }
 
 @Composable
+private fun HumidityWindUvSection(humidity: String?, windSpeed: String, uvWarningTimes: String?) {
+  Row(
+    horizontalArrangement = Arrangement.SpaceBetween,
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+  ) {
+    if (humidity != null) {
+      SectionEntry(
+        iconRes = R.drawable.ic_water_24dp,
+        iconDesc = stringResource(R.string.home_humidityIconDesc),
+        content = humidity
+      )
+    }
+    SectionEntry(
+      iconRes = R.drawable.ic_weather_windy_24dp,
+      iconDesc = stringResource(R.string.home_humidityIconDesc),
+      content = windSpeed
+    )
+    if (uvWarningTimes != null) {
+      SectionEntry(
+        iconRes = R.drawable.ic_weather_sunny_alert_24dp,
+        iconDesc = stringResource(R.string.home_humidityIconDesc),
+        content = uvWarningTimes
+      )
+    }
+  }
+}
+
+@Composable
+private fun SectionEntry(@DrawableRes iconRes: Int, iconDesc: String, content: String) {
+  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+    Row(
+      horizontalArrangement = Arrangement.spacedBy(8.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Icon(painterResource(iconRes), contentDescription = iconDesc)
+      Text(content, style = TinyTempTextStyle)
+    }
+  }
+}
+
+@Composable
 @Preview(showBackground = true, backgroundColor = 0xFFFFFF)
 private fun ForecastUiPreview() {
   SocketWeatherTheme {
@@ -147,6 +196,9 @@ private fun ForecastUiPreview() {
         highTemperature = "22°",
         lowTemperature = "14°",
         feelsLikeTemperature = "15.8°",
+        humidityPercent = "50%",
+        windSpeed = "20 km/h",
+        uvWarningTimes = "10:00 - 16:00",
         description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
         graphItems = listOf(
           TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),

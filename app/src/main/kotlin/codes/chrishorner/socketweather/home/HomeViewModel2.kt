@@ -15,6 +15,7 @@ import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
 import codes.chrishorner.socketweather.util.Strings
+import codes.chrishorner.socketweather.util.localTimeAtZone
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharingStarted
@@ -140,6 +141,18 @@ class HomeViewModel2(
       )
     }
 
+    val uvWarningTimes = todayForecast.uv.run {
+      if (start_time == null || end_time == null) {
+        null
+      } else {
+        strings.get(
+          R.string.home_uvProtection,
+          start_time.localTimeAtZone(location.timezone),
+          end_time.localTimeAtZone(location.timezone)
+        )
+      }
+    }
+
     return FormattedConditions(
       iconDescriptor = iconDescriptor,
       isNight = night,
@@ -147,6 +160,9 @@ class HomeViewModel2(
       highTemperature = strings.formatDegrees(highTemp),
       lowTemperature = strings.formatDegrees(lowTemp),
       feelsLikeTemperature = tempFeelsLike?.let { strings.formatDegrees(it) } ?: "--",
+      humidityPercent = humidity?.let { strings.formatPercent(it) },
+      windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
+      uvWarningTimes = uvWarningTimes,
       description = todayForecast.extended_text ?: todayForecast.short_text,
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts

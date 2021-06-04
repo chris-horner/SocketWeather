@@ -29,6 +29,11 @@ import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.ArrowDropUp
+import androidx.compose.material.icons.rounded.CheckCircleOutline
+import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
@@ -40,7 +45,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
@@ -113,7 +117,7 @@ private fun LocationSwitcherContent(
     ) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Icon(
-          painterResource(R.drawable.ic_check_circle_outline_24dp),
+          Icons.Rounded.CheckCircleOutline,
           contentDescription = null,
           modifier = Modifier.padding(horizontal = 20.dp)
         )
@@ -124,7 +128,7 @@ private fun LocationSwitcherContent(
       }
       Spacer(modifier = Modifier.weight(1f))
       Icon(
-        painterResource(R.drawable.ic_arrow_drop_up_24dp),
+        Icons.Rounded.ArrowDropUp,
         contentDescription = null,
         Modifier.padding(horizontal = 16.dp)
       )
@@ -144,7 +148,7 @@ private fun LocationSwitcherContent(
           if (item.showTrackingIcon) {
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
               Icon(
-                painterResource(R.drawable.ic_my_location_24dp),
+                Icons.Rounded.MyLocation,
                 contentDescription = null,
                 Modifier.padding(horizontal = 20.dp)
               )
@@ -171,7 +175,7 @@ private fun LocationSwitcherContent(
     ) {
       CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
         Icon(
-          painterResource(R.drawable.ic_add_24dp),
+          Icons.Rounded.Add,
           contentDescription = null,
           modifier = Modifier.padding(horizontal = 20.dp)
         )

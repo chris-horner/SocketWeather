@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<resources>
-
-  <attr format="color" name="colorDivider" />
-  <attr format="color" name="colorScrim" />
-  <attr format="color" name="colorHint" />
-
-</resources>

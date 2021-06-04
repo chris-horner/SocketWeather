@@ -10,14 +10,14 @@ import androidx.compose.ui.graphics.Color
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.systemuicontroller.rememberAndroidSystemUiController
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
 @ExperimentalAnimatedInsets
 fun RootContainer(content: @Composable () -> Unit) {
   SocketWeatherTheme {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {
-      val systemUiController = rememberAndroidSystemUiController()
+      val systemUiController = rememberSystemUiController()
       val useDarkIcons = MaterialTheme.colors.isLight
       SideEffect {
         systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)

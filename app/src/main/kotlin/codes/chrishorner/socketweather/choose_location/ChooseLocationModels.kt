@@ -15,10 +15,6 @@ data class ChooseLocationState(
   enum class Error { Permission, Submission }
 }
 
-enum class ChooseLocationDataEvent {
-  SubmissionError, SubmissionSuccess, PermissionError
-}
-
 sealed class ChooseLocationUiEvent {
   data class ResultSelected(val result: SearchResult) : ChooseLocationUiEvent()
   data class InputSearch(val query: String) : ChooseLocationUiEvent()

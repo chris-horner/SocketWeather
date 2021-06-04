@@ -5,6 +5,7 @@
   <color name="backgroundBlue">#f5fcfe</color>
   <color name="systemScrimLight">#1103a9f4</color>
   <color name="systemScrimDark">#cc000000</color>
+  <color name="translucentGrey">#5555</color>
   <color name="transparent">#00000000</color>
 
 </resources>

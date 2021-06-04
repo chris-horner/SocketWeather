@@ -38,14 +38,15 @@ class SocketWeatherApp : Application() {
       initialiseSingletons()
     }
 
-    // If our API environment ever changes, remove all saved location selections.
-    val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
+    if (BuildConfig.DEBUG) {
+      // If our API environment ever changes, remove all saved location selections.
+      val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
 
-    scope.launch {
-      appSingletons.networkComponents.environmentChanges.first()
-      allowMainThreadDiskOperations {
-        Timber.d("In collection")
-        appSingletons.locationSelectionStore.clear()
+      scope.launch {
+        appSingletons.networkComponents.environmentChanges.first()
+        allowMainThreadDiskOperations {
+          appSingletons.locationSelectionStore.clear()
+        }
       }
     }
   }

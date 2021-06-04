@@ -1,9 +1,6 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
-import au.com.gridstone.debugdrawer.okhttplogs.HttpLogger
-import au.com.gridstone.debugdrawer.retrofit.DebugRetrofitConfig
-import au.com.gridstone.debugdrawer.retrofit.Endpoint
 import codes.chrishorner.socketweather.debug.DebugEndpoint
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENDPOINT
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
@@ -31,7 +28,6 @@ import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
 import okhttp3.logging.HttpLoggingInterceptor.Level
-import okhttp3.logging.HttpLoggingInterceptor.Logger
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -50,26 +46,19 @@ class DebugNetworkComponents(
   moshi: Moshi
 ) : NetworkComponents {
 
-  @Deprecated("Delete once migration to Compose is complete.")
-  val debugRetrofitConfig: DebugRetrofitConfig
-  @Deprecated("Delete once migration to Compose is complete.")
-  val httpLogger = HttpLogger(app, prettyPrintJson = true)
-
-  private val httpLogger2 = HttpLoggingInterceptor(object : Logger {
-    override fun log(message: String) {
-      val formattedMessage: String = try {
-        when {
-          message.startsWith('{') -> JSONObject(message).toString(2)
-          message.startsWith('[') -> JSONArray(message).toString(2)
-          else -> message
-        }
-      } catch (e: JSONException) {
-        message
+  private val logger = HttpLoggingInterceptor { message ->
+    val formattedMessage: String = try {
+      when {
+        message.startsWith('{') -> JSONObject(message).toString(2)
+        message.startsWith('[') -> JSONArray(message).toString(2)
+        else -> message
       }
-
-      Timber.tag("HTTP").v(formattedMessage)
+    } catch (e: JSONException) {
+      message
     }
-  })
+
+    Timber.tag("HTTP").v(formattedMessage)
+  }
 
   private val environmentChangeFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
   private val preferenceStore = app.debugPreferences
@@ -77,15 +66,10 @@ class DebugNetworkComponents(
   override val environmentChanges: Flow<Unit> = environmentChangeFlow
 
   init {
-    val endpoints = listOf(
-      Endpoint("Mock", "https://localhost/mock/", isMock = true),
-      Endpoint("Production", apiEndpoint)
-    )
     val networkBehavior = NetworkBehavior.create()
-    debugRetrofitConfig = DebugRetrofitConfig(app, endpoints, networkBehavior)
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
-      .addInterceptor(httpLogger2)
+      .addInterceptor(logger)
       .build()
 
     val currentEndpoint: DebugEndpoint = runBlocking {
@@ -120,7 +104,7 @@ class DebugNetworkComponents(
 
     preferenceStore.data
       .onEach { preferences ->
-        httpLogger2.level = preferences.getEnum<Level>(HTTP_LOG_LEVEL) ?: Level.BASIC
+        logger.level = preferences.getEnum<Level>(HTTP_LOG_LEVEL) ?: Level.BASIC
         networkBehavior.setDelay(preferences[MOCK_HTTP_DELAY] ?: 1_000, TimeUnit.MILLISECONDS)
         networkBehavior.setVariancePercent(preferences[MOCK_HTTP_VARIANCE] ?: 40)
         networkBehavior.setFailurePercent(preferences[MOCK_HTTP_FAIL_RATE] ?: 0)

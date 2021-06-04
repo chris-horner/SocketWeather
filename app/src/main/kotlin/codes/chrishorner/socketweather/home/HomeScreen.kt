@@ -58,13 +58,11 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
-import codes.chrishorner.socketweather.home.HomeState2.Content
+import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
-import codes.chrishorner.socketweather.home.HomeState2 as HomeState
-import codes.chrishorner.socketweather.home.HomeViewModel2 as HomeViewModel
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {

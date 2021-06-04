@@ -3,17 +3,8 @@
 <resources>
 
   <color name="backgroundBlue">#f5fcfe</color>
-  <color name="primaryBlue">#c1e4ee</color>
-  <color name="primaryBlueVariant">#00abe3</color>
-  <color name="accentOrange">#fb9039</color>
-  <color name="accentOrangeVariant">#f2a363</color>
-  <color name="darkGrey">#121212</color>
   <color name="systemScrimLight">#1103a9f4</color>
   <color name="systemScrimDark">#cc000000</color>
-  <color name="scrimLight">#44000000</color>
-  <color name="scrimDark">#AA000000</color>
-  <color name="black">#000000</color>
-  <color name="white">#ffffff</color>
   <color name="transparent">#00000000</color>
 
 </resources>

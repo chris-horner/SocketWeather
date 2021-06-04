@@ -4,9 +4,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import codes.chrishorner.socketweather.appSingletons
-import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.PermissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationDataEvent.SubmissionSuccess
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
@@ -26,8 +23,6 @@ import codes.chrishorner.socketweather.data.WeatherApi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -50,10 +45,8 @@ class ChooseLocationViewModel(
   private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationSelectionStore.hasFollowMeSaved)
   private val stateFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
-  private val eventsFlow = MutableSharedFlow<ChooseLocationDataEvent>(extraBufferCapacity = 1)
 
   val states: StateFlow<ChooseLocationState> = stateFlow
-  val events: Flow<ChooseLocationDataEvent> = eventsFlow
 
   init {
     searchQueryFlow
@@ -80,16 +73,7 @@ class ChooseLocationViewModel(
     CloseClicked -> { /* Not handled by ViewModel. */ }
   }
 
-  // TODO: Remove once compose migration is complete.
-  fun observeEvents(): Flow<ChooseLocationDataEvent> = events
-
-  // TODO: Remove once compose migration is complete.
-  fun inputSearchQuery(query: String) {
-    searchQueryFlow.value = query
-  }
-
-  // TODO: Make private once compose migration is complete.
-  fun selectResult(result: SearchResult) {
+  private fun selectResult(result: SearchResult) {
     scope.launch {
       stateFlow.value = stateFlow.value.copy(loadingStatus = Submitting)
 
@@ -97,32 +81,23 @@ class ChooseLocationViewModel(
         val location = api.getLocation(result.geohash)
         locationSelectionStore.saveAndSelect(LocationSelection.Static(location))
         stateFlow.value = stateFlow.value.copy(loadingStatus = Submitted)
-        // TODO: Remove once compose migration is complete.
-        eventsFlow.emit(SubmissionSuccess)
       } catch (e: Exception) {
         Timber.e(e, "Failed to select location.")
         stateFlow.value = stateFlow.value.copy(loadingStatus = SearchingDone, error = Error.Submission)
         delay(1_500L)
         stateFlow.value = stateFlow.value.copy(error = null)
-        // TODO: Remove once compose migration is complete.
-        eventsFlow.emit(SubmissionError)
       }
     }
   }
 
-  // TODO: Make private once compose migration is complete.
-  fun selectFollowMe(locationPermissionGranted: Boolean) {
+  private fun selectFollowMe(locationPermissionGranted: Boolean) {
     scope.launch {
       if (locationPermissionGranted) {
         locationSelectionStore.saveAndSelect(LocationSelection.FollowMe)
-        // TODO: Remove once compose migration is complete.
-        eventsFlow.emit(SubmissionSuccess)
       } else {
         stateFlow.value = stateFlow.value.copy(error = Error.Permission)
         delay(1_500L)
         stateFlow.value = stateFlow.value.copy(error = null)
-        // TODO: Remove once compose migration is complete.
-        eventsFlow.emit(PermissionError)
       }
     }
   }

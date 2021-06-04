@@ -1,20 +1,16 @@
 package codes.chrishorner.socketweather
 
 import android.os.Bundle
-import android.view.ViewGroup
+import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
-import codes.chrishorner.socketweather.choose_location.ChooseLocationController
-import codes.chrishorner.socketweather.data.LocationSelection
-import codes.chrishorner.socketweather.home.HomeController
-import codes.chrishorner.socketweather.util.ControllerLeakListener
-import codes.chrishorner.socketweather.util.asTransaction
-import com.bluelinelabs.conductor.Conductor
-import com.bluelinelabs.conductor.Router
+import codes.chrishorner.socketweather.data.Forecaster
+import com.google.accompanist.insets.ExperimentalAnimatedInsets
+import org.threeten.bp.Duration
+import org.threeten.bp.Instant
 
+@ExperimentalAnimatedInsets
 class MainActivity : AppCompatActivity() {
-
-  private lateinit var router: Router
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
@@ -22,17 +18,27 @@ class MainActivity : AppCompatActivity() {
     // Render under the status and navigation bars.
     WindowCompat.setDecorFitsSystemWindows(window, false)
 
-    val rootContainer: ViewGroup = CurrentBuildTypeComponents.createRootContainerFor(this)
-    router = Conductor.attachRouter(this, rootContainer, savedInstanceState)
-    router.addChangeListener(ControllerLeakListener)
+    setContent {
+      RootContainer {
+        val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
+        NavGraph(currentSelection = locationSelection)
+      }
+    }
+  }
 
-    if (!router.hasRootController()) {
-      val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
+  override fun onResume() {
+    super.onResume()
 
-      if (locationSelection == LocationSelection.None) {
-        router.setRoot(ChooseLocationController(displayAsRoot = true).asTransaction())
-      } else {
-        router.setRoot(HomeController().asTransaction())
+    val forecaster = appSingletons.forecaster
+
+    when (val state = forecaster.states.value) {
+      is Forecaster.State.Idle -> forecaster.refresh()
+
+      is Forecaster.State.Loaded -> {
+        val elapsedTime = Duration.between(state.forecast.updateTime, Instant.now())
+        if (elapsedTime.toMinutes() > 1) {
+          forecaster.refresh()
+        }
       }
     }
   }
@@ -45,18 +51,5 @@ class MainActivity : AppCompatActivity() {
   override fun onStop() {
     super.onStop()
     appSingletons.deviceLocator.disable()
-  }
-
-  override fun onBackPressed() {
-    if (!router.handleBack()) {
-      // Guard against a leak introduced in Android 10.
-      // https://twitter.com/Piwai/status/1169274622614704129
-      finishAfterTransition()
-    }
-  }
-
-  override fun onDestroy() {
-    super.onDestroy()
-    router.removeChangeListener(ControllerLeakListener)
   }
 }

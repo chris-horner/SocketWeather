@@ -16,7 +16,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
-import codes.chrishorner.socketweather.home.HomeViewModel2
+import codes.chrishorner.socketweather.home.HomeViewModel
 
 private object NavArgs {
   const val SHOW_CLOSE_BUTTON = "show_close_button"
@@ -49,7 +49,7 @@ fun NavGraph(currentSelection: LocationSelection) {
     startDestination = initialRoute
   ) {
     composable(Screen.Home.routeDefinition) {
-      val viewModel = createVm { context -> HomeViewModel2(context) }
+      val viewModel = createVm { context -> HomeViewModel(context) }
       HomeScreen(viewModel, navController)
     }
     composable(

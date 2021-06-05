@@ -96,7 +96,7 @@ fun NetworkModule() {
     ) { selectedRate ->
       scope.launch {
         preferenceStore.edit { preferences ->
-          preferences[MOCK_HTTP_FAIL_RATE] = selectedRate
+          preferences[MOCK_HTTP_ERROR_RATE] = selectedRate
         }
       }
     }
@@ -118,6 +118,5 @@ fun NetworkModule() {
 
 private fun Int.formatAsRatePercent(): String = when (this) {
   0 -> "None"
-  100 -> "All"
   else -> "$this%"
 }

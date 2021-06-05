@@ -4,6 +4,7 @@ import android.app.Application
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.DEVICE_LOCATION
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.DEVICE_LOCATION_MODE
 import codes.chrishorner.socketweather.debug.blockingGet
+import codes.chrishorner.socketweather.debug.blockingGetValue
 import codes.chrishorner.socketweather.debug.debugPreferences
 import codes.chrishorner.socketweather.debug.getEnum
 import kotlinx.coroutines.CoroutineScope
@@ -29,7 +30,7 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
 
   init {
     val mode = preferenceStore.blockingGet().getEnum(DEVICE_LOCATION_MODE) ?: Mode.REAL
-    val locationName = preferenceStore.blockingGet()[DEVICE_LOCATION] ?: mockLocations.entries.first().key
+    val locationName = preferenceStore.blockingGetValue(DEVICE_LOCATION) ?: mockLocations.entries.first().key
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     modeFlow = preferenceStore.data

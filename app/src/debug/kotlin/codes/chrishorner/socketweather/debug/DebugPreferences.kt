@@ -12,10 +12,7 @@ import androidx.datastore.preferences.preferencesDataStore
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
-val Context.debugPreferences: DataStore<Preferences> get() = applicationContext.nonLeakingPreferences
-
-// Remove once fixed: https://issuetracker.google.com/issues/184415662
-private val Context.nonLeakingPreferences: DataStore<Preferences> by preferencesDataStore("debugSettings")
+val Context.debugPreferences: DataStore<Preferences> by preferencesDataStore("debugSettings")
 
 /**
  * Synchronously read the current [Preferences].
@@ -25,7 +22,7 @@ fun DataStore<Preferences>.blockingGet() = runBlocking { data.first() }
 /**
  * Synchronously read a value from the current [Preferences].
  */
-fun <T> DataStore<Preferences>.blockingGet(key: Key<T>): T? {
+fun <T> DataStore<Preferences>.blockingGetValue(key: Key<T>): T? {
   return blockingGet()[key]
 }
 

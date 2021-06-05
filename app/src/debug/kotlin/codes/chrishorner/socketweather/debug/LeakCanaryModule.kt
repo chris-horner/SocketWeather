@@ -7,13 +7,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.datastore.preferences.core.edit
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENABLE_HEAP_DUMPS
 import com.alorma.drawer_modules.ActionsModule
 import com.alorma.drawer_modules.actions.ButtonAction
 import com.alorma.drawer_modules.actions.SwitchAction
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import leakcanary.LeakCanary
 
 @Composable
@@ -21,12 +19,8 @@ fun LeakCanaryModule() {
 
   val scope = rememberCoroutineScope()
   val context = LocalContext.current
-  val preferences = context.debugPreferences
-  val heapDumpsEnabled: Boolean = runBlocking {
-    preferences.data
-      .map { it[DebugPreferenceKeys.ENABLE_HEAP_DUMPS] ?: true }
-      .first()
-  }
+  val preferenceStore = context.debugPreferences
+  val heapDumpsEnabled = preferenceStore.blockingGetValue(ENABLE_HEAP_DUMPS) ?: true
 
   ActionsModule(
     title = "Leaks",
@@ -35,7 +29,9 @@ fun LeakCanaryModule() {
 
     SwitchAction(text = "Enable heap dumps", isChecked = heapDumpsEnabled) { checked ->
       scope.launch {
-        preferences.edit { it[DebugPreferenceKeys.ENABLE_HEAP_DUMPS] = checked }
+        preferenceStore.edit { preferences ->
+          preferences[ENABLE_HEAP_DUMPS] = checked
+        }
       }
     }
 

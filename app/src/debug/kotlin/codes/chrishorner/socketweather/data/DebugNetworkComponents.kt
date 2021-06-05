@@ -9,13 +9,12 @@ import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_ERROR
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_ERROR_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_FAIL_RATE
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_VARIANCE
+import codes.chrishorner.socketweather.debug.blockingGet
 import codes.chrishorner.socketweather.debug.debugPreferences
 import codes.chrishorner.socketweather.debug.getEnum
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.drop
 import kotlinx.coroutines.flow.first
@@ -23,7 +22,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import okhttp3.OkHttpClient
 import okhttp3.ResponseBody.Companion.toResponseBody
 import okhttp3.logging.HttpLoggingInterceptor
@@ -60,10 +58,10 @@ class DebugNetworkComponents(
     Timber.tag("HTTP").v(formattedMessage)
   }
 
-  private val environmentChangeFlow = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
   private val preferenceStore = app.debugPreferences
   override val api: WeatherApi
-  override val environmentChanges: Flow<Unit> = environmentChangeFlow
+
+  private var environmentChangeAction = {}
 
   init {
     val networkBehavior = NetworkBehavior.create()
@@ -72,12 +70,7 @@ class DebugNetworkComponents(
       .addInterceptor(logger)
       .build()
 
-    val currentEndpoint: DebugEndpoint = runBlocking {
-      preferenceStore.data
-        .map { preferences -> preferences[ENDPOINT] ?: DebugEndpoint.MOCK.ordinal }
-        .map { index -> DebugEndpoint.values()[index] }
-        .first()
-    }
+    val currentEndpoint = preferenceStore.blockingGet().getEnum(ENDPOINT) ?: DebugEndpoint.MOCK
 
     val retrofit: Retrofit = Retrofit.Builder()
       .baseUrl(
@@ -125,10 +118,14 @@ class DebugNetworkComponents(
         .first()
 
       // Notify any listeners.
-      environmentChangeFlow.emit(Unit)
+      environmentChangeAction()
 
       // Restart the app.
       ProcessPhoenix.triggerRebirth(app)
     }
+  }
+
+  override fun addEnvironmentChangeAction(action: () -> Unit) {
+    environmentChangeAction = action
   }
 }

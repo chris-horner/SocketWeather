@@ -6,11 +6,7 @@ import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import com.jakewharton.threetenabp.AndroidThreeTen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @Suppress("unused") // It's used in AndroidManifest.xml.
@@ -38,15 +34,10 @@ class SocketWeatherApp : Application() {
       initialiseSingletons()
     }
 
-    if (BuildConfig.DEBUG) {
-      // If our API environment ever changes, remove all saved location selections.
-      val scope = CoroutineScope(Dispatchers.Main.immediate + SupervisorJob())
-
-      scope.launch {
-        appSingletons.networkComponents.environmentChanges.first()
-        allowMainThreadDiskOperations {
-          appSingletons.locationSelectionStore.clear()
-        }
+    // If our API environment ever changes, remove all saved location selections.
+    appSingletons.networkComponents.addEnvironmentChangeAction {
+      allowMainThreadDiskOperations {
+        runBlocking { appSingletons.locationSelectionStore.clear() }
       }
     }
   }

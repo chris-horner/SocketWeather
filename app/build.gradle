@@ -105,7 +105,7 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
 }
 
 dependencies {
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:${versions.kotlin}"
+  implementation "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
   implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
   implementation "androidx.compose.ui:ui:${versions.compose}"
   implementation "androidx.compose.material:material:${versions.compose}"

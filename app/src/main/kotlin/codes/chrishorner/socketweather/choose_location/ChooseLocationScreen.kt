@@ -104,7 +104,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
     color = MaterialTheme.colors.background,
     modifier = Modifier
       .statusBarsPadding()
-      .navigationBarsPadding(left = true, right = true, bottom = false)
+      .navigationBarsPadding(start = true, end = true, bottom = false)
   ) {
     Box {
       Column {

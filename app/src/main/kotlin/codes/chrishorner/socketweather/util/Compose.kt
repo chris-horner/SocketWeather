@@ -49,7 +49,7 @@ fun InsetAwareTopAppBar(
       elevation = 0.dp,
       modifier = Modifier
         .statusBarsPadding()
-        .navigationBarsPadding(left = true, right = true, bottom = false)
+        .navigationBarsPadding(start = true, end = true, bottom = false)
     )
   }
 }

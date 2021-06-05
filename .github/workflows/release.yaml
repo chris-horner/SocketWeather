@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags:
-      - '*.*.*'
+      - 'v*.*.*'
 
 jobs:
   deploy:
@@ -43,7 +43,7 @@ jobs:
           socket_weather_password: ${{ secrets.socket_weather_password }}
         run: bash ./gradlew assemble
 
-      - name: Create tag
+      - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
           draft: true

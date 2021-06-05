@@ -1,2 +1,3 @@
-Fixed issues with network request management.
-Fixed issues with parsing BOMs eccentric data.
+- 💌 Migrated UI to Jetpack Compose!
+- 📍 Fixed "Follow me" not working on Android 11
+- 🌧 Added some workarounds for some of BOMs eccentric data

@@ -9,13 +9,13 @@ import codes.chrishorner.socketweather.util.await
 import com.google.android.gms.location.LocationAvailability
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
-import com.google.android.gms.location.LocationRequest.PRIORITY_HIGH_ACCURACY
+import com.google.android.gms.location.LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.conflate
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.emptyFlow
@@ -48,8 +48,8 @@ class RealDeviceLocator(private val app: Application) : DeviceLocator {
   }
 }
 
-private val request = LocationRequest()
-  .setPriority(PRIORITY_HIGH_ACCURACY)
+private val request = LocationRequest.create()
+  .setPriority(PRIORITY_BALANCED_POWER_ACCURACY)
   .setFastestInterval(1000)
   .setMaxWaitTime(3000)
   .setInterval(2000)
@@ -62,8 +62,8 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
 
   val client = LocationServices.getFusedLocationProviderClient(context)
 
-  return channelFlow {
-    cachedLocation?.let { offer(it) }
+  return callbackFlow {
+    cachedLocation?.let { send(it) }
 
     val lastKnownLocation: Location? = try {
       client.lastLocation.await()
@@ -85,7 +85,7 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
         val deviceLocation = DeviceLocation(result.lastLocation.latitude, result.lastLocation.longitude)
         Timber.d("New location update: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
         cachedLocation = deviceLocation
-        offer(deviceLocation)
+        trySend(deviceLocation)
       }
 
       override fun onLocationAvailability(availability: LocationAvailability) {}
@@ -93,7 +93,10 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
 
     if (!isClosedForSend) {
       try {
-        client.requestLocationUpdates(request, callback, Looper.getMainLooper())
+        client.requestLocationUpdates(request, callback, Looper.getMainLooper()).addOnFailureListener { e ->
+          Timber.e(e, "Failed to request location updates.")
+          close(e)
+        }
       } catch (e: SecurityException) {
         Timber.e(e, "Location permission not granted.")
       }

@@ -46,7 +46,8 @@ jobs:
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1
         with:
-          draft: true
+          draft: false
+          body_path: app/src/main/play/release-notes/en-AU/default.txt
           files: |
             app/build/outputs/apk/release/app-release.apk
             app/build/outputs/apk/debug/app-debug.apk

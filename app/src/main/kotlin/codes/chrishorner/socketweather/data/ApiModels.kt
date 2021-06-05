@@ -53,7 +53,7 @@ data class Rain(val amount: Amount, val chance: Int) {
   data class Amount(val min: Float?, val max: Float?, val units: String)
 }
 
-data class Wind(val speed_kilometre: Int, val direction: String)
+data class Wind(val speed_kilometre: Int, val direction: String?)
 
 data class Uv(val max_index: Int?, val start_time: Instant?, val end_time: Instant?)
 

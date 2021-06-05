@@ -4,8 +4,8 @@ import android.content.Context
 import android.text.format.DateUtils
 import androidx.annotation.StringRes
 import codes.chrishorner.socketweather.R
-import org.threeten.bp.Instant
 import java.text.DecimalFormat
+import java.time.Instant
 
 interface Strings {
 

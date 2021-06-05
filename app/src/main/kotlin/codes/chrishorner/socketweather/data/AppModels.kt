@@ -1,6 +1,6 @@
 package codes.chrishorner.socketweather.data
 
-import org.threeten.bp.Instant
+import java.time.Instant
 
 sealed class LocationSelection {
   object FollowMe : LocationSelection()

@@ -2,14 +2,14 @@ package codes.chrishorner.socketweather.data
 
 import codes.chrishorner.socketweather.data.Rain.Amount
 import com.squareup.moshi.JsonDataException
-import org.threeten.bp.Clock
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.Period
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZoneOffset
 import java.io.IOException
+import java.time.Clock
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.Period
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 class TestApi(clock: Clock) : WeatherApi {
 

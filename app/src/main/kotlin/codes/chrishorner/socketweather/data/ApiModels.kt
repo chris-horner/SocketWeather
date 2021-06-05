@@ -1,7 +1,7 @@
 package codes.chrishorner.socketweather.data
 
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * A representation of the wrapped payloads the BOM API returns. Any Envelope objects

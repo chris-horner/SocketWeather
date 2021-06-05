@@ -24,11 +24,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import org.threeten.bp.Clock
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDate
-import org.threeten.bp.format.DateTimeFormatter
-import org.threeten.bp.format.TextStyle
+import java.time.Clock
+import java.time.Duration
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.TextStyle
 import java.util.Locale
 
 class HomeViewModel(
@@ -62,7 +62,6 @@ class HomeViewModel(
   private fun switchLocation(selection: LocationSelection) {
     scope.launch {
       locationStore.select(selection)
-
     }
   }
 

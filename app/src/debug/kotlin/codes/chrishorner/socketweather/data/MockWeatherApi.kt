@@ -1,16 +1,16 @@
 package codes.chrishorner.socketweather.data
 
 import codes.chrishorner.socketweather.data.Rain.Amount
-import org.threeten.bp.Duration
-import org.threeten.bp.LocalDate
-import org.threeten.bp.LocalDateTime
-import org.threeten.bp.LocalTime
-import org.threeten.bp.Period
-import org.threeten.bp.ZoneId
-import org.threeten.bp.ZoneOffset
 import retrofit2.mock.BehaviorDelegate
 import retrofit2.mock.MockRetrofit
 import retrofit2.mock.create
+import java.time.Duration
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
+import java.time.Period
+import java.time.ZoneId
+import java.time.ZoneOffset
 
 class MockWeatherApi(mockRetrofit: MockRetrofit) : WeatherApi {
 

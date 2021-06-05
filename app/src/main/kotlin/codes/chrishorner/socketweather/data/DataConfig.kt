@@ -10,9 +10,9 @@ import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
-import org.threeten.bp.Instant
-import org.threeten.bp.ZoneId
 import java.lang.reflect.Type
+import java.time.Instant
+import java.time.ZoneId
 
 object DataConfig {
 

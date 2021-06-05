@@ -3,7 +3,7 @@ package codes.chrishorner.socketweather.data
 import com.google.common.truth.Truth.assertThat
 import com.squareup.moshi.JsonAdapter
 import org.junit.Test
-import org.threeten.bp.ZoneId
+import java.time.ZoneId
 
 class JsonParsingTest {
 

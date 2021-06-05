@@ -5,7 +5,6 @@ import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
-import com.jakewharton.threetenabp.AndroidThreeTen
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
@@ -30,7 +29,6 @@ class SocketWeatherApp : Application() {
     // Explicitly initialise these dependencies on the main thread as they're
     // needed for the whole app to do its thing.
     allowMainThreadDiskOperations {
-      AndroidThreeTen.init(this)
       initialiseSingletons()
     }
 

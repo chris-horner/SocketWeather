@@ -9,7 +9,7 @@ import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationSelectionDiskStore
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
-import org.threeten.bp.Clock
+import java.time.Clock
 
 /**
  * A cheap and dirty service locator that houses singletons used throughout

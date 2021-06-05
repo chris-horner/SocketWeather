@@ -16,9 +16,9 @@ import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.supervisorScope
-import org.threeten.bp.Clock
-import org.threeten.bp.Instant
 import timber.log.Timber
+import java.time.Clock
+import java.time.Instant
 
 /**
  * A singleton that holds the current state of the [Forecast] for the whole application.

@@ -139,9 +139,8 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
   val dateForecasts: List<DateForecast> = dateForecastsRequest.await()
   val hourlyForecasts: List<ThreeHourlyForecast> = hourlyForecastsRequest.await()
 
-  val currentInfo: CurrentInformation = requireNotNull(dateForecasts.getOrNull(0)?.now) {
-    "Invalid dateForecasts. First element must contain a valid 'now' field."
-  }
+  val currentInfo: CurrentInformation = dateForecasts.getOrNull(0)?.now
+    ?: throw JsonDataException("Invalid dateForecasts. First element must contain a valid 'now' field.")
 
   val todayForecast: DateForecast = dateForecasts[0]
 

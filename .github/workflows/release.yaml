@@ -38,11 +38,13 @@ jobs:
         run: bash ./gradlew publishListing
 
       - name: Build APKs
+        env:
+          socket_weather_alias: ${{ secrets.socket_weather_alias }}
+          socket_weather_password: ${{ secrets.socket_weather_password }}
         run: bash ./gradlew assemble
 
       - name: Create tag
         uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/v')
         with:
           draft: true
           files: |

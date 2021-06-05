@@ -28,14 +28,14 @@ jobs:
           upload_keystore: ${{ secrets.upload_keystore }}
         run: echo $upload_keystore | base64 -di > app/keys/upload.keystore
 
-#      - name: Publish app to internal test track
-#        env:
-#          socket_weather_alias: ${{ secrets.socket_weather_alias }}
-#          socket_weather_password: ${{ secrets.socket_weather_password }}
-#        run: bash ./gradlew publishReleaseBundle
+      - name: Publish bundle to internal test track
+        env:
+          socket_weather_alias: ${{ secrets.socket_weather_alias }}
+          socket_weather_password: ${{ secrets.socket_weather_password }}
+        run: bash ./gradlew publishReleaseBundle
 
-#      - name: Update store listing
-#        run: bash ./gradlew publishListing
+      - name: Update store listing
+        run: bash ./gradlew publishListing
 
       - name: Build APKs
         env:

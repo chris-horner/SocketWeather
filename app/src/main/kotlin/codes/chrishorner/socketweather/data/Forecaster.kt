@@ -131,7 +131,7 @@ private fun createFlowOfStates(
 private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Location): Forecast = supervisorScope {
   // Request observations, date, and hourly forecasts simultaneously.
   // For whatever reason for _some_ requests require that the `geohash` passed in is the
-  // first 6 characters. Super annoying, but that's the price of an undocumentated API.
+  // first 6 characters. Super annoying, but that's the price of an undocumented API.
   val observationsRequest = async { api.getObservations(location.geohash.take(6)) }
   val dateForecastsRequest = async { api.getDateForecasts(location.geohash.take(6)) }
   val hourlyForecastsRequest = async { api.getThreeHourlyForecasts(location.geohash.take(6)) }

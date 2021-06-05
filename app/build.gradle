@@ -133,7 +133,6 @@ dependencies {
   debugImplementation "com.squareup.retrofit2:retrofit-mock:${versions.retrofit}"
   implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
   implementation "com.google.android.gms:play-services-location:${versions.play_services_location}"
-  debugImplementation "com.jakewharton:process-phoenix:${versions.process_phoenix}"
   debugImplementation "com.github.alorma:drawer-base:${versions.debugdrawer}"
   debugImplementation "com.github.alorma:drawer-modules:${versions.debugdrawer}"
   testImplementation "org.threeten:threetenbp:${versions.threetenbp}"

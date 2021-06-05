@@ -13,7 +13,7 @@ import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
 @Composable
-@ExperimentalAnimatedInsets
+@OptIn(ExperimentalAnimatedInsets::class)
 fun RootContainer(content: @Composable () -> Unit) {
   SocketWeatherTheme {
     ProvideWindowInsets(windowInsetsAnimationsEnabled = true) {

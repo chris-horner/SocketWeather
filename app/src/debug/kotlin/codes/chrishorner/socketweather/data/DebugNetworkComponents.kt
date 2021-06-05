@@ -1,6 +1,8 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
+import android.content.Intent
+import codes.chrishorner.socketweather.MainActivity
 import codes.chrishorner.socketweather.debug.DebugEndpoint
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENDPOINT
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
@@ -12,7 +14,6 @@ import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.MOCK_HTTP_VARIA
 import codes.chrishorner.socketweather.debug.blockingGet
 import codes.chrishorner.socketweather.debug.debugPreferences
 import codes.chrishorner.socketweather.debug.getEnum
-import com.jakewharton.processphoenix.ProcessPhoenix
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -121,7 +122,10 @@ class DebugNetworkComponents(
       environmentChangeAction()
 
       // Restart the app.
-      ProcessPhoenix.triggerRebirth(app)
+      val intent = Intent(app, MainActivity::class.java)
+      intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+      app.startActivity(intent)
+      Runtime.getRuntime().exit(0)
     }
   }
 

@@ -5,11 +5,9 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.data.Forecaster
-import com.google.accompanist.insets.ExperimentalAnimatedInsets
 import org.threeten.bp.Duration
 import org.threeten.bp.Instant
 
-@ExperimentalAnimatedInsets
 class MainActivity : AppCompatActivity() {
 
   override fun onCreate(savedInstanceState: Bundle?) {

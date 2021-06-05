@@ -142,8 +142,14 @@ private fun Observations(conditions: FormattedConditions) {
 
 @Composable
 private fun HumidityWindUvSection(humidity: String?, windSpeed: String, uvWarningTimes: String?) {
+  // Change spacing strategy depending on what data's available.
+  val arrangement = when {
+    humidity != null && uvWarningTimes != null -> Arrangement.SpaceBetween
+    else -> Arrangement.spacedBy(16.dp)
+  }
+
   Row(
-    horizontalArrangement = Arrangement.SpaceBetween,
+    horizontalArrangement = arrangement,
     modifier = Modifier
       .fillMaxWidth()
       .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)

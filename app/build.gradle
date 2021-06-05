@@ -3,8 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 0
-def versionMinor = 6
-def versionPatch = 2
+def versionMinor = 7
+def versionPatch = 0
 
 android {
   compileSdkVersion versions.compile_sdk

@@ -35,13 +35,13 @@ class LocationSelectionDiskStore(
   private val currentSelectionStore = DataStoreFactory.create(
     MoshiSerializer<LocationSelection>(moshi, default = LocationSelection.None)
   ) {
-    app.dataStoreFile("currentSelection")
+    app.dataStoreFile("current_selection")
   }
 
   private val selectionsStore = DataStoreFactory.create(
     MoshiSerializer(moshi, default = emptySet<LocationSelection>())
   ) {
-    app.dataStoreFile("savedSelections")
+    app.dataStoreFile("saved_selections")
   }
 
   override val currentSelection: StateFlow<LocationSelection>

@@ -1,8 +1,9 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
+import android.content.Context
 import androidx.datastore.core.DataStoreFactory
-import androidx.datastore.dataStoreFile
+import codes.chrishorner.socketweather.util.getOrCreateFile
 import com.squareup.moshi.Moshi
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -26,22 +27,23 @@ interface LocationSelectionStore {
  * Initializing this class invokes a synchronous disk read.
  */
 class LocationSelectionDiskStore(
-  private val app: Application,
+  app: Application,
   moshi: Moshi
 ) : LocationSelectionStore {
 
+  private val directory = app.getDir("location_choices", Context.MODE_PRIVATE)
   private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
   private val currentSelectionStore = DataStoreFactory.create(
     MoshiSerializer<LocationSelection>(moshi, default = LocationSelection.None)
   ) {
-    app.dataStoreFile("current_selection")
+    getOrCreateFile(directory, "current_selection")
   }
 
   private val selectionsStore = DataStoreFactory.create(
     MoshiSerializer(moshi, default = emptySet<LocationSelection>())
   ) {
-    app.dataStoreFile("saved_selections")
+    getOrCreateFile(directory, "saved_selections")
   }
 
   override val currentSelection: StateFlow<LocationSelection>

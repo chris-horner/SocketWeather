@@ -9,6 +9,7 @@ import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationSelectionDiskStore
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.data.RealForecaster
 import java.time.Clock
 
 /**
@@ -39,7 +40,7 @@ private class SingletonCache(app: Application) : Singletons {
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
   override val locationSelectionStore = LocationSelectionDiskStore(app, DataConfig.moshi)
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
-  override val forecaster = Forecaster(
+  override val forecaster = RealForecaster(
     clock = Clock.systemDefaultZone(),
     api = networkComponents.api,
     locationSelections = locationSelectionStore.currentSelection,

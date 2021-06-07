@@ -23,12 +23,7 @@ import java.time.Instant
 /**
  * A singleton that holds the current state of the [Forecast] for the whole application.
  */
-class Forecaster(
-  clock: Clock,
-  api: WeatherApi,
-  locationSelections: Flow<LocationSelection>,
-  deviceLocations: Flow<DeviceLocation>
-) {
+interface Forecaster {
 
   sealed class State(open val selection: LocationSelection) {
     object Idle : State(LocationSelection.None)
@@ -39,9 +34,21 @@ class Forecaster(
     data class Error(override val selection: LocationSelection, val type: ForecastError) : State(selection)
   }
 
+  val states: StateFlow<State>
+  fun refresh()
+}
+
+class RealForecaster(
+  clock: Clock,
+  api: WeatherApi,
+  locationSelections: Flow<LocationSelection>,
+  deviceLocations: Flow<DeviceLocation>,
+  scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
+) : Forecaster {
+
   private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
 
-  val states: StateFlow<State>
+  override val states: StateFlow<State>
 
   init {
     val stateFlow: Flow<State> = createFlowOfStates(
@@ -52,11 +59,10 @@ class Forecaster(
       refreshes.onStart { emit(Unit) }
     )
 
-    val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
     states = stateFlow.stateIn(scope, started = SharingStarted.Eagerly, Idle)
   }
 
-  fun refresh() {
+  override fun refresh() {
     refreshes.tryEmit(Unit)
   }
 }

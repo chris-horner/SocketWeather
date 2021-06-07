@@ -2,48 +2,37 @@ package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.FlowTurbine
 import com.google.common.truth.Subject
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.TestCoroutineDispatcher
-import kotlinx.coroutines.test.resetMain
-import kotlinx.coroutines.test.setMain
-import org.junit.rules.TestWatcher
-import org.junit.runner.Description
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.UncompletedCoroutinesError
+import kotlinx.coroutines.test.runBlockingTest
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 /**
- * Sets the main coroutines dispatcher for unit testing.
+ * The same as [runBlockingTest], except the [TestCoroutineScope] is cancelled at the end of
+ * `testBody`'s execution, along with any coroutines that are still running.
  *
- * See https://medium.com/androiddevelopers/easy-coroutines-in-android-viewmodelscope-25bffb605471
- * and https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-test
+ * The key difference is that `runBlockingTest` throws [UncompletedCoroutinesError] if it finishes
+ * with coroutines running, where as this function simply cancels them.
+ *
+ * This is useful when testing code that subscribes to unending streams (such as a [SharedFlow]),
+ * and rather than orchestrating cancellation from that source manually you simply want the end
+ * of the test to cancel that subscription.
+ *
+ * @see runBlockingTest
  */
-class MainDispatcherRule(private val dispatcher: TestCoroutineDispatcher = TestCoroutineDispatcher()) : TestWatcher() {
-
-  override fun starting(description: Description?) {
-    super.starting(description)
-    Dispatchers.setMain(dispatcher)
-  }
-
-  override fun finished(description: Description?) {
-    super.finished(description)
-    Dispatchers.resetMain()
-    dispatcher.cleanupTestCoroutines()
-  }
+fun runCancellingBlockingTest(
+  context: CoroutineContext = EmptyCoroutineContext,
+  testBody: suspend TestCoroutineScope.() -> Unit
+) = runBlockingTest(context) {
+  val job = Job()
+  val scope = TestCoroutineScope(coroutineContext + job)
+  testBody(scope)
+  scope.advanceUntilIdle()
+  job.cancel()
 }
-
-class TestCollector<T>(scope: CoroutineScope, flow: Flow<T>) {
-
-  private val collectedValues = mutableListOf<T>()
-  private val job = scope.launch { flow.collect { collectedValues.add(it) } }
-
-  operator fun get(index: Int) = collectedValues[index]
-
-  fun dispose() = job.cancel()
-}
-
-fun <T> Flow<T>.test(scope: CoroutineScope) = TestCollector(scope, this)
 
 inline fun <reified T> Subject.isInstanceOf() {
   isInstanceOf(T::class.java)

@@ -21,7 +21,6 @@ import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.WeatherApi
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -31,7 +30,6 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.transformLatest
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 class ChooseLocationViewModel(
@@ -105,7 +103,7 @@ class ChooseLocationViewModel(
 
   private suspend fun search(query: String): ChooseLocationState {
     return try {
-      val results = withContext(Dispatchers.IO) { api.searchForLocation(query) }
+      val results = api.searchForLocation(query)
       stateFlow.value.copy(results = results, loadingStatus = SearchingDone)
     } catch (e: Exception) {
       Timber.e(e, "Search failed with query %s", query)

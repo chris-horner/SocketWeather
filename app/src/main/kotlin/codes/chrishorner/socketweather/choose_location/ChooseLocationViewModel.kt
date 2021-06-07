@@ -94,6 +94,7 @@ class ChooseLocationViewModel(
     scope.launch {
       if (locationPermissionGranted) {
         locationSelectionStore.saveAndSelect(LocationSelection.FollowMe)
+        stateFlow.value = stateFlow.value.copy(loadingStatus = Submitted)
       } else {
         stateFlow.value = stateFlow.value.copy(error = Error.Permission)
         delay(1_500L)

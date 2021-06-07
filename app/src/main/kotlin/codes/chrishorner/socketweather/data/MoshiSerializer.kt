@@ -11,6 +11,7 @@ import kotlinx.coroutines.withContext
 import okio.buffer
 import okio.sink
 import okio.source
+import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -22,12 +23,13 @@ inline fun <reified T> MoshiSerializer(moshi: Moshi, default: T): Serializer<T> 
   override val defaultValue: T = default
 
   override suspend fun readFrom(input: InputStream): T {
-    try {
-      return withContext(Dispatchers.IO) {
+    return try {
+      withContext(Dispatchers.IO) {
         input.source().buffer().use { source -> adapter.fromJson(source) } ?: defaultValue
       }
-    } catch (e: JsonDataException) {
-      throw CorruptionException("Failed to read from store.", e)
+    } catch (e: Exception) {
+      Timber.e(e, "Failed to read value from disk.")
+      defaultValue
     }
   }
 

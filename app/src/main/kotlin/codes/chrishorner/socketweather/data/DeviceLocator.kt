@@ -69,6 +69,7 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
       client.lastLocation.await()
     } catch (e: SecurityException) {
       Timber.e(e, "Location permission not granted.")
+      close(e)
       null
     }
 
@@ -85,7 +86,7 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
         val deviceLocation = DeviceLocation(result.lastLocation.latitude, result.lastLocation.longitude)
         Timber.d("New location update: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
         cachedLocation = deviceLocation
-        trySend(deviceLocation)
+        if (!isClosedForSend) trySend(deviceLocation)
       }
 
       override fun onLocationAvailability(availability: LocationAvailability) {}
@@ -99,6 +100,7 @@ private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
         }
       } catch (e: SecurityException) {
         Timber.e(e, "Location permission not granted.")
+        close(e)
       }
     }
 

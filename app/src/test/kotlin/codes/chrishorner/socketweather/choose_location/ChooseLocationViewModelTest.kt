@@ -5,6 +5,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Loadi
 import codes.chrishorner.socketweather.data.FakeLocationSelectionStore
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.TestApi
+import codes.chrishorner.socketweather.data.TestApi.ResponseMode
 import codes.chrishorner.socketweather.data.runCancellingBlockingTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
@@ -26,6 +27,13 @@ class ChooseLocationViewModelTest {
     clock = Clock.fixed(fixedInstant, ZoneId.of("Australia/Melbourne"))
     api = TestApi(clock)
   }
+
+  private fun createViewModel(scope: CoroutineScope) = ChooseLocationViewModel(
+    showCloseButton = false,
+    api = api,
+    locationSelectionStore = locationSelectionStore,
+    overrideScope = scope
+  )
 
   @Test fun `loading state changes to searching on character entry`() = runCancellingBlockingTest {
     val viewModel = createViewModel(this)
@@ -108,10 +116,35 @@ class ChooseLocationViewModelTest {
     }
   }
 
-  private fun createViewModel(scope: CoroutineScope) = ChooseLocationViewModel(
-    showCloseButton = false,
-    api = api,
-    locationSelectionStore = locationSelectionStore,
-    overrideScope = scope
-  )
+  @Test fun `searching with failing network shows error`() = runCancellingBlockingTest {
+    val viewModel = createViewModel(this)
+    api.responseMode = ResponseMode.NETWORK_ERROR
+
+    viewModel.states.test {
+      assertThat(expectItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      // Entering a query should transition from Searching -> Searching Error.
+      viewModel.handle(ChooseLocationUiEvent.InputSearch("Fakezroy"))
+      assertThat(expectItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
+      assertThat(expectItem().loadingStatus).isEqualTo(LoadingStatus.SearchingError)
+    }
+  }
+
+  @Test fun `choosing result with failing network shows error`() = runCancellingBlockingTest {
+    val viewModel = createViewModel(this)
+    viewModel.states.test {
+      assertThat(expectItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      // Searching for "Fakezroy" should emit a single search result from TestApi.
+      viewModel.handle(ChooseLocationUiEvent.InputSearch("Fakezroy"))
+      assertThat(expectItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
+      val result = expectItem().results.single()
+      assertThat(result.name).isEqualTo("Fakezroy")
+
+      // Setting network responses to fail and selecting the result should show an error.
+      api.responseMode = ResponseMode.NETWORK_ERROR
+      viewModel.handle(ChooseLocationUiEvent.ResultSelected(result))
+      assertThat(expectItem().error).isEqualTo(ChooseLocationState.Error.Submission)
+    }
+  }
 }

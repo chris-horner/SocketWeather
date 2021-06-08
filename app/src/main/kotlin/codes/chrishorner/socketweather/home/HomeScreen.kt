@@ -1,6 +1,8 @@
 package codes.chrishorner.socketweather.home
 
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.res.Configuration
+import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
@@ -61,6 +63,7 @@ import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import codes.chrishorner.socketweather.util.permissionState
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 
@@ -225,6 +228,11 @@ private fun Error(type: ForecastError, onRefresh: () -> Unit) {
     }
   }
 
+  val activityResultRegistry = LocalActivityResultRegistryOwner.current?.activityResultRegistry
+  val locationPermissionState = activityResultRegistry?.permissionState(ACCESS_COARSE_LOCATION) {
+    onRefresh()
+  }
+
   Column(
     modifier = Modifier
       .fillMaxSize()
@@ -242,7 +250,16 @@ private fun Error(type: ForecastError, onRefresh: () -> Unit) {
         .padding(top = 8.dp, bottom = 16.dp)
     )
     Image(painter = image, contentDescription = null)
-    Button(modifier = Modifier.width(200.dp), onClick = onRefresh) {
+    Button(
+      modifier = Modifier.width(200.dp),
+      onClick = {
+        if (type == ForecastError.LOCATION) {
+          locationPermissionState?.launchPermissionRequest()
+        } else {
+          onRefresh()
+        }
+      }
+    ) {
       Text(stringResource(R.string.home_error_retryButton))
     }
   }

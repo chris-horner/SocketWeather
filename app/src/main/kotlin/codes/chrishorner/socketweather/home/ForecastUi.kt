@@ -39,7 +39,6 @@ import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.styles.TinyTempTextStyle
-import codes.chrishorner.socketweather.util.ThickDivider
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
@@ -59,22 +58,15 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
       Text(
         text = conditions.description,
         style = MaterialTheme.typography.body1,
-        modifier = Modifier.padding(horizontal = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
       )
     }
 
-    ThickDivider(
+    TimeForecastGraph(
+      entries = conditions.graphItems,
       modifier = Modifier
-        .padding(16.dp)
         .fillMaxWidth()
-    )
-
-    TimeForecastGraph(entries = conditions.graphItems, modifier = Modifier.fillMaxWidth())
-
-    ThickDivider(
-      modifier = Modifier
-        .padding(16.dp)
-        .fillMaxWidth()
+        .padding(top = 8.dp, bottom = 16.dp)
     )
 
     UpcomingForecasts(forecasts = conditions.upcomingForecasts)

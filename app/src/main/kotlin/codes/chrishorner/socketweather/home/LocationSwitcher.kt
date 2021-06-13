@@ -48,7 +48,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.styles.ScrimColor
+import codes.chrishorner.socketweather.styles.scrim
 import com.google.accompanist.insets.systemBarsPadding
 
 @Composable
@@ -77,7 +77,7 @@ fun LocationSwitcher(
             indication = null
           ) { onDismissRequest() }
           .alpha(transition.scrimAlpha)
-          .background(ScrimColor)
+          .background(MaterialTheme.colors.scrim)
       )
 
       Card(

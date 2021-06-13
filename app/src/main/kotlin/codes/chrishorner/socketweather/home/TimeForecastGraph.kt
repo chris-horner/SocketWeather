@@ -1,27 +1,37 @@
 package codes.chrishorner.socketweather.home
 
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredHeight
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
+import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Schedule
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -31,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.SmallTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.styles.backgroundSecondary
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -39,7 +50,17 @@ import kotlin.math.sqrt
  * isn't changing much over time, (unheard of in Melbourne), then the line graph won't
  * fluctuate too aggressively for small changes.
  */
-private const val MIN_RANGE_OF_DEGREES = 8
+private const val MinRangeOfDegrees = 8
+
+private val TotalComponentHeight = 208.dp // Amount of vertical space this Composable wants to take up.
+private val TopTitleSectionHeight = 32.dp // Height of area where we show the time.
+private val BottomTitleSectionHeight = 32.dp // Height of area where we show chance of rain.
+private val EntryColumnWidth = 64.dp // Amount of horizontal space given to each entry in the graph.
+private val LinePointGap = 12.dp // Visual space between dots and lines on the graph.
+private val GraphVerticalPadding = 16.dp // Amount of space between the title sections and the line graph.
+
+// Total available space in which to draw the line graph.
+private val GraphHeight = TotalComponentHeight - TopTitleSectionHeight - BottomTitleSectionHeight
 
 private data class TemperatureScale(val min: Int, val max: Int) {
   val range = abs(min - max)
@@ -47,139 +68,239 @@ private data class TemperatureScale(val min: Int, val max: Int) {
 
 @Composable
 fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastGraphItem>) {
-  val totalGraphHeight = 208.dp
-  val topSectionHeight: Dp // Top area that contains chance of rain (if applicable).
+  // Total height available for the line graph to render. This should be shorter than GraphHeight,
+  // allowing the temperature text to be rendered above each dot.
+  val lineGraphHeight: Dp
+  // Rough approximation of how tall the temperature text will be.
   val temperatureTextHeight: Dp
-  val listGraphHeight: Dp // Total height in which an entry's temperature will appear.
-  val lineGraphHeight: Dp // Total height available for the line graph to render.
-  val bottomSectionHeight = 40.dp // Bottom area that displays the entry's time.
-  val columnWidth = 64.dp
-  val linePointGap = 12.dp // Visual space between dots and lines on the graph.
 
-  val showChanceOfRain = entries.any { it.rainChancePercent > 0 }
-  val rainIconPainter = painterResource(R.drawable.ic_water)
   val scale = getTemperatureScale(entries)
   val listState = rememberLazyListState()
-  val foregroundColour = MaterialTheme.colors.onBackground
-  val fadedColour = MaterialTheme.colors.onBackground.copy(alpha = 0.2f)
 
   with(LocalDensity.current) {
-    topSectionHeight = if (showChanceOfRain) 40.dp else 0.dp
-    listGraphHeight = totalGraphHeight - topSectionHeight - bottomSectionHeight
     temperatureTextHeight = SmallTempTextStyle.fontSize.toDp() + 8.dp // Add 8dp to approximate the actual height.
-    lineGraphHeight = listGraphHeight - temperatureTextHeight
+    lineGraphHeight = GraphHeight - temperatureTextHeight - (GraphVerticalPadding * 2)
   }
 
-  Box(modifier = modifier.requiredHeight(totalGraphHeight)) {
+  Box(modifier = modifier.requiredHeight(TotalComponentHeight)) {
 
-    // Start by drawing chance of rain, temperature, and time as LazyRow items.
+    // Start by drawing some background colour to sit behind the time and chance of rain.
+    TitleBackgrounds()
 
-    LazyRow(state = listState, modifier = Modifier.fillMaxHeight()) {
-      items(entries) { entry ->
-        Column(
-          modifier = Modifier
-            .width(columnWidth)
-            .fillMaxHeight(),
-          horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-          if (showChanceOfRain) {
-            if (entry.rainChancePercent > 0) {
-              Row(
-                modifier = Modifier
-                  .height(topSectionHeight)
-                  .padding(bottom = 16.dp),
-                verticalAlignment = Alignment.Bottom
-              ) {
-                Icon(
-                  painter = rainIconPainter,
-                  contentDescription = null, // Not important for accessibility.
-                  tint = fadedColour
-                )
-                Text(entry.formattedRainChance, style = MaterialTheme.typography.overline)
-              }
-            } else {
-              Spacer(modifier = Modifier.height(topSectionHeight))
-            }
-          }
+    // Then draw time, temperature, and chance of rain as scrollable LazyRow items.
+    ScrollableEntries(lineGraphHeight, scale, entries, listState)
 
-          Box(modifier = Modifier.height(listGraphHeight)) {
-            val yOffset = entry.getGraphY(lineGraphHeight, scale) - 6.dp
-            Text(
-              text = entry.formattedTemperature,
-              style = SmallTempTextStyle,
-              modifier = Modifier.offset(y = yOffset),
-            )
-          }
-
-          Text(
-            text = entry.time,
-            style = MaterialTheme.typography.overline,
-            modifier = Modifier
-              .height(bottomSectionHeight)
-              .padding(top = 12.dp)
-          )
-        }
-      }
-    }
-
-    // Next, inspect the LazyRow's list state and determine where and what to draw
+    // Next, inspect the scrolling list state and determine where and what to draw
     // for the line graph.
-
-    Canvas(
+    LineGraph(
+      lineGraphHeight, scale, entries, listState,
       modifier = Modifier
         .fillMaxWidth()
         .height(lineGraphHeight)
-        .offset(y = topSectionHeight + temperatureTextHeight)
-    ) {
+        .offset(y = TopTitleSectionHeight + temperatureTextHeight + GraphVerticalPadding)
+    )
 
-      // Determine which entries are currently on screen.
+    // Finally, render some icons to sit on top of the title sections.
+    TitleIcons()
+  }
+}
 
-      val firstEntryIndex = listState.firstVisibleItemIndex
-      val lastEntryIndex =
-        (firstEntryIndex + (size.width / columnWidth.toPx()).toInt() + 1).coerceAtMost(entries.size - 1)
-      var columnIndex = 0
+/**
+ * For each entry, draw the time, temperature, and chance of rain in a horizontal scrolling list.
+ */
+@Composable
+private fun ScrollableEntries(
+  lineGraphHeight: Dp,
+  scale: TemperatureScale,
+  entries: List<TimeForecastGraphItem>,
+  listState: LazyListState,
+) {
+  LazyRow(
+    state = listState,
+    modifier = Modifier.fillMaxHeight()
+  ) {
+    itemsIndexed(entries) { index, entry ->
+      Column(
+        modifier = Modifier
+          .width(EntryColumnWidth)
+          .fillMaxHeight(),
+        horizontalAlignment = Alignment.CenterHorizontally
+      ) {
 
-      // Iterate through every currently visible entry.
-
-      @Suppress("UseWithIndex") // Avoid allocating an iterator.
-      for (entryIndex in firstEntryIndex..lastEntryIndex) {
-
-        // Draw a dot at the appropriate location.
-
-        val entry = entries[entryIndex]
-        val x = (columnWidth.toPx() / 2) + (columnWidth.toPx() * columnIndex) - listState.firstVisibleItemScrollOffset
-        val y = entry.getGraphY(lineGraphHeight, scale).toPx()
-
-        drawCircle(
-          color = foregroundColour,
-          radius = 3.dp.toPx(),
-          center = Offset(x, y)
-        )
-
-        // If there's an entry prior to the current, draw a line between the previous
-        // coordinates and the current coordinates.
-
-        entries.getOrNull(entryIndex - 1)?.let { previousEntry ->
-          val previousX = x - columnWidth.toPx()
-          val previousY = previousEntry.getGraphY(lineGraphHeight, scale).toPx()
-          val slope = (y - previousY) / (x - previousX)
-          val start: Offset
-          val end: Offset
-
-          if (slope == 0f) {
-            start = Offset(x = previousX + linePointGap.toPx(), y = previousY)
-            end = Offset(x = x - linePointGap.toPx(), y = previousY)
-          } else {
-            val dx = linePointGap.toPx() / sqrt(1 + (slope * slope))
-            val dy = slope * dx
-            start = Offset(x = previousX + dx, y = previousY + dy)
-            end = Offset(x = x - dx, y = y - dy)
+        Box(
+          contentAlignment = Alignment.Center,
+          modifier = Modifier.height(TopTitleSectionHeight)
+        ) {
+          // Don't draw a time title for the first entry.
+          if (index > 0) {
+            Text(
+              text = entry.time,
+              style = MaterialTheme.typography.overline,
+            )
           }
-
-          drawLine(fadedColour, start, end, strokeWidth = 3.dp.toPx(), StrokeCap.Round)
         }
 
-        columnIndex++
+        Box(
+          modifier = Modifier
+            .height(GraphHeight)
+            .padding(vertical = GraphVerticalPadding)
+        ) {
+          // The position of the temperature text is dictated by where it should sit
+          // on the graph, minus some amount to make it appear above the dot.
+          val yOffset = entry.getGraphY(lineGraphHeight, scale) - 6.dp
+          Text(
+            text = entry.formattedTemperature,
+            style = SmallTempTextStyle,
+            modifier = Modifier.offset(y = yOffset),
+          )
+        }
+
+        Box(
+          contentAlignment = Alignment.Center,
+          modifier = Modifier.height(TopTitleSectionHeight)
+        ) {
+          // Don't draw a chance of rain title for the first entry, or any entries
+          // where the chance of rain is 0.
+          if (entry.rainChancePercent > 0 && index > 0) {
+            Text(
+              text = entry.formattedRainChance,
+              style = MaterialTheme.typography.overline,
+            )
+          }
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Uses the [LazyListState] to determine which entries are currently visible
+ * and draws a line graph.
+ */
+@Composable
+private fun LineGraph(
+  lineGraphHeight: Dp,
+  scale: TemperatureScale,
+  entries: List<TimeForecastGraphItem>,
+  listState: LazyListState,
+  modifier: Modifier,
+) {
+  val dotColor = MaterialTheme.colors.onBackground
+  val lineColor = remember { dotColor.copy(alpha = 0.2f) }
+
+  Canvas(modifier) {
+
+    // Determine which entries are currently on screen.
+
+    val firstEntryIndex = listState.firstVisibleItemIndex
+    val lastEntryIndex = (firstEntryIndex + (size.width / EntryColumnWidth.toPx()).toInt() + 1)
+      .coerceAtMost(entries.size - 1)
+
+    var columnIndex = 0
+
+    // Iterate through every currently visible entry.
+
+    @Suppress("UseWithIndex") // Avoid allocating an iterator.
+    for (entryIndex in firstEntryIndex..lastEntryIndex) {
+
+      // Draw a dot at the appropriate location.
+
+      val entry = entries[entryIndex]
+      val x =
+        (EntryColumnWidth.toPx() / 2) + (EntryColumnWidth.toPx() * columnIndex) - listState.firstVisibleItemScrollOffset
+      val y = entry.getGraphY(lineGraphHeight, scale).toPx()
+
+      drawCircle(
+        color = dotColor,
+        radius = 3.dp.toPx(),
+        center = Offset(x, y)
+      )
+
+      // If there's an entry prior to the current, draw a line between the previous
+      // coordinates and the current coordinates.
+
+      entries.getOrNull(entryIndex - 1)?.let { previousEntry ->
+        val previousX = x - EntryColumnWidth.toPx()
+        val previousY = previousEntry.getGraphY(lineGraphHeight, scale).toPx()
+        val slope = (y - previousY) / (x - previousX)
+        val start: Offset
+        val end: Offset
+
+        if (slope == 0f) {
+          start = Offset(x = previousX + LinePointGap.toPx(), y = previousY)
+          end = Offset(x = x - LinePointGap.toPx(), y = previousY)
+        } else {
+          val dx = LinePointGap.toPx() / sqrt(1 + (slope * slope))
+          val dy = slope * dx
+          start = Offset(x = previousX + dx, y = previousY + dy)
+          end = Offset(x = x - dx, y = y - dy)
+        }
+
+        drawLine(lineColor, start, end, strokeWidth = 3.dp.toPx(), StrokeCap.Round)
+      }
+
+      columnIndex++
+    }
+  }
+}
+
+/**
+ * The slightly different coloured bars that sit on the top and bottom of the graph.
+ */
+@Composable
+private fun TitleBackgrounds() {
+  Column(
+    verticalArrangement = Arrangement.SpaceBetween,
+    modifier = Modifier.fillMaxSize(),
+  ) {
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(TopTitleSectionHeight)
+        .background(MaterialTheme.colors.backgroundSecondary)
+    )
+    Box(
+      modifier = Modifier
+        .fillMaxWidth()
+        .height(BottomTitleSectionHeight)
+        .background(MaterialTheme.colors.backgroundSecondary)
+    )
+  }
+}
+
+/**
+ * The icons for time and chance of rain that sit at the start of the title section.
+ */
+@Composable
+private fun TitleIcons() {
+  val gradientBackground = Brush.horizontalGradient(
+    0f to MaterialTheme.colors.backgroundSecondary,
+    0.7f to MaterialTheme.colors.backgroundSecondary,
+    1f to Color.Transparent,
+  )
+
+  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+    Column(
+      verticalArrangement = Arrangement.SpaceBetween,
+      modifier = Modifier.fillMaxHeight(),
+    ) {
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .width(EntryColumnWidth)
+          .height(TopTitleSectionHeight)
+          .background(gradientBackground)
+      ) {
+        Icon(Icons.Default.Schedule, contentDescription = null)
+      }
+      Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+          .width(EntryColumnWidth)
+          .height(BottomTitleSectionHeight)
+          .background(gradientBackground)
+      ) {
+        Icon(painterResource(R.drawable.ic_rain_chance_24dp), contentDescription = null)
       }
     }
   }
@@ -200,9 +321,9 @@ private fun getTemperatureScale(items: List<TimeForecastGraphItem>): Temperature
   val scale = abs(max - min)
 
   // Check the range at which the temperature is changing. If it's lower than our minimum,
-  // then force the min and max temperatures to adhere to MIN_RANGE_OF_DEGREES.
-  if (scale < MIN_RANGE_OF_DEGREES) {
-    val tempDelta = (MIN_RANGE_OF_DEGREES - scale) / 2
+  // then force the min and max temperatures to adhere to MinRangeOfDegrees.
+  if (scale < MinRangeOfDegrees) {
+    val tempDelta = (MinRangeOfDegrees - scale) / 2
     min -= tempDelta
     max += tempDelta
   }

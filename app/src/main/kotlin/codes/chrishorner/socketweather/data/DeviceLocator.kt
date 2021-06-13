@@ -45,50 +45,54 @@ class RealDeviceLocator(private val app: Application) : DeviceLocator {
 
 private var cachedLocation: DeviceLocation? = null
 
-private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> {
-  val locationManager: LocationManager = context.getSystemService()!!
+private fun getDeviceLocationUpdates(context: Context): Flow<DeviceLocation> = callbackFlow {
+  val locationManager: LocationManager? = context.getSystemService()
 
-  return callbackFlow {
-    cachedLocation?.let { send(it) }
-
-    val lastKnownLocation = try {
-      locationManager.getLastKnownLocation(NETWORK_PROVIDER)
-    } catch (e: SecurityException) {
-      Timber.e(e, "Location permission not granted.")
-      close(e)
-      null
-    }
-
-    if (lastKnownLocation != null && !isClosedForSend) {
-      val deviceLocation = DeviceLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
-      Timber.d("Found last known location: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
-      cachedLocation = deviceLocation
-      send(deviceLocation)
-    }
-
-    val callback = object : LocationListener {
-      override fun onLocationChanged(location: Location) {
-        val deviceLocation = DeviceLocation(location.latitude, location.longitude)
-        Timber.d("New location update: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
-        cachedLocation = deviceLocation
-        if (!isClosedForSend) trySend(deviceLocation)
-      }
-
-      override fun onProviderEnabled(provider: String) {}
-
-      override fun onProviderDisabled(provider: String) {
-        Timber.e("Location provider %s isn't enabled.", provider)
-        close(IllegalStateException("Location provider $provider isn't enabled."))
-      }
-    }
-
-    try {
-      locationManager.requestLocationUpdates(NETWORK_PROVIDER, 3000, 50f, callback)
-    } catch (e: SecurityException) {
-      Timber.e(e, "Location permission not granted.")
-      close(e)
-    }
-
-    awaitClose { locationManager.removeUpdates(callback) }
+  if (locationManager == null) {
+    Timber.e("LocationManager not available.")
+    close(IllegalStateException("LocationManager not available."))
+    return@callbackFlow
   }
+
+  cachedLocation?.let { send(it) }
+
+  val lastKnownLocation = try {
+    locationManager.getLastKnownLocation(NETWORK_PROVIDER)
+  } catch (e: SecurityException) {
+    Timber.e(e, "Location permission not granted.")
+    close(e)
+    null
+  }
+
+  if (lastKnownLocation != null && !isClosedForSend) {
+    val deviceLocation = DeviceLocation(lastKnownLocation.latitude, lastKnownLocation.longitude)
+    Timber.d("Found last known location: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
+    cachedLocation = deviceLocation
+    send(deviceLocation)
+  }
+
+  val callback = object : LocationListener {
+    override fun onLocationChanged(location: Location) {
+      val deviceLocation = DeviceLocation(location.latitude, location.longitude)
+      Timber.d("New location update: %f, %f", deviceLocation.latitude, deviceLocation.longitude)
+      cachedLocation = deviceLocation
+      if (!isClosedForSend) trySend(deviceLocation)
+    }
+
+    override fun onProviderEnabled(provider: String) {}
+
+    override fun onProviderDisabled(provider: String) {
+      Timber.e("Location provider %s isn't enabled.", provider)
+      close(IllegalStateException("Location provider $provider isn't enabled."))
+    }
+  }
+
+  try {
+    locationManager.requestLocationUpdates(NETWORK_PROVIDER, 3000, 50f, callback)
+  } catch (e: SecurityException) {
+    Timber.e(e, "Location permission not granted.")
+    close(e)
+  }
+
+  awaitClose { locationManager.removeUpdates(callback) }
 }

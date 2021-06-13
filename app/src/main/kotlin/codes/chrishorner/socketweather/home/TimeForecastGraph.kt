@@ -31,7 +31,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -273,10 +272,11 @@ private fun TitleBackgrounds() {
  */
 @Composable
 private fun TitleIcons() {
+  val transparentBackground = MaterialTheme.colors.backgroundSecondary.copy(alpha = 0f)
   val gradientBackground = Brush.horizontalGradient(
     0f to MaterialTheme.colors.backgroundSecondary,
     0.7f to MaterialTheme.colors.backgroundSecondary,
-    1f to Color.Transparent,
+    1f to transparentBackground,
   )
 
   CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {

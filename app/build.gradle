@@ -132,7 +132,6 @@ dependencies {
   implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
   debugImplementation "com.squareup.retrofit2:retrofit-mock:${versions.retrofit}"
   implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
-  implementation "com.google.android.gms:play-services-location:${versions.play_services_location}"
   debugImplementation "com.github.alorma:drawer-base:${versions.debugdrawer}"
   debugImplementation "com.github.alorma:drawer-modules:${versions.debugdrawer}"
   testImplementation "junit:junit:${versions.junit}"

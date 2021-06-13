@@ -18,7 +18,6 @@ buildscript {
                   'moshi'                 : '1.12.0',
                   'okhttp'                : '4.10.0-RC1',
                   'retrofit'              : '2.9.0',
-                  'play_services_location': '18.0.0',
                   'play_publisher'        : '3.4.0-agp7.0',
                   'junit'                 : '4.13.2',
                   'turbine'               : '0.5.2',

@@ -118,6 +118,7 @@ dependencies {
   implementation "androidx.navigation:navigation-compose:${versions.navigation}"
   implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"
   implementation "androidx.appcompat:appcompat:${versions.appcompat}"
+  implementation "org.osmdroid:osmdroid-android:${versions.osmdroid}"
   implementation "androidx.core:core-ktx:${versions.androidx_core}"
   implementation "androidx.activity:activity-compose:${versions.androidx_activity}"
   implementation "androidx.datastore:datastore:${versions.datastore}"

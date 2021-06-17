@@ -12,10 +12,11 @@ fun getOrCreateFile(directory: File, name: String): File {
 /**
  * Explicitly perform disk operations that would normally violate [StrictMode].
  */
-inline fun allowMainThreadDiskOperations(block: () -> Unit) {
+inline fun <R> allowMainThreadDiskOperations(block: () -> R): R {
   val diskReadPolicy = StrictMode.allowThreadDiskReads()
   val diskWritePolicy = StrictMode.allowThreadDiskWrites()
-  block()
+  val result = block()
   StrictMode.setThreadPolicy(diskReadPolicy)
   StrictMode.setThreadPolicy(diskWritePolicy)
+  return result
 }

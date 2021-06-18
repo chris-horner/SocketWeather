@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
@@ -288,6 +289,9 @@ private fun FollowMeButton(onClick: (hasLocationPermission: Boolean) -> Unit) {
   }
 
   Button(
+    colors = ButtonDefaults.buttonColors(
+      backgroundColor = MaterialTheme.colors.primaryVariant
+    ),
     modifier = Modifier
       .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
       .fillMaxWidth()

@@ -70,6 +70,11 @@ android {
     compose true
   }
 
+  composeOptions {
+    kotlinCompilerExtensionVersion versions.compose
+    kotlinCompilerVersion versions.kotlin
+  }
+
   lintOptions {
     // It's fine for external libs to optionally link against invalid packages.
     disable 'InvalidPackage'

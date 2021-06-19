@@ -22,7 +22,10 @@ import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Radar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -33,6 +36,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import codes.chrishorner.socketweather.BuildConfig
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
@@ -42,7 +46,7 @@ import codes.chrishorner.socketweather.styles.TinyTempTextStyle
 import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
-fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
+fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEvent: (HomeEvent) -> Unit) {
 
   Column(
     modifier = Modifier
@@ -60,6 +64,19 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState) {
         style = MaterialTheme.typography.body1,
         modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
       )
+    }
+
+    if (BuildConfig.DEBUG) {
+      OutlinedButton(
+        onClick = { onEvent(HomeEvent.ViewRainRadar) },
+        modifier = Modifier
+          .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+          .align(Alignment.End)
+      ) {
+        Icon(Icons.Rounded.Radar, contentDescription = null)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(stringResource(R.string.home_rainRadarButton))
+      }
     }
 
     TimeForecastGraph(
@@ -216,6 +233,8 @@ private fun ForecastUiPreview() {
           UpcomingForecast("Saturday", 50, "50%", "shower", "17°", "26°"),
         )
       )
-    )
+    ) {
+      // Don't handle events in preview.
+    }
   }
 }

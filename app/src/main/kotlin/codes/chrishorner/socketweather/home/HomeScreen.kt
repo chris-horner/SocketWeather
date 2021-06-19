@@ -60,6 +60,7 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
+import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
@@ -74,6 +75,7 @@ fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
     when (event) {
       AddLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
       ViewAbout -> navController.navigate(Screen.About.getRoute())
+      ViewRainRadar -> navController.navigate(Screen.RainRadar.getRoute())
       else -> viewModel.handleEvent(event)
     }
   }
@@ -181,8 +183,8 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
 private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit) {
   when (state) {
     is Content.Error -> Error(state.type) { onEvent(Refresh) }
-    is Content.Refreshing -> ForecastUi(state.conditions, scrollState)
-    is Content.Loaded -> ForecastUi(state.conditions, scrollState)
+    is Content.Refreshing -> ForecastUi(state.conditions, scrollState, onEvent)
+    is Content.Loaded -> ForecastUi(state.conditions, scrollState, onEvent)
     else -> Loading()
   }
 }

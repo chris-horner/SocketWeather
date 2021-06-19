@@ -31,6 +31,7 @@ sealed class HomeEvent {
   object AddLocation : HomeEvent()
   object Refresh : HomeEvent()
   object ViewAbout : HomeEvent()
+  object ViewRainRadar : HomeEvent()
 }
 
 data class FormattedConditions(

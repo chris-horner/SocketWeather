@@ -6,6 +6,12 @@ def versionMajor = 0
 def versionMinor = 7
 def versionPatch = 1
 
+// Reads the Google Maps key that is used in AndroidManifest.
+Properties properties = new Properties()
+if (rootProject.file("local.properties").exists()) {
+  properties.load(rootProject.file("local.properties").newDataInputStream())
+}
+
 android {
   compileSdkVersion versions.compile_sdk
 
@@ -15,6 +21,7 @@ android {
     targetSdkVersion versions.compile_sdk
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
+    manifestPlaceholders = [ googleMapsKey : properties.getProperty("google.maps.key", "") ]
   }
 
   sourceSets {
@@ -145,4 +152,11 @@ dependencies {
   testImplementation "app.cash.turbine:turbine:${versions.turbine}"
   testImplementation "com.google.truth:truth:${versions.truth}"
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.jdk_desugar}"
+  implementation "com.google.maps.android:maps-v3-ktx:${versions.google_maps}"
+  constraints {
+    // Volley is a transitive dependency of Google Maps.
+    implementation("com.android.volley:volley:${versions.volley}") {
+      because("Only volley 1.2.0 or newer is available on maven.google.com")
+    }
+  }
 }

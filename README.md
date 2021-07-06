@@ -17,7 +17,6 @@ This app is a bit of a hobby project where I experiment with different ideas. Th
 
 I stumbled upon https://api.weather.bom.gov.au/v1. All requests and responses have been modelled after poking and prodding that endpoint.
 
-### Where are the Fragments?
+## Google Maps
 
-Not here. The codebase actually unironically used something similar to [Fragnums](https://github.com/pyricau/fragnums)
-in the early stages of its development. Now it uses Jetpack Compose for its UI!
+If you're building this project and want the `MapView` to work, generate an API key as per [the documentation](https://developers.google.com/maps/documentation/android-sdk/get-api-key). When restricting the key to Android apps, use `codes.chrishorner.socketweather.debug` as the package name, and `31:A7:4A:C7:5E:DD:A5:7C:8E:01:F5:9E:83:4A:EE:C6:DE:BC:73:EB` as the SHA-1 fingerprint.

@@ -20,3 +20,8 @@ I stumbled upon https://api.weather.bom.gov.au/v1. All requests and responses ha
 ## Google Maps
 
 If you're building this project and want the `MapView` to work, generate an API key as per [the documentation](https://developers.google.com/maps/documentation/android-sdk/get-api-key). When restricting the key to Android apps, use `codes.chrishorner.socketweather.debug` as the package name, and `31:A7:4A:C7:5E:DD:A5:7C:8E:01:F5:9E:83:4A:EE:C6:DE:BC:73:EB` as the SHA-1 fingerprint.
+
+Once you have an API key, add it to `local.properties` like so
+```
+google.maps.key={insert_your_api_key_here}
+```

@@ -25,6 +25,7 @@ import org.osmdroid.config.Configuration
 import org.osmdroid.tileprovider.MapTileProviderBase
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex.getX
 import org.osmdroid.util.MapTileIndex.getY
@@ -56,13 +57,20 @@ fun RainRadarScreen() {
 
       // While we're on screen, loop through and display each rainfall overlay.
       while (true) {
-        overlays[index].isEnabled = true
+        val overlay = overlays[index]
+        overlay.isEnabled = true
         mapView.invalidate()
 
-        // Pause on each overlay for 500ms, or 1s if it's the last.
-        if (index == overlays.size - 1) delay(1_000) else delay(500)
+        if (overlay.tileStates.isDone) {
+          // Pause on each overlay for 500ms, or 1s if it's the last.
+          if (index == overlays.size - 1) delay(1_000) else delay(500)
+        } else {
+          while (!overlay.tileStates.isDone) {
+            delay(500)
+          }
+        }
 
-        overlays[index].isEnabled = false
+        overlay.isEnabled = false
         index++
         if (index >= overlays.size) index = 0
       }
@@ -83,6 +91,8 @@ private fun getTileProvider(context: Context): MapTileProviderBase {
       "https://stamen-tiles-c.a.ssl.fastly.net/terrain",
       "https://stamen-tiles-d.a.ssl.fastly.net/terrain",
     ),
+    "© OpenStreetMap contributors",
+    TileSourcePolicy(4, 0)
   ) {
     override fun getTileURLString(pMapTileIndex: Long): String {
       return "$baseUrl/${getZoom(pMapTileIndex)}/${getX(pMapTileIndex)}/${getY(pMapTileIndex)}$mImageFilenameEnding"
@@ -99,7 +109,9 @@ private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {
     10,
     256,
     ".png",
-    arrayOf("https://api.weather.bom.gov.au/v1/rainradar/tiles/$timestamp")
+    arrayOf("https://api.weather.bom.gov.au/v1/rainradar/tiles/$timestamp"),
+    "© Australian Bureau of Meteorology",
+    RadarTileSourcePolicy
   ) {
     override fun getTileURLString(pMapTileIndex: Long): String {
       return "$baseUrl/${getZoom(pMapTileIndex)}/${getX(pMapTileIndex)}/${getY(pMapTileIndex)}$mImageFilenameEnding"

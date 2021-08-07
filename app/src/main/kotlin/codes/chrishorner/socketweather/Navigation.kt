@@ -17,7 +17,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.home.HomeViewModel
-import codes.chrishorner.socketweather.rain_radar.RainRadarScreen2
+import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 
 private object NavArgs {
   const val SHOW_CLOSE_BUTTON = "show_close_button"
@@ -70,7 +70,7 @@ fun NavGraph(currentSelection: LocationSelection) {
       AboutScreen(navController)
     }
     composable(route = Screen.RainRadar.routeDefinition) {
-      RainRadarScreen2()
+      RainRadarScreen()
     }
   }
 }

@@ -15,14 +15,17 @@ import androidx.lifecycle.Lifecycle.Event.ON_DESTROY
 import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
 import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.LifecycleEventObserver
+import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.osmdroid.config.Configuration
+import org.osmdroid.tileprovider.MapTileProviderBase
 import org.osmdroid.tileprovider.MapTileProviderBasic
 import org.osmdroid.tileprovider.tilesource.OnlineTileSourceBase
+import org.osmdroid.util.GeoPoint
 import org.osmdroid.util.MapTileIndex.getX
 import org.osmdroid.util.MapTileIndex.getY
 import org.osmdroid.util.MapTileIndex.getZoom
@@ -42,6 +45,10 @@ fun RainRadarScreen() {
 
   AndroidView({ rawMapView }) { mapView ->
 
+    mapView.tileProvider = getTileProvider(context)
+    mapView.controller.setZoom(9.0)
+    mapView.controller.setCenter(GeoPoint(-37.80517674019138, 144.98394260916697))
+
     mapView.overlays.addAll(overlays)
 
     scope.launch {
@@ -49,18 +56,40 @@ fun RainRadarScreen() {
 
       // While we're on screen, loop through and display each rainfall overlay.
       while (true) {
-        mapView.overlays[index].isEnabled = true
+        overlays[index].isEnabled = true
         mapView.invalidate()
 
         // Pause on each overlay for 500ms, or 1s if it's the last.
-        if (index == mapView.overlays.size - 1) delay(1_000) else delay(500)
+        if (index == overlays.size - 1) delay(1_000) else delay(500)
 
-        mapView.overlays[index].isEnabled = false
+        overlays[index].isEnabled = false
         index++
         if (index >= overlays.size) index = 0
       }
     }
   }
+}
+
+private fun getTileProvider(context: Context): MapTileProviderBase {
+  val source = object : OnlineTileSourceBase(
+    "Terrain",
+    0,
+    18,
+    256,
+    "@2x.png",
+    arrayOf(
+      "https://stamen-tiles-a.a.ssl.fastly.net/terrain",
+      "https://stamen-tiles-b.a.ssl.fastly.net/terrain",
+      "https://stamen-tiles-c.a.ssl.fastly.net/terrain",
+      "https://stamen-tiles-d.a.ssl.fastly.net/terrain",
+    ),
+  ) {
+    override fun getTileURLString(pMapTileIndex: Long): String {
+      return "$baseUrl/${getZoom(pMapTileIndex)}/${getX(pMapTileIndex)}/${getY(pMapTileIndex)}$mImageFilenameEnding"
+    }
+  }
+
+  return MapTileProviderBasic(context, source)
 }
 
 private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {
@@ -99,6 +128,7 @@ private fun rememberMapViewWithLifecycle(): MapView {
     // MapView performs disk operations on the main thread when initialised 😢.
     allowMainThreadDiskOperations {
       MapView(context).apply {
+        id = R.id.map
         setMultiTouchControls(true)
         zoomController.setVisibility(Visibility.NEVER)
         isTilesScaledToDpi = true
@@ -106,13 +136,11 @@ private fun rememberMapViewWithLifecycle(): MapView {
     }
   }
 
-  val lifecycleObserver = rememberMapLifecycleObserver(mapView)
   val lifecycle = LocalLifecycleOwner.current.lifecycle
-
-  DisposableEffect(lifecycle) {
+  DisposableEffect(lifecycle, mapView) {
+    val lifecycleObserver = getMapLifecycleObserver(mapView)
     lifecycle.addObserver(lifecycleObserver)
     onDispose {
-      mapView.onDetach()
       lifecycle.removeObserver(lifecycleObserver)
     }
   }
@@ -120,14 +148,13 @@ private fun rememberMapViewWithLifecycle(): MapView {
   return mapView
 }
 
-@Composable
-private fun rememberMapLifecycleObserver(mapView: MapView): LifecycleEventObserver = remember(mapView) {
-  LifecycleEventObserver { _, event ->
-    @Suppress("NON_EXHAUSTIVE_WHEN") // osmdroid only cares about these events.
-    when (event) {
-      ON_RESUME -> mapView.onResume()
-      ON_PAUSE -> mapView.onPause()
-      ON_DESTROY -> mapView.onDetach()
-    }
+private fun getMapLifecycleObserver(
+  mapView: MapView
+): LifecycleEventObserver = LifecycleEventObserver { _, event ->
+  @Suppress("NON_EXHAUSTIVE_WHEN") // osmdroid only cares about these events.
+  when (event) {
+    ON_RESUME -> mapView.onResume()
+    ON_PAUSE -> mapView.onPause()
+    ON_DESTROY -> mapView.onDetach()
   }
 }

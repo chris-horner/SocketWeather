@@ -38,7 +38,7 @@ class RealForecasterTest {
     val forecaster = RealForecaster(fixedClock, testApi, selections, deviceLocations, scope = this)
 
     forecaster.states.test {
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
   }
 
@@ -71,15 +71,15 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // Initially display `Loaded`.
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
 
       // Next we request a refresh.
       advanceUntilIdle()
       forecaster.refresh()
 
       // When refreshing, we should transition from `Refreshing` -> `Loaded`.
-      assertThat(expectItem()).isInstanceOf<Refreshing>()
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<Refreshing>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
   }
 
@@ -122,9 +122,9 @@ class RealForecasterTest {
       forecaster.refresh()
 
       // When refreshing, we should transition from `FindingLocation` -> `LoadingForecast` -> `Loaded`.
-      assertThat(expectItem()).isInstanceOf<FindingLocation>()
-      assertThat(expectItem()).isInstanceOf<LoadingForecast>()
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<FindingLocation>()
+      assertThat(awaitItem()).isInstanceOf<LoadingForecast>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
   }
 
@@ -148,8 +148,8 @@ class RealForecasterTest {
       forecaster.refresh()
 
       // When refreshing, we should transition from `LoadingForecast` -> `Loaded`.
-      assertThat(expectItem()).isInstanceOf<LoadingForecast>()
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<LoadingForecast>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
   }
 
@@ -187,8 +187,8 @@ class RealForecasterTest {
       forecaster.refresh()
 
       // When refreshing, we should transition from `LoadingForecast` -> `Loaded`.
-      assertThat(expectItem()).isInstanceOf<LoadingForecast>()
-      assertThat(expectItem()).isInstanceOf<Loaded>()
+      assertThat(awaitItem()).isInstanceOf<LoadingForecast>()
+      assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
   }
 }

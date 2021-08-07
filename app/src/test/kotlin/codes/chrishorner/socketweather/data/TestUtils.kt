@@ -42,5 +42,5 @@ inline fun <reified T> Subject.isInstanceOf() {
  * Like [FlowTurbine.expectItem], except asserts and returns the item as a different type.
  */
 suspend inline fun <reified R> FlowTurbine<*>.expectItemAs(): R {
-  return expectItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
+  return awaitItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
 }

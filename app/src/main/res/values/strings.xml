@@ -54,6 +54,9 @@
   <string name="switchLocation_followMeSubtitle">Forecast at your location</string>
   <string name="switchLocation_add">Add another location</string>
 
+  <string name="rainRadar_backDesc">Back</string>
+  <string name="rainRadar_title">Rain radar</string>
+
   <string name="about_title">About</string>
   <string name="about_body">This app was hand made in Melbourne by Chris Horner. It\'s still a little rough around the edges, but it should improve with time. Development was inspired by Shifty Jelly\'s late Pocket Weather.\n\nAll forecast data is provided by the Australian Bureau of Meteorology.\n\nThis app respects your privacy and doesn\'t harvest your data. It\'s also completely open source.</string>
   <string name="about_source">Source on GitHub</string>

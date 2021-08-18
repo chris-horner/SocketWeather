@@ -4,9 +4,9 @@ import org.osmdroid.tileprovider.tilesource.TileSourcePolicy
 import java.net.HttpURLConnection
 
 /**
- * Only rain radar tiles for an hour.
+ * Only cache rain radar tiles for an hour.
  */
-object RadarTileSourcePolicy : TileSourcePolicy(0, 0) {
+object RadarTileSourcePolicy : TileSourcePolicy(6, 0) {
 
   override fun computeExpirationTime(pHttpExpiresHeader: String?, pHttpCacheControlHeader: String?, now: Long): Long {
     return now + (60 * 60 * 1_000)

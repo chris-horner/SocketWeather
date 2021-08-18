@@ -9,10 +9,10 @@ import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -23,7 +23,6 @@ import androidx.compose.ui.viewinterop.AndroidView
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import org.osmdroid.util.GeoPoint
 
 @Composable
@@ -31,9 +30,9 @@ fun RainRadarScreen() {
   val systemUiController = rememberSystemUiController()
   val useDarkIcons = MaterialTheme.colors.isLight
 
-  // Force dark system icons while viewing Rain Radar Screen.
+  // Force dark system icons while viewing this screen.
   DisposableEffect(Unit) {
-    systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = true)
+    systemUiController.setSystemBarsColor(Color.White.copy(alpha = 0.4f), darkIcons = true)
     onDispose {
       systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
     }
@@ -60,41 +59,37 @@ fun RainRadarScreen() {
 
 @Composable
 private fun RainRadar(setLoading: (Boolean) -> Unit) {
-  val rawMapView = rememberMapViewWithLifecycle()
   val context = LocalContext.current
-  val scope = rememberCoroutineScope()
+  val rawMapView = rememberMapViewWithLifecycle()
   val overlays = remember { getRainRadarOverlays(context) }
+  var activeOverlayIndex by remember { mutableStateOf(0) }
 
-  AndroidView({ rawMapView }) { mapView ->
+  LaunchedEffect(Unit) {
+    // While we're on screen, loop through and display each rainfall overlay.
+    while (true) {
+      setLoading(overlays.any { !it.tileStates.isDone } || overlays.any { it.tileStates.notFound > 0 })
 
-    mapView.tileProvider = getTileProvider(context)
-    mapView.controller.setZoom(9.0)
-    mapView.controller.setCenter(GeoPoint(-37.80517674019138, 144.98394260916697))
-    mapView.overlays.addAll(overlays)
+      // Pause on each overlay for 500ms, or 1s if it's the last.
+      if (activeOverlayIndex == overlays.size - 1) delay(1_000) else delay(500)
 
-    scope.launch {
-      var index = 0
+      activeOverlayIndex++
+      if (activeOverlayIndex >= overlays.size) activeOverlayIndex = 0
+    }
+  }
 
-      // While we're on screen, loop through and display each rainfall overlay.
-      while (true) {
-        val overlay = overlays[index]
-        overlay.isEnabled = true
-        mapView.invalidate()
-        setLoading(overlays.any { it.tileStates.notFound > 0 })
-
-        if (overlay.tileStates.notFound == 0) {
-          // Pause on each overlay for 500ms, or 1s if it's the last.
-          if (index == overlays.size - 1) delay(1_000) else delay(500)
-        } else {
-          while (overlay.tileStates.notFound > 0) {
-            delay(500)
-          }
-        }
-
-        overlay.isEnabled = false
-        index++
-        if (index >= overlays.size) index = 0
+  AndroidView(
+    {
+      rawMapView.apply {
+        tileProvider = getTileProvider(context)
+        controller.setZoom(9.0)
+        controller.setCenter(GeoPoint(-37.80517674019138, 144.98394260916697))
+        this.overlays.addAll(overlays)
       }
     }
+  ) { mapView ->
+    val previousIndex = (if (activeOverlayIndex == 0) overlays.size else activeOverlayIndex) - 1
+    overlays[previousIndex].isEnabled = false
+    overlays[activeOverlayIndex].isEnabled = true
+    mapView.invalidate()
   }
 }

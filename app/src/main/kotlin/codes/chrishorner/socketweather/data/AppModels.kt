@@ -27,3 +27,5 @@ data class Forecast(
 data class DeviceLocation(val latitude: Double, val longitude: Double)
 
 enum class ForecastError { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
+
+data class RainTimestamp(val timestamp: String, val label: String)

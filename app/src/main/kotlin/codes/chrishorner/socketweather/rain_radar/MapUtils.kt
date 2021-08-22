@@ -15,7 +15,6 @@ import androidx.lifecycle.Lifecycle.Event.ON_PAUSE
 import androidx.lifecycle.Lifecycle.Event.ON_RESUME
 import androidx.lifecycle.LifecycleEventObserver
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -105,8 +104,8 @@ fun getTileProvider(context: Context): MapTileProviderBase {
   return MapTileProviderBasic(context, source)
 }
 
-fun getRainRadarOverlays(context: Context): List<TilesOverlay> {
-  return generateRainRadarTimestamps().map { timestamp -> getRainOverlay(context, timestamp) }
+fun getRainRadarOverlays(context: Context, timestamps: List<String>): List<TilesOverlay> {
+  return timestamps.map { getRainOverlay(context, it) }
 }
 
 private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {

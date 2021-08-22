@@ -20,6 +20,7 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,15 +32,17 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.navigation.NavController
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
-import kotlinx.coroutines.delay
 import org.osmdroid.util.GeoPoint
+import org.osmdroid.views.overlay.TilesOverlay
 
 @Composable
-fun RainRadarScreen() {
+fun RainRadarScreen(viewModel: RainRadarViewModel, navController: NavController) {
+  val state: RainRadarState by viewModel.states.collectAsState()
   val systemUiController = rememberSystemUiController()
   val useDarkIcons = MaterialTheme.colors.isLight
 
@@ -55,71 +58,65 @@ fun RainRadarScreen() {
     colors = LightColors,
     typography = MaterialTheme.typography,
   ) {
-    RainRadarUi()
+    RainRadarUi(state) { navController.popBackStack() }
   }
 }
 
 @Composable
-private fun RainRadarUi() {
+private fun RainRadarUi(state: RainRadarState, onBackPressed: () -> Unit = {}) {
   var loading by remember { mutableStateOf(true) }
 
   Box {
-    RainRadar { loading = it }
+    RainRadar(state) { loading = it }
 
     InsetAwareTopAppBar(
-      title = { ToolbarTitle(loading) },
+      title = { ToolbarTitle(state.subtitle, loading) },
       navigationIcon = {
-        IconButton(onClick = { /*TODO*/ }) {
+        IconButton(onClick = onBackPressed) {
           Icon(Rounded.ArrowBack, contentDescription = stringResource(R.string.rainRadar_backDesc))
         }
       },
       backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.6f),
       elevation = 0.dp,
     )
-
-
   }
 }
 
 @Composable
-private fun RainRadar(setLoading: (Boolean) -> Unit) {
+@Suppress("UNCHECKED_CAST")
+private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
   val context = LocalContext.current
   val rawMapView = rememberMapViewWithLifecycle()
-  val overlays = remember { getRainRadarOverlays(context) }
-  var activeOverlayIndex by remember { mutableStateOf(0) }
 
-  LaunchedEffect(Unit) {
-    // While we're on screen, loop through and display each rainfall overlay.
-    while (true) {
-      setLoading(overlays.any { !it.tileStates.isDone } || overlays.any { it.tileStates.notFound > 0 })
-
-      // Pause on each overlay for 500ms, or 1s if it's the last.
-      if (activeOverlayIndex == overlays.size - 1) delay(1_000) else delay(500)
-
-      activeOverlayIndex++
-      if (activeOverlayIndex >= overlays.size) activeOverlayIndex = 0
-    }
+  LaunchedEffect(state.timestamps) {
+    rawMapView.overlayManager.clear()
+    rawMapView.overlays.addAll(getRainRadarOverlays(context, state.timestamps))
   }
 
   AndroidView(
     {
       rawMapView.apply {
         tileProvider = getTileProvider(context)
+        // TODO: Set position in state.
         controller.setZoom(9.0)
         controller.setCenter(GeoPoint(-37.80517674019138, 144.98394260916697))
-        this.overlays.addAll(overlays)
       }
     }
   ) { mapView ->
-    val previousIndex = (if (activeOverlayIndex == 0) overlays.size else activeOverlayIndex) - 1
-    overlays[previousIndex].isEnabled = false
-    overlays[activeOverlayIndex].isEnabled = true
-    mapView.invalidate()
+    val overlays = mapView.overlays as List<TilesOverlay>
+    setLoading(overlays.any { !it.tileStates.isDone } || overlays.any { it.tileStates.notFound > 0 })
+
+    if (overlays.isNotEmpty()) {
+      val previousIndex = (if (state.activeOverlayIndex == 0) overlays.size else state.activeOverlayIndex) - 1
+      overlays[previousIndex].isEnabled = false
+      overlays[state.activeOverlayIndex].isEnabled = true
+      mapView.invalidate()
+    }
   }
 }
 
 @Composable
-private fun ToolbarTitle(loading: Boolean) {
+private fun ToolbarTitle(subtitle: String, loading: Boolean) {
   Row(
     verticalAlignment = Alignment.CenterVertically,
   ) {
@@ -131,7 +128,7 @@ private fun ToolbarTitle(loading: Boolean) {
         .weight(1f)
     ) {
       Text(stringResource(R.string.rainRadar_title), style = MaterialTheme.typography.h5)
-      Text(text = "TODO: Subtitle", style = MaterialTheme.typography.caption)
+      Text(text = subtitle, style = MaterialTheme.typography.caption)
     }
 
     AnimatedVisibility(

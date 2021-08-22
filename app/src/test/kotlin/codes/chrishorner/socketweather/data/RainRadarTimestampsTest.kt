@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.time.Clock
 import java.time.LocalDateTime
-import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 class RainRadarTimestampsTest {
@@ -12,42 +12,42 @@ class RainRadarTimestampsTest {
   @Test fun `timestamps generated from time on the hour`() {
     val timestamps = generateRainRadarTimestamps(getFixedClockAt(12, 0))
     assertThat(timestamps).containsExactly(
-      "202106270100",
-      "202106270110",
-      "202106270120",
-      "202106270130",
-      "202106270140",
-      "202106270150"
-    )
+      RainTimestamp("202106271100", "11:00am"),
+      RainTimestamp("202106271110", "11:10am"),
+      RainTimestamp("202106271120", "11:20am"),
+      RainTimestamp("202106271130", "11:30am"),
+      RainTimestamp("202106271140", "11:40am"),
+      RainTimestamp("202106271150", "11:50am"),
+    ).inOrder()
   }
 
   @Test fun `timestamps generated from twelve minutes past the hour`() {
-    val timestamps = generateRainRadarTimestamps(getFixedClockAt(15, 12))
+    val timestamps = generateRainRadarTimestamps(getFixedClockAt(0, 12))
     assertThat(timestamps).containsExactly(
-      "202106270410",
-      "202106270420",
-      "202106270430",
-      "202106270440",
-      "202106270450",
-      "202106270500"
-    )
+      RainTimestamp("202106262310", "11:10pm"),
+      RainTimestamp("202106262320", "11:20pm"),
+      RainTimestamp("202106262330", "11:30pm"),
+      RainTimestamp("202106262340", "11:40pm"),
+      RainTimestamp("202106262350", "11:50pm"),
+      RainTimestamp("202106270000", "12:00am"),
+    ).inOrder()
   }
 
   @Test fun `timestamps generated from thirty-nine minutes past the hour`() {
     val timestamps = generateRainRadarTimestamps(getFixedClockAt(13, 39))
     assertThat(timestamps).containsExactly(
-      "202106270230",
-      "202106270240",
-      "202106270250",
-      "202106270300",
-      "202106270310",
-      "202106270320"
-    )
+      RainTimestamp("202106271230", "12:30pm"),
+      RainTimestamp("202106271240", "12:40pm"),
+      RainTimestamp("202106271250", "12:50pm"),
+      RainTimestamp("202106271300", "1:00pm"),
+      RainTimestamp("202106271310", "1:10pm"),
+      RainTimestamp("202106271320", "1:20pm"),
+    ).inOrder()
   }
 
   private fun getFixedClockAt(hour: Int, minute: Int): Clock {
     val fixedDateTime = LocalDateTime.of(2021, 6, 27, hour, minute)
-    val zone = ZoneId.of("Australia/Melbourne")
+    val zone = ZoneOffset.UTC
     val fixedInstant = ZonedDateTime.of(fixedDateTime, zone).toInstant()
     return Clock.fixed(fixedInstant, zone)
   }

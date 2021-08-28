@@ -19,4 +19,4 @@ jobs:
           java-version: 11
 
       - name: Run tests
-        run: bash ./gradlew testDebug --stacktrace
+        run: bash ./gradlew testDebug --info

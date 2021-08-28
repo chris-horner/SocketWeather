@@ -26,4 +26,4 @@ jobs:
         if: success() || failure()
         with:
           name: test-results
-          path: testDebugUnitTest/TEST-*.xml
+          path: app/build/test-results/testDebugUnitTest/TEST-*.xml

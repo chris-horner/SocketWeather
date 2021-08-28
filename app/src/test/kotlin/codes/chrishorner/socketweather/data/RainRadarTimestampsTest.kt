@@ -1,13 +1,17 @@
 package codes.chrishorner.socketweather.data
 
 import com.google.common.truth.Truth.assertThat
+import org.junit.Rule
 import org.junit.Test
 import java.time.Clock
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.ZonedDateTime
+import java.util.Locale
 
 class RainRadarTimestampsTest {
+
+  @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
   @Test fun `timestamps generated from time on the hour`() {
     val timestamps = generateRainRadarTimestamps(getFixedClockAt(12, 0))

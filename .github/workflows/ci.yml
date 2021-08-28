@@ -21,7 +21,7 @@ jobs:
       - name: Run tests
         run: bash ./gradlew testDebug
 
-      - name: Upload test artifacts
+      - name: Upload test reports
         uses: actions/upload-artifact@v2
         if: success() || failure()
         with:

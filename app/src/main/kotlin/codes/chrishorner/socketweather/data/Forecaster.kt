@@ -1,7 +1,7 @@
 package codes.chrishorner.socketweather.data
 
-import codes.chrishorner.socketweather.data.Forecaster.State
-import codes.chrishorner.socketweather.data.Forecaster.State.Idle
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Idle
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -9,12 +9,16 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
 import timber.log.Timber
 import java.time.Clock
@@ -25,16 +29,21 @@ import java.time.Instant
  */
 interface Forecaster {
 
-  sealed class State(open val selection: LocationSelection) {
-    object Idle : State(LocationSelection.None)
-    data class FindingLocation(override val selection: LocationSelection) : State(selection)
-    data class LoadingForecast(override val selection: LocationSelection, val location: Location) : State(selection)
-    data class Loaded(override val selection: LocationSelection, val forecast: Forecast) : State(selection)
-    data class Refreshing(override val selection: LocationSelection, val previousForecast: Forecast) : State(selection)
-    data class Error(override val selection: LocationSelection, val type: ForecastError) : State(selection)
+  sealed class LoadingState(open val selection: LocationSelection) {
+    object Idle : LoadingState(LocationSelection.None)
+    data class FindingLocation(override val selection: LocationSelection) : LoadingState(selection)
+    data class LoadingForecast(override val selection: LocationSelection, val location: Location) :
+      LoadingState(selection)
+
+    data class Loaded(override val selection: LocationSelection, val forecast: Forecast) : LoadingState(selection)
+    data class Refreshing(override val selection: LocationSelection, val previousForecast: Forecast) :
+      LoadingState(selection)
+
+    data class Error(override val selection: LocationSelection, val type: ForecastError) : LoadingState(selection)
   }
 
-  val states: StateFlow<State>
+  val states: StateFlow<LoadingState>
+  val forecast: StateFlow<Forecast?>
   fun refresh()
 }
 
@@ -47,11 +56,13 @@ class RealForecaster(
 ) : Forecaster {
 
   private val refreshes = MutableSharedFlow<Unit>(extraBufferCapacity = 1)
+  private val forecastState = MutableStateFlow<Forecast?>(null)
 
-  override val states: StateFlow<State>
+  override val states: StateFlow<LoadingState>
+  override val forecast: StateFlow<Forecast?> = forecastState
 
   init {
-    val stateFlow: Flow<State> = createFlowOfStates(
+    val loadingStateFlow: Flow<LoadingState> = createFlowOfStates(
       clock,
       api,
       locationSelections,
@@ -59,7 +70,13 @@ class RealForecaster(
       refreshes.onStart { emit(Unit) }
     )
 
-    states = stateFlow.stateIn(scope, started = SharingStarted.Eagerly, Idle)
+    states = loadingStateFlow.stateIn(scope, started = SharingStarted.Eagerly, Idle)
+
+    scope.launch {
+      states.filterIsInstance<LoadingState.Loaded>().collect { state ->
+        forecastState.value = state.forecast
+      }
+    }
   }
 
   override fun refresh() {
@@ -73,7 +90,7 @@ private fun createFlowOfStates(
   locationSelections: Flow<LocationSelection>,
   deviceLocations: Flow<DeviceLocation>,
   refreshRequests: Flow<Unit>
-): Flow<State> {
+): Flow<LoadingState> {
   // Emit a LocationSelection whenever a new selection is made, or whenever a
   // new refresh request comes through.
   val selectionTriggers: Flow<LocationSelection> =
@@ -90,44 +107,44 @@ private fun createFlowOfStates(
     when (locationState) {
       is LocationResolution.Searching -> {
         if (lastKnownForecast != null) {
-          emit(State.Refreshing(locationState.selection, lastKnownForecast))
+          emit(LoadingState.Refreshing(locationState.selection, lastKnownForecast))
         } else {
-          emit(State.FindingLocation(locationState.selection))
+          emit(LoadingState.FindingLocation(locationState.selection))
         }
       }
 
       is LocationResolution.DeviceLocationError -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ForecastError.LOCATION))
+        emit(LoadingState.Error(locationState.selection, type = ForecastError.LOCATION))
       }
 
       is LocationResolution.NetworkError -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ForecastError.NETWORK))
+        emit(LoadingState.Error(locationState.selection, type = ForecastError.NETWORK))
       }
 
       is LocationResolution.NotInAustralia -> {
         cachedForecast = null
-        emit(State.Error(locationState.selection, type = ForecastError.NOT_AUSTRALIA))
+        emit(LoadingState.Error(locationState.selection, type = ForecastError.NOT_AUSTRALIA))
       }
 
       is LocationResolution.Resolved -> {
         if (lastKnownForecast != null) {
-          emit(State.Refreshing(locationState.selection, lastKnownForecast))
+          emit(LoadingState.Refreshing(locationState.selection, lastKnownForecast))
         } else {
-          emit(State.LoadingForecast(locationState.selection, locationState.location))
+          emit(LoadingState.LoadingForecast(locationState.selection, locationState.location))
         }
 
         try {
           val forecast = loadForecast(api, clock, locationState.location)
           cachedForecast = forecast
-          emit(State.Loaded(locationState.selection, forecast))
+          emit(LoadingState.Loaded(locationState.selection, forecast))
         } catch (e: JsonDataException) {
           Timber.e(e, "API returned unexpected data.")
-          emit(State.Error(locationState.selection, ForecastError.DATA))
+          emit(LoadingState.Error(locationState.selection, ForecastError.DATA))
         } catch (e: Exception) {
           Timber.e(e, "Failed to load forecast.")
-          emit(State.Error(locationState.selection, ForecastError.NETWORK))
+          emit(LoadingState.Error(locationState.selection, ForecastError.NETWORK))
         }
       }
     }

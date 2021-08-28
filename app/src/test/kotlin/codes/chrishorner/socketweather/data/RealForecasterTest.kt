@@ -1,11 +1,11 @@
 package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.test
-import codes.chrishorner.socketweather.data.Forecaster.State.Error
-import codes.chrishorner.socketweather.data.Forecaster.State.FindingLocation
-import codes.chrishorner.socketweather.data.Forecaster.State.Loaded
-import codes.chrishorner.socketweather.data.Forecaster.State.LoadingForecast
-import codes.chrishorner.socketweather.data.Forecaster.State.Refreshing
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Error
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.FindingLocation
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Loaded
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.LoadingForecast
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Refreshing
 import codes.chrishorner.socketweather.data.TestApi.ResponseMode
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -190,5 +190,22 @@ class RealForecasterTest {
       assertThat(awaitItem()).isInstanceOf<LoadingForecast>()
       assertThat(awaitItem()).isInstanceOf<Loaded>()
     }
+  }
+
+  @Test fun `forecast value updates alongside loading state`() = runCancellingBlockingTest {
+
+    val locationSelections = MutableStateFlow(LocationSelection.Static(testApi.location1))
+    val deviceLocations = emptyFlow<DeviceLocation>()
+    val forecaster = RealForecaster(fixedClock, testApi, locationSelections, deviceLocations, scope = this)
+
+    val firstStateValue = forecaster.states.value
+    firstStateValue.assertIsOfType<Loaded>()
+    assertThat(firstStateValue.forecast).isEqualTo(forecaster.forecast.value)
+
+    locationSelections.value = LocationSelection.Static(testApi.location2)
+
+    val secondStateValue = forecaster.states.value
+    secondStateValue.assertIsOfType<Loaded>()
+    assertThat(secondStateValue.forecast).isEqualTo(forecaster.forecast.value)
   }
 }

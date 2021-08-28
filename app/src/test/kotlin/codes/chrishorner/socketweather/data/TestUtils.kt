@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.FlowTurbine
 import com.google.common.truth.Subject
+import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.test.TestCoroutineScope
@@ -11,6 +12,8 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import java.util.Locale
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -40,6 +43,14 @@ fun runCancellingBlockingTest(
 
 inline fun <reified T> Subject.isInstanceOf() {
   isInstanceOf(T::class.java)
+}
+
+@OptIn(ExperimentalContracts::class)
+inline fun <reified T> Any?.assertIsOfType() {
+  contract {
+    returns() implies (this@assertIsOfType is T)
+  }
+  assertThat(this).isInstanceOf<T>()
 }
 
 /**

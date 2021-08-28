@@ -30,9 +30,9 @@ class MainActivity : AppCompatActivity() {
     val forecaster = appSingletons.forecaster
 
     when (val state = forecaster.states.value) {
-      is Forecaster.State.Idle -> forecaster.refresh()
+      is Forecaster.LoadingState.Idle -> forecaster.refresh()
 
-      is Forecaster.State.Loaded -> {
+      is Forecaster.LoadingState.Loaded -> {
         val elapsedTime = Duration.between(state.forecast.updateTime, Instant.now())
         if (elapsedTime.toMinutes() > 1) {
           forecaster.refresh()

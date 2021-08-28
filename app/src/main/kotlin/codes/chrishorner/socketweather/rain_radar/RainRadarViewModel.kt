@@ -1,13 +1,17 @@
 package codes.chrishorner.socketweather.rain_radar
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import codes.chrishorner.socketweather.appSingletons
+import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.transformLatest
@@ -41,4 +45,11 @@ class RainRadarViewModel(
       }
     }
     .stateIn(scope, SharingStarted.WhileSubscribed(5_000), RainRadarState())
+
+  companion object {
+    operator fun invoke(context: Context) {
+      val currentSelection = context.appSingletons.forecaster.states.filterIsInstance<Forecaster.LoadingState.Loaded>()
+      currentSelection
+    }
+  }
 }

@@ -65,13 +65,13 @@ class HomeViewModel(
     }
   }
 
-  private fun Forecaster.State.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
+  private fun Forecaster.LoadingState.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
     val toolbarTitle = when (this) {
-      Forecaster.State.Idle -> strings[R.string.home_loading]
-      is Forecaster.State.FindingLocation -> strings[R.string.home_findingLocation]
-      is Forecaster.State.Refreshing -> this.previousForecast.location.name
-      is Forecaster.State.Loaded -> this.forecast.location.name
-      is Forecaster.State.Error -> when (val selection = this.selection) {
+      Forecaster.LoadingState.Idle -> strings[R.string.home_loading]
+      is Forecaster.LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
+      is Forecaster.LoadingState.Refreshing -> this.previousForecast.location.name
+      is Forecaster.LoadingState.Loaded -> this.forecast.location.name
+      is Forecaster.LoadingState.Error -> when (val selection = this.selection) {
         is Static -> selection.location.name
         is FollowMe -> strings[R.string.home_findingLocation]
         is None -> throw IllegalStateException("Cannot display LocationSelection of None.")
@@ -80,8 +80,8 @@ class HomeViewModel(
     }
 
     val toolbarSubtitle = when (this) {
-      is Forecaster.State.Refreshing -> strings[R.string.home_updatingNow]
-      is Forecaster.State.Loaded -> {
+      is Forecaster.LoadingState.Refreshing -> strings[R.string.home_updatingNow]
+      is Forecaster.LoadingState.Loaded -> {
         if (Duration.between(forecast.updateTime, clock.instant()).toMinutes() > 0) {
           strings.get(R.string.home_lastUpdated, strings.getRelativeTimeSpanString(forecast.updateTime))
         } else {
@@ -92,11 +92,11 @@ class HomeViewModel(
     }
 
     val content = when (this) {
-      Forecaster.State.Idle -> HomeState.Content.Empty
-      is Forecaster.State.FindingLocation, is Forecaster.State.LoadingForecast -> HomeState.Content.Loading
-      is Forecaster.State.Refreshing -> HomeState.Content.Refreshing(previousForecast.format())
-      is Forecaster.State.Loaded -> HomeState.Content.Loaded(forecast.format())
-      is Forecaster.State.Error -> HomeState.Content.Error(type)
+      Forecaster.LoadingState.Idle -> HomeState.Content.Empty
+      is Forecaster.LoadingState.FindingLocation, is Forecaster.LoadingState.LoadingForecast -> HomeState.Content.Loading
+      is Forecaster.LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format())
+      is Forecaster.LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format())
+      is Forecaster.LoadingState.Error -> HomeState.Content.Error(type)
     }
 
     return HomeState(

@@ -4,7 +4,7 @@ import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import java.time.Clock
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.time.ZonedDateTime
 
 class RainRadarTimestampsTest {
@@ -47,7 +47,7 @@ class RainRadarTimestampsTest {
 
   private fun getFixedClockAt(hour: Int, minute: Int): Clock {
     val fixedDateTime = LocalDateTime.of(2021, 6, 27, hour, minute)
-    val zone = ZoneOffset.UTC
+    val zone = ZoneId.of("UTC")
     val fixedInstant = ZonedDateTime.of(fixedDateTime, zone).toInstant()
     return Clock.fixed(fixedInstant, zone)
   }

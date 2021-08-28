@@ -19,4 +19,11 @@ jobs:
           java-version: 11
 
       - name: Run tests
-        run: bash ./gradlew testDebug --info
+        run: bash ./gradlew testDebug
+
+      - name: Upload test artifacts
+        uses: actions/upload-artifact@v2
+        if: success() || failure()
+        with:
+          name: test-results
+          path: testDebugUnitTest/TEST-*.xml

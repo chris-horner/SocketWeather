@@ -1,8 +1,8 @@
 package codes.chrishorner.socketweather.data
 
 import java.time.Clock
-import java.time.LocalDateTime
 import java.time.ZoneOffset
+import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 private const val COUNT = 6
@@ -20,7 +20,7 @@ private val labelFormat = DateTimeFormatter.ofPattern("h:mma")
  * If the current time is `12:12`, the most resent timestamp will be for `12:00`
  */
 fun generateRainRadarTimestamps(clock: Clock = Clock.systemDefaultZone()): List<RainTimestamp> {
-  val nowUtc = LocalDateTime.now(clock.withZone(ZoneOffset.UTC))
+  val nowUtc = ZonedDateTime.now(clock.withZone(ZoneOffset.UTC))
   val minutesAtNearestTen = (nowUtc.minute / 10) * 10
   val nowAtNearestTenMinutes = nowUtc.withMinute(minutesAtNearestTen)
 
@@ -28,7 +28,7 @@ fun generateRainRadarTimestamps(clock: Clock = Clock.systemDefaultZone()): List<
     for (i in 0 until COUNT) {
       val intervalMinutes = (i + 1) * 10
       val time = nowAtNearestTenMinutes.minusMinutes(intervalMinutes.toLong())
-      add(index = 0, RainTimestamp(time.format(timestampFormat), time.format(labelFormat)))
+      add(index = 0, RainTimestamp(time.format(timestampFormat), time.withZoneSameInstant(clock.zone).format(labelFormat)))
     }
   }
 }

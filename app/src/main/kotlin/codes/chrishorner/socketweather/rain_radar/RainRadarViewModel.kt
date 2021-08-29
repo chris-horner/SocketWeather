@@ -35,7 +35,7 @@ class RainRadarViewModel(
 
       // Loop through and display each rainfall overlay.
       while (true) {
-        emit(state.copy(subtitle = subtitles[activeIndex], activeOverlayIndex = activeIndex))
+        emit(state.copy(subtitle = subtitles[activeIndex], activeTimestampIndex = activeIndex))
 
         // Pause on each timestamp for 500ms, or 1s if it's the last.
         if (activeIndex == rainTimestamps.size - 1) delay(1_000) else delay(500)

@@ -54,9 +54,9 @@ inline fun <reified T> Any?.assertIsOfType() {
 }
 
 /**
- * Like [FlowTurbine.expectItem], except asserts and returns the item as a different type.
+ * Like [FlowTurbine.awaitItem], except asserts and returns the item as a different type.
  */
-suspend inline fun <reified R> FlowTurbine<*>.expectItemAs(): R {
+suspend inline fun <reified R> FlowTurbine<*>.awaitItemAs(): R {
   return awaitItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
 }
 

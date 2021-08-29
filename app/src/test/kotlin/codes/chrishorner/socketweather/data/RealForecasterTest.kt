@@ -50,16 +50,16 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // Initially we should be displaying `Loaded` with location1's forecast.
-      assertThat(expectItemAs<Loaded>().forecast.location).isEqualTo(testApi.location1)
+      assertThat(awaitItemAs<Loaded>().forecast.location).isEqualTo(testApi.location1)
 
       // Next we pretend to be the device providing an updated location.
       deviceLocations.value = testApi.deviceLocation2
 
       // This should kick us into a `Refreshing` status, but still with the initial location.
-      assertThat(expectItemAs<Refreshing>().previousForecast.location).isEqualTo(testApi.location1)
+      assertThat(awaitItemAs<Refreshing>().previousForecast.location).isEqualTo(testApi.location1)
 
       // Once the forecast is loaded, we should be displaying `Loaded` again with the new location.
-      assertThat(expectItemAs<Loaded>().forecast.location).isEqualTo(testApi.location2)
+      assertThat(awaitItemAs<Loaded>().forecast.location).isEqualTo(testApi.location2)
     }
   }
 
@@ -91,14 +91,14 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // Initially we should be displaying `Loaded` with location1's forecast.
-      assertThat(expectItemAs<Loaded>().forecast.location).isEqualTo(testApi.location1)
+      assertThat(awaitItemAs<Loaded>().forecast.location).isEqualTo(testApi.location1)
 
       // Next we pretend to be the user selecting a different location.
       locationSelections.value = LocationSelection.Static(testApi.location2)
 
       // When loading the new location, we should transition from `Refreshing` -> `Loaded`.
-      assertThat(expectItemAs<Refreshing>().previousForecast.location).isEqualTo(testApi.location1)
-      assertThat(expectItemAs<Loaded>().forecast.location).isEqualTo(testApi.location2)
+      assertThat(awaitItemAs<Refreshing>().previousForecast.location).isEqualTo(testApi.location1)
+      assertThat(awaitItemAs<Loaded>().forecast.location).isEqualTo(testApi.location2)
     }
   }
 
@@ -114,7 +114,7 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // Our first state should be failure.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.LOCATION)
+      assertThat(awaitItemAs<Error>().type).isEqualTo(ForecastError.LOCATION)
 
       // Next, reconfigure location updates to succeed and request a refresh.
       advanceUntilIdle()
@@ -140,7 +140,7 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // With network requests failing, our initial state should be `Error` with type `NETWORK`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.NETWORK)
+      assertThat(awaitItemAs<Error>().type).isEqualTo(ForecastError.NETWORK)
 
       // Next, reconfigure network requests to succeed and request a refresh.
       advanceUntilIdle()
@@ -163,7 +163,7 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // The state emitted should be `Error` with type `NOT_AUSTRALIA`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.NOT_AUSTRALIA)
+      assertThat(awaitItemAs<Error>().type).isEqualTo(ForecastError.NOT_AUSTRALIA)
     }
   }
 
@@ -179,7 +179,7 @@ class RealForecasterTest {
 
     forecaster.states.test {
       // With network requests failing, our initial state should be `Error` with type `DATA`.
-      assertThat(expectItemAs<Error>().type).isEqualTo(ForecastError.DATA)
+      assertThat(awaitItemAs<Error>().type).isEqualTo(ForecastError.DATA)
 
       // Next, reconfigure network requests to succeed and request a refresh.
       advanceUntilIdle()

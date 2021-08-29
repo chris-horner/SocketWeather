@@ -6,7 +6,7 @@ data class RainRadarState(
   val location: RainRadarLocation,
   val subtitle: String = "",
   val timestamps: List<String> = emptyList(),
-  val activeOverlayIndex: Int = 0,
+  val activeTimestampIndex: Int = 0,
 )
 
 data class RainRadarLocation(

@@ -107,9 +107,9 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
     setLoading(overlays.any { !it.tileStates.isDone } || overlays.any { it.tileStates.notFound > 0 })
 
     if (overlays.isNotEmpty()) {
-      val previousIndex = (if (state.activeOverlayIndex == 0) overlays.size else state.activeOverlayIndex) - 1
+      val previousIndex = (if (state.activeTimestampIndex == 0) overlays.size else state.activeTimestampIndex) - 1
       overlays[previousIndex].isEnabled = false
-      overlays[state.activeOverlayIndex].isEnabled = true
+      overlays[state.activeTimestampIndex].isEnabled = true
       mapView.invalidate()
     }
   }

@@ -88,6 +88,7 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
   val context = LocalContext.current
   val rawMapView = rememberMapViewWithLifecycle()
 
+  // Every time timestamps change, remove and reset the MapView's overlays.
   LaunchedEffect(state.timestamps) {
     rawMapView.overlayManager.clear()
     rawMapView.overlays.addAll(getRainRadarOverlays(context, state.timestamps))
@@ -97,9 +98,8 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
     {
       rawMapView.apply {
         tileProvider = getTileProvider(context)
-        // TODO: Set position in state.
-        controller.setZoom(9.0)
-        controller.setCenter(GeoPoint(-37.80517674019138, 144.98394260916697))
+        controller.setCenter(GeoPoint(state.location.latitude, state.location.longitude))
+        controller.setZoom(state.location.zoom)
       }
     }
   ) { mapView ->

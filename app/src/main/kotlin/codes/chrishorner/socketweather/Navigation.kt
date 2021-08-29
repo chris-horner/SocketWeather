@@ -71,7 +71,8 @@ fun NavGraph(currentSelection: LocationSelection) {
       AboutScreen(navController)
     }
     composable(route = Screen.RainRadar.routeDefinition) {
-      RainRadarScreen(RainRadarViewModel(), navController)
+      val viewModel = createVm { context -> RainRadarViewModel(context) }
+      RainRadarScreen(viewModel, navController)
     }
   }
 }

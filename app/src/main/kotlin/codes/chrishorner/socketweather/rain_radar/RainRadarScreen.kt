@@ -1,5 +1,7 @@
 package codes.chrishorner.socketweather.rain_radar
 
+import android.graphics.PorterDuff
+import android.graphics.PorterDuffColorFilter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -82,6 +84,8 @@ private fun RainRadarUi(state: RainRadarState, onBackPressed: () -> Unit = {}) {
   }
 }
 
+private val zeroAlphaFilter = PorterDuffColorFilter(0, PorterDuff.Mode.CLEAR)
+
 @Composable
 @Suppress("UNCHECKED_CAST")
 private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
@@ -104,16 +108,24 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
     }
   ) { mapView ->
     val overlays = mapView.overlays as List<TilesOverlay>
-    setLoading(overlays.any { !it.tileStates.isDone } || overlays.any { it.tileStates.notFound > 0 })
+    setLoading(overlays.any { it.isLoading })
+
+    for (overlay in overlays) {
+      val loading = overlay.isLoading
+      // Set each overlay to enabled only if it's loading. Otherwise set its alpha to zero.
+      // This enables the overlay to continue downloading tiles but hide if it's not for the
+      // current `activeTimestampIndex`.
+      overlay.isEnabled = loading
+      overlay.setColorFilter(if (loading) zeroAlphaFilter else null)
+    }
 
     if (overlays.isNotEmpty()) {
-      val previousIndex = (if (state.activeTimestampIndex == 0) overlays.size else state.activeTimestampIndex) - 1
-      overlays[previousIndex].isEnabled = false
       overlays[state.activeTimestampIndex].isEnabled = true
       mapView.invalidate()
     }
   }
 }
+
 
 @Composable
 private fun ToolbarTitle(subtitle: String, loading: Boolean) {

@@ -108,6 +108,9 @@ fun getRainRadarOverlays(context: Context, timestamps: List<String>): List<Tiles
   return timestamps.map { getRainOverlay(context, it) }
 }
 
+val TilesOverlay.isLoading: Boolean
+  get() = !tileStates.isDone || tileStates.notFound > 0
+
 private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {
   val source = object : OnlineTileSourceBase(
     timestamp,
@@ -130,6 +133,5 @@ private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {
   val provider = MapTileProviderBasic(context, source)
   val overlay = TilesOverlay(provider, context)
   overlay.loadingBackgroundColor = Color.TRANSPARENT
-  overlay.isEnabled = false
   return overlay
 }

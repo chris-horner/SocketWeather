@@ -102,3 +102,5 @@ val TinyTempTextStyle = SocketWeatherTypography.body1.copy(
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Medium
 )
+
+val CopyrightTextStyle = SocketWeatherTypography.caption.copy(fontSize = 10.sp)

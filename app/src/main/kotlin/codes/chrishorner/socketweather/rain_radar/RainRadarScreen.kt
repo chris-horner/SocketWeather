@@ -1,5 +1,7 @@
 package codes.chrishorner.socketweather.rain_radar
 
+import android.content.Intent
+import android.content.Intent.ACTION_VIEW
 import android.graphics.PorterDuff
 import android.graphics.PorterDuffColorFilter
 import androidx.compose.animation.AnimatedVisibility
@@ -12,6 +14,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -32,12 +35,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.styles.CopyrightTextStyle
 import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.TilesOverlay
@@ -56,6 +66,7 @@ fun RainRadarScreen(viewModel: RainRadarViewModel, navController: NavController)
     }
   }
 
+  // Force a light theme while viewing this screen.
   MaterialTheme(
     colors = LightColors,
     typography = MaterialTheme.typography,
@@ -67,6 +78,7 @@ fun RainRadarScreen(viewModel: RainRadarViewModel, navController: NavController)
 @Composable
 private fun RainRadarUi(state: RainRadarState, onBackPressed: () -> Unit = {}) {
   var loading by remember { mutableStateOf(true) }
+  val context = LocalContext.current
 
   Box {
     RainRadar(state) { loading = it }
@@ -81,10 +93,23 @@ private fun RainRadarUi(state: RainRadarState, onBackPressed: () -> Unit = {}) {
       backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.6f),
       elevation = 0.dp,
     )
+
+    ClickableText(
+      text = CopyrightText,
+      style = CopyrightTextStyle,
+      modifier = Modifier
+        .align(Alignment.BottomCenter)
+        .systemBarsPadding()
+        .padding(8.dp)
+    ) { offset ->
+      CopyrightText.getStringAnnotations(tag = TAG_URL, start = offset, end = offset)
+        .firstOrNull()
+        ?.let { annotation ->
+          context.startActivity(Intent(ACTION_VIEW, annotation.item.toUri()))
+        }
+    }
   }
 }
-
-private val zeroAlphaFilter = PorterDuffColorFilter(0, PorterDuff.Mode.CLEAR)
 
 @Composable
 @Suppress("UNCHECKED_CAST")
@@ -116,7 +141,7 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
       // This enables the overlay to continue downloading tiles but hide if it's not for the
       // current `activeTimestampIndex`.
       overlay.isEnabled = loading
-      overlay.setColorFilter(if (loading) zeroAlphaFilter else null)
+      overlay.setColorFilter(if (loading) ZeroAlphaFilter else null)
     }
 
     if (overlays.isNotEmpty()) {
@@ -125,7 +150,6 @@ private fun RainRadar(state: RainRadarState, setLoading: (Boolean) -> Unit) {
     }
   }
 }
-
 
 @Composable
 private fun ToolbarTitle(subtitle: String, loading: Boolean) {
@@ -155,4 +179,42 @@ private fun ToolbarTitle(subtitle: String, loading: Boolean) {
       )
     }
   }
+}
+
+private val ZeroAlphaFilter = PorterDuffColorFilter(0, PorterDuff.Mode.CLEAR)
+private const val TAG_URL = "url"
+private val CopyrightText = buildAnnotatedString {
+  append("Map tiles by ")
+
+  pushStringAnnotation(TAG_URL, annotation = "https://stamen.com")
+  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+    append("Stamen Design")
+  }
+  pop()
+
+  append(", under ")
+
+  pushStringAnnotation(TAG_URL, annotation = "https://creativecommons.org/licenses/by/3.0")
+  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+    append("CC BY 3.0")
+  }
+  pop()
+
+  append(". Data by ")
+
+  pushStringAnnotation(TAG_URL, annotation = "https://openstreetmap.org")
+  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+    append("OpenStreetMap")
+  }
+  pop()
+
+  append(", under ")
+
+  pushStringAnnotation(TAG_URL, annotation = "https://www.openstreetmap.org/copyright")
+  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
+    append("ODbL")
+  }
+  pop()
+
+  append(".")
 }

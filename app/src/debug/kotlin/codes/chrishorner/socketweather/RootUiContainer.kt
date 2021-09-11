@@ -23,11 +23,11 @@ fun RootContainer(content: @Composable () -> Unit) {
       SideEffect {
         systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
       }
-      //ComposeDebugDrawer {
+      ComposeDebugDrawer {
         Box(modifier = Modifier.fillMaxSize()) {
           content()
         }
-      //}
+      }
     }
   }
 }

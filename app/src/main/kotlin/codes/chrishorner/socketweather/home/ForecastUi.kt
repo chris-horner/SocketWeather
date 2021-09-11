@@ -36,7 +36,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import codes.chrishorner.socketweather.BuildConfig
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
@@ -66,18 +65,16 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEven
       )
     }
 
-    if (BuildConfig.DEBUG) {
-      OutlinedButton(
-        onClick = { onEvent(HomeEvent.ViewRainRadar) },
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
-          .align(Alignment.End)
-      ) {
-        Icon(Icons.Rounded.Radar, contentDescription = null)
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(stringResource(R.string.home_rainRadarButton))
-      }
+    OutlinedButton(
+      onClick = { onEvent(HomeEvent.ViewRainRadar) },
+      modifier = Modifier
+        .fillMaxWidth()
+        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+        .align(Alignment.End)
+    ) {
+      Icon(Icons.Rounded.Radar, contentDescription = null)
+      Spacer(modifier = Modifier.width(12.dp))
+      Text(stringResource(R.string.home_rainRadarButton))
     }
 
     TimeForecastGraph(

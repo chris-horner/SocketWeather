@@ -63,7 +63,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
         )
 
         Text(
-          text = forecast.highTemperature,
+          text = forecast.lowTemperature,
           style = SmallTempTextStyle,
           textAlign = TextAlign.End,
           maxLines = 1,
@@ -81,7 +81,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
         )
 
         Text(
-          text = forecast.lowTemperature,
+          text = forecast.highTemperature,
           style = SmallTempTextStyle,
           textAlign = TextAlign.End,
           modifier = Modifier.widthIn(min = 36.dp)

@@ -1,4 +1,4 @@
-- 💥 Fix app crashing for fresh installs
-- 💌 Migrated UI to Jetpack Compose!
-- 📍 Fixed "Follow me" not working on Android 11
-- 🌧 Added some workarounds for some of BOMs eccentric data
+- 🌧 Added rain radar
+- 🗺 Improved reliability of approximate location detection
+- 📈 Tweaked temperature graph for readability
+- 🔧 Slight UI tweaks here and there

@@ -70,6 +70,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEven
       OutlinedButton(
         onClick = { onEvent(HomeEvent.ViewRainRadar) },
         modifier = Modifier
+          .fillMaxWidth()
           .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
           .align(Alignment.End)
       ) {

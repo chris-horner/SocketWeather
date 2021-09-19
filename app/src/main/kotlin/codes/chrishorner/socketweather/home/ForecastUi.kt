@@ -170,13 +170,13 @@ private fun HumidityWindUvSection(humidity: String?, windSpeed: String, uvWarnin
     }
     SectionEntry(
       iconRes = R.drawable.ic_weather_windy_24dp,
-      iconDesc = stringResource(R.string.home_humidityIconDesc),
+      iconDesc = stringResource(R.string.home_windIconDesc),
       content = windSpeed
     )
     if (uvWarningTimes != null) {
       SectionEntry(
         iconRes = R.drawable.ic_weather_sunny_alert_24dp,
-        iconDesc = stringResource(R.string.home_humidityIconDesc),
+        iconDesc = stringResource(R.string.home_uvProtectionIconDesc),
         content = uvWarningTimes
       )
     }

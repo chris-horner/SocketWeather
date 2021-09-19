@@ -3,6 +3,7 @@ package codes.chrishorner.socketweather.data
 import android.app.Application
 import android.content.Intent
 import codes.chrishorner.socketweather.MainActivity
+import codes.chrishorner.socketweather.data.DataConfig.UserAgentInterceptor
 import codes.chrishorner.socketweather.debug.DebugEndpoint
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.ENDPOINT
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.HTTP_LOG_LEVEL
@@ -69,6 +70,7 @@ class DebugNetworkComponents(
 
     val httpClient: OkHttpClient = OkHttpClient.Builder()
       .addInterceptor(logger)
+      .addNetworkInterceptor(UserAgentInterceptor())
       .build()
 
     val currentEndpoint = preferenceStore.blockingGet().getEnum(ENDPOINT) ?: DebugEndpoint.MOCK

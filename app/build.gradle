@@ -143,5 +143,6 @@ dependencies {
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
   testImplementation "app.cash.turbine:turbine:${versions.turbine}"
   testImplementation "com.google.truth:truth:${versions.truth}"
+  testImplementation "com.squareup.okhttp3:mockwebserver:${versions.okhttp}"
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.jdk_desugar}"
 }

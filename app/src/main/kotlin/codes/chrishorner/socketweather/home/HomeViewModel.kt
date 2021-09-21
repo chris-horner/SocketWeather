@@ -114,7 +114,7 @@ class HomeViewModel(
       TimeForecastGraphItem(
         temperatureC = hourlyForecast.temp,
         formattedTemperature = strings.formatDegrees(hourlyForecast.temp),
-        time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).toUpperCase(Locale.getDefault()),
+        time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).uppercase(Locale.getDefault()),
         rainChancePercent = hourlyForecast.rain.chance,
         formattedRainChance = strings.formatPercent(hourlyForecast.rain.chance),
       )

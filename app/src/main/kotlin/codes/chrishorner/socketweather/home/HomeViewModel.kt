@@ -7,17 +7,21 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Forecaster
+import codes.chrishorner.socketweather.data.Forecaster.LoadingState
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.LocationSelectionStore
+import codes.chrishorner.socketweather.home.FormattedConditions.Description
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
+import codes.chrishorner.socketweather.home.HomeEvent.ToggleDescription
 import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.localTimeAtZone
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -42,20 +46,28 @@ class HomeViewModel(
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
   private val scope = overrideScope ?: viewModelScope
 
-  val states: StateFlow<HomeState> = tickerFlow(10_000, emitImmediately = true)
-    .flatMapLatest { forecaster.states }
-    .combine(locationStore.savedSelections) { forecasterState, savedSelections ->
-      forecasterState.toHomeState(savedSelections)
-    }
+  private val showExtendedDescription: MutableStateFlow<Boolean> = MutableStateFlow(false)
+
+  val states: StateFlow<HomeState> = combine(
+    tickerFlow(10_000, emitImmediately = true).flatMapLatest { forecaster.states },
+    locationStore.savedSelections,
+    showExtendedDescription
+  ) { forecasterState, savedSelections, showExtendedDescription ->
+    forecasterState.toHomeState(savedSelections, showExtendedDescription)
+  }
     .stateIn(
       scope = scope,
       started = SharingStarted.Eagerly,
-      initialValue = forecaster.states.value.toHomeState(locationStore.savedSelections.value)
+      initialValue = forecaster.states.value.toHomeState(
+        locationStore.savedSelections.value,
+        showExtendedDescription.value
+      )
     )
 
   fun handleEvent(event: HomeEvent) = when (event) {
     Refresh -> forecaster.refresh()
     is SwitchLocation -> switchLocation(event.selection)
+    is ToggleDescription -> toggleDescription(event.showExtended)
     else -> error("Unhandled home event.")
   }
 
@@ -65,13 +77,22 @@ class HomeViewModel(
     }
   }
 
-  private fun Forecaster.LoadingState.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
+  private fun toggleDescription(showExtended: Boolean) {
+    scope.launch {
+      showExtendedDescription.emit(showExtended)
+    }
+  }
+
+  private fun LoadingState.toHomeState(
+    savedSelections: Set<LocationSelection>,
+    showExtendedDescription: Boolean
+  ): HomeState {
     val toolbarTitle = when (this) {
-      Forecaster.LoadingState.Idle -> strings[R.string.home_loading]
-      is Forecaster.LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
-      is Forecaster.LoadingState.Refreshing -> this.previousForecast.location.name
-      is Forecaster.LoadingState.Loaded -> this.forecast.location.name
-      is Forecaster.LoadingState.Error -> when (val selection = this.selection) {
+      LoadingState.Idle -> strings[R.string.home_loading]
+      is LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
+      is LoadingState.Refreshing -> this.previousForecast.location.name
+      is LoadingState.Loaded -> this.forecast.location.name
+      is LoadingState.Error -> when (val selection = this.selection) {
         is Static -> selection.location.name
         is FollowMe -> strings[R.string.home_findingLocation]
         is None -> throw IllegalStateException("Cannot display LocationSelection of None.")
@@ -80,8 +101,8 @@ class HomeViewModel(
     }
 
     val toolbarSubtitle = when (this) {
-      is Forecaster.LoadingState.Refreshing -> strings[R.string.home_updatingNow]
-      is Forecaster.LoadingState.Loaded -> {
+      is LoadingState.Refreshing -> strings[R.string.home_updatingNow]
+      is LoadingState.Loaded -> {
         if (Duration.between(forecast.updateTime, clock.instant()).toMinutes() > 0) {
           strings.get(R.string.home_lastUpdated, strings.getRelativeTimeSpanString(forecast.updateTime))
         } else {
@@ -92,11 +113,11 @@ class HomeViewModel(
     }
 
     val content = when (this) {
-      Forecaster.LoadingState.Idle -> HomeState.Content.Empty
-      is Forecaster.LoadingState.FindingLocation, is Forecaster.LoadingState.LoadingForecast -> HomeState.Content.Loading
-      is Forecaster.LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format())
-      is Forecaster.LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format())
-      is Forecaster.LoadingState.Error -> HomeState.Content.Error(type)
+      LoadingState.Idle -> HomeState.Content.Empty
+      is LoadingState.FindingLocation, is LoadingState.LoadingForecast -> HomeState.Content.Loading
+      is LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format(showExtendedDescription))
+      is LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format(showExtendedDescription))
+      is LoadingState.Error -> HomeState.Content.Error(type)
     }
 
     return HomeState(
@@ -108,7 +129,7 @@ class HomeViewModel(
     )
   }
 
-  private fun Forecast.format(): FormattedConditions {
+  private fun Forecast.format(showExtendedDescription: Boolean): FormattedConditions {
 
     val graphItems = hourlyForecasts.map { hourlyForecast ->
       TimeForecastGraphItem(
@@ -161,7 +182,19 @@ class HomeViewModel(
       humidityPercent = humidity?.let { strings.formatPercent(it) },
       windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
       uvWarningTimes = uvWarningTimes,
-      description = todayForecast.extended_text ?: todayForecast.short_text,
+      description = todayForecast.run {
+        val hasExtendedDescription =
+          !short_text.isNullOrBlank() && !extended_text.isNullOrBlank() && short_text != extended_text
+        Description(
+          text = when {
+            hasExtendedDescription && showExtendedDescription -> extended_text!!
+            hasExtendedDescription -> short_text!!
+            else -> short_text ?: extended_text ?: return@run null
+          },
+          hasExtended = hasExtendedDescription,
+          isExtended = showExtendedDescription
+        )
+      },
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts
     )

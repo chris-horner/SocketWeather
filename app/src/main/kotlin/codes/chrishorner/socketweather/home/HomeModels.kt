@@ -31,6 +31,7 @@ sealed class HomeEvent {
   object AddLocation : HomeEvent()
   object Refresh : HomeEvent()
   object ViewAbout : HomeEvent()
+  data class ToggleDescription(val showExtended: Boolean) : HomeEvent()
   object ViewRainRadar : HomeEvent()
 }
 
@@ -44,10 +45,17 @@ data class FormattedConditions(
   val humidityPercent: String?,
   val windSpeed: String,
   val uvWarningTimes: String?,
-  val description: String?,
+  val description: Description?,
   val graphItems: List<TimeForecastGraphItem>,
   val upcomingForecasts: List<UpcomingForecast>,
-)
+) {
+
+  data class Description(
+    val text: String,
+    val hasExtended: Boolean,
+    val isExtended: Boolean
+  )
+}
 
 data class TimeForecastGraphItem(
   val temperatureC: Int,

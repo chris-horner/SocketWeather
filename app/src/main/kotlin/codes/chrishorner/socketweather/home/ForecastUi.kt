@@ -1,9 +1,12 @@
 package codes.chrishorner.socketweather.home
 
 import androidx.annotation.DrawableRes
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,12 +28,16 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ExpandLess
+import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Radar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -38,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
+import codes.chrishorner.socketweather.home.FormattedConditions.Description
 import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
@@ -58,10 +66,9 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEven
     HumidityWindUvSection(conditions.humidityPercent, conditions.windSpeed, conditions.uvWarningTimes)
 
     if (conditions.description != null) {
-      Text(
-        text = conditions.description,
-        style = MaterialTheme.typography.body1,
-        modifier = Modifier.padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+      Description(
+        description = conditions.description,
+        onToggle = { onEvent(HomeEvent.ToggleDescription(it)) }
       )
     }
 
@@ -197,6 +204,47 @@ private fun SectionEntry(@DrawableRes iconRes: Int, iconDesc: String, content: S
 }
 
 @Composable
+private fun Description(
+  description: Description,
+  onToggle: (Boolean) -> Unit
+) {
+  val (text, expandable, expanded) = description
+
+  Column(
+    modifier = Modifier
+      .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+      .fillMaxWidth()
+      .clickable(
+        enabled = expandable,
+        onClick = { onToggle(!expanded) },
+        onClickLabel = stringResource(
+          if (expanded)
+            R.string.home_expandedDescriptionOnClickLabel
+          else
+            R.string.home_collapsedDescriptionOnClickLabel
+        )
+      )
+  ) {
+    Text(
+      text = text,
+      style = MaterialTheme.typography.body1,
+      modifier = Modifier.animateContentSize()
+    )
+
+    if (expandable) {
+      val rotation: Float by animateFloatAsState(if (expanded) 0F else -360F)
+      Icon(
+        imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+        contentDescription = null,
+        modifier = Modifier
+          .align(Alignment.CenterHorizontally)
+          .rotate(rotation)
+      )
+    }
+  }
+}
+
+@Composable
 @Preview(showBackground = true, backgroundColor = 0xFFFFFF)
 private fun ForecastUiPreview() {
   SocketWeatherTheme {
@@ -212,7 +260,11 @@ private fun ForecastUiPreview() {
         humidityPercent = "50%",
         windSpeed = "20 km/h",
         uvWarningTimes = "10:00 - 16:00",
-        description = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
+        description = Description(
+          text = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
+          hasExtended = true,
+          isExtended = true
+        ),
         graphItems = listOf(
           TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),
           TimeForecastGraphItem(22, "22°", "11 AM", 10, "10%"),

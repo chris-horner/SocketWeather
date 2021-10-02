@@ -7,7 +7,6 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.Forecaster.LoadingState
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
@@ -83,16 +82,16 @@ class HomeViewModel(
     }
   }
 
-  private fun LoadingState.toHomeState(
+  private fun Forecaster.LoadingState.toHomeState(
     savedSelections: Set<LocationSelection>,
     showExtendedDescription: Boolean
   ): HomeState {
     val toolbarTitle = when (this) {
-      LoadingState.Idle -> strings[R.string.home_loading]
-      is LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
-      is LoadingState.Refreshing -> this.previousForecast.location.name
-      is LoadingState.Loaded -> this.forecast.location.name
-      is LoadingState.Error -> when (val selection = this.selection) {
+      Forecaster.LoadingState.Idle -> strings[R.string.home_loading]
+      is Forecaster.LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
+      is Forecaster.LoadingState.Refreshing -> this.previousForecast.location.name
+      is Forecaster.LoadingState.Loaded -> this.forecast.location.name
+      is Forecaster.LoadingState.Error -> when (val selection = this.selection) {
         is Static -> selection.location.name
         is FollowMe -> strings[R.string.home_findingLocation]
         is None -> throw IllegalStateException("Cannot display LocationSelection of None.")
@@ -101,8 +100,8 @@ class HomeViewModel(
     }
 
     val toolbarSubtitle = when (this) {
-      is LoadingState.Refreshing -> strings[R.string.home_updatingNow]
-      is LoadingState.Loaded -> {
+      is Forecaster.LoadingState.Refreshing -> strings[R.string.home_updatingNow]
+      is Forecaster.LoadingState.Loaded -> {
         if (Duration.between(forecast.updateTime, clock.instant()).toMinutes() > 0) {
           strings.get(R.string.home_lastUpdated, strings.getRelativeTimeSpanString(forecast.updateTime))
         } else {
@@ -113,11 +112,11 @@ class HomeViewModel(
     }
 
     val content = when (this) {
-      LoadingState.Idle -> HomeState.Content.Empty
-      is LoadingState.FindingLocation, is LoadingState.LoadingForecast -> HomeState.Content.Loading
-      is LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format(showExtendedDescription))
-      is LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format(showExtendedDescription))
-      is LoadingState.Error -> HomeState.Content.Error(type)
+      Forecaster.LoadingState.Idle -> HomeState.Content.Empty
+      is Forecaster.LoadingState.FindingLocation, is Forecaster.LoadingState.LoadingForecast -> HomeState.Content.Loading
+      is Forecaster.LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format(showExtendedDescription))
+      is Forecaster.LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format(showExtendedDescription))
+      is Forecaster.LoadingState.Error -> HomeState.Content.Error(type)
     }
 
     return HomeState(

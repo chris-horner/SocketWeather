@@ -28,12 +28,14 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ExpandLess
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Radar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -66,10 +68,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEven
     HumidityWindUvSection(conditions.humidityPercent, conditions.windSpeed, conditions.uvWarningTimes)
 
     if (conditions.description != null) {
-      Description(
-        description = conditions.description,
-        onToggle = { onEvent(HomeEvent.ToggleDescription(it)) }
-      )
+      Description(conditions.description)
     }
 
     OutlinedButton(
@@ -204,18 +203,15 @@ private fun SectionEntry(@DrawableRes iconRes: Int, iconDesc: String, content: S
 }
 
 @Composable
-private fun Description(
-  description: Description,
-  onToggle: (Boolean) -> Unit
-) {
-  val (text, expandable, expanded) = description
+private fun Description(description: Description) {
+  var expanded by remember { mutableStateOf(false) }
 
   Column(
     modifier = Modifier
       .fillMaxWidth()
       .clickable(
-        enabled = expandable,
-        onClick = { onToggle(!expanded) },
+        enabled = description.hasExtended,
+        onClick = { expanded = !expanded },
         onClickLabel = stringResource(
           if (expanded)
             R.string.home_expandedDescriptionOnClickLabel
@@ -226,12 +222,12 @@ private fun Description(
       .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
     Text(
-      text = text,
+      text = if (expanded) description.extended!! else description.short!!,
       style = MaterialTheme.typography.body1,
       modifier = Modifier.animateContentSize()
     )
 
-    if (expandable) {
+    if (description.hasExtended) {
       val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f)
       Icon(
         imageVector = Icons.Rounded.ExpandMore,
@@ -261,9 +257,9 @@ private fun ForecastUiPreview() {
         windSpeed = "20 km/h",
         uvWarningTimes = "10:00 - 16:00",
         description = Description(
-          text = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
-          hasExtended = true,
-          isExtended = true
+          short = "Hazy",
+          extended = "Partly cloudy. Areas of haze. Winds southerly 20 to 30 km/h decreasing to 15 to 20 km/h in the evening.",
+          hasExtended = true
         ),
         graphItems = listOf(
           TimeForecastGraphItem(20, "20°", "8 AM", 0, ""),

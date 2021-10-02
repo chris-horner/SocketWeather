@@ -15,12 +15,10 @@ import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.home.FormattedConditions.Description
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
-import codes.chrishorner.socketweather.home.HomeEvent.ToggleDescription
 import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.localTimeAtZone
 import codes.chrishorner.socketweather.util.tickerFlow
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
@@ -45,28 +43,20 @@ class HomeViewModel(
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
   private val scope = overrideScope ?: viewModelScope
 
-  private val showExtendedDescription: MutableStateFlow<Boolean> = MutableStateFlow(false)
-
-  val states: StateFlow<HomeState> = combine(
-    tickerFlow(10_000, emitImmediately = true).flatMapLatest { forecaster.states },
-    locationStore.savedSelections,
-    showExtendedDescription
-  ) { forecasterState, savedSelections, showExtendedDescription ->
-    forecasterState.toHomeState(savedSelections, showExtendedDescription)
-  }
+  val states: StateFlow<HomeState> = tickerFlow(10_000, emitImmediately = true)
+    .flatMapLatest { forecaster.states }
+    .combine(locationStore.savedSelections) { forecasterState, savedSelections ->
+      forecasterState.toHomeState(savedSelections)
+    }
     .stateIn(
       scope = scope,
       started = SharingStarted.Eagerly,
-      initialValue = forecaster.states.value.toHomeState(
-        locationStore.savedSelections.value,
-        showExtendedDescription.value
-      )
+      initialValue = forecaster.states.value.toHomeState(locationStore.savedSelections.value)
     )
 
   fun handleEvent(event: HomeEvent) = when (event) {
     Refresh -> forecaster.refresh()
     is SwitchLocation -> switchLocation(event.selection)
-    is ToggleDescription -> toggleDescription(event.showExtended)
     else -> error("Unhandled home event.")
   }
 
@@ -76,16 +66,7 @@ class HomeViewModel(
     }
   }
 
-  private fun toggleDescription(showExtended: Boolean) {
-    scope.launch {
-      showExtendedDescription.emit(showExtended)
-    }
-  }
-
-  private fun Forecaster.LoadingState.toHomeState(
-    savedSelections: Set<LocationSelection>,
-    showExtendedDescription: Boolean
-  ): HomeState {
+  private fun Forecaster.LoadingState.toHomeState(savedSelections: Set<LocationSelection>): HomeState {
     val toolbarTitle = when (this) {
       Forecaster.LoadingState.Idle -> strings[R.string.home_loading]
       is Forecaster.LoadingState.FindingLocation -> strings[R.string.home_findingLocation]
@@ -114,8 +95,8 @@ class HomeViewModel(
     val content = when (this) {
       Forecaster.LoadingState.Idle -> HomeState.Content.Empty
       is Forecaster.LoadingState.FindingLocation, is Forecaster.LoadingState.LoadingForecast -> HomeState.Content.Loading
-      is Forecaster.LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format(showExtendedDescription))
-      is Forecaster.LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format(showExtendedDescription))
+      is Forecaster.LoadingState.Refreshing -> HomeState.Content.Refreshing(previousForecast.format())
+      is Forecaster.LoadingState.Loaded -> HomeState.Content.Loaded(forecast.format())
       is Forecaster.LoadingState.Error -> HomeState.Content.Error(type)
     }
 
@@ -128,7 +109,7 @@ class HomeViewModel(
     )
   }
 
-  private fun Forecast.format(showExtendedDescription: Boolean): FormattedConditions {
+  private fun Forecast.format(): FormattedConditions {
 
     val graphItems = hourlyForecasts.map { hourlyForecast ->
       TimeForecastGraphItem(
@@ -182,16 +163,13 @@ class HomeViewModel(
       windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
       uvWarningTimes = uvWarningTimes,
       description = todayForecast.run {
-        val hasExtendedDescription =
-          !short_text.isNullOrBlank() && !extended_text.isNullOrBlank() && short_text != extended_text
+        val short = short_text?.takeIf { it.isNotBlank() }
+        val extended = extended_text?.takeIf { it.isNotBlank() }
+        if (short == null && extended == null) return@run null
         Description(
-          text = when {
-            hasExtendedDescription && showExtendedDescription -> extended_text!!
-            hasExtendedDescription -> short_text!!
-            else -> short_text ?: extended_text ?: return@run null
-          },
-          hasExtended = hasExtendedDescription,
-          isExtended = showExtendedDescription
+          short = short ?: extended,
+          extended = extended ?: short,
+          hasExtended = short != null && extended != null && short != extended
         )
       },
       graphItems = graphItems,

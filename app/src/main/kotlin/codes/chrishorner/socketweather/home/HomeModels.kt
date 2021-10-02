@@ -31,7 +31,6 @@ sealed class HomeEvent {
   object AddLocation : HomeEvent()
   object Refresh : HomeEvent()
   object ViewAbout : HomeEvent()
-  data class ToggleDescription(val showExtended: Boolean) : HomeEvent()
   object ViewRainRadar : HomeEvent()
 }
 
@@ -51,9 +50,9 @@ data class FormattedConditions(
 ) {
 
   data class Description(
-    val text: String,
-    val hasExtended: Boolean,
-    val isExtended: Boolean
+    val short: String?,
+    val extended: String?,
+    val hasExtended: Boolean
   )
 }
 

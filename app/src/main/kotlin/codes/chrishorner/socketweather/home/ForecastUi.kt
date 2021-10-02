@@ -232,9 +232,9 @@ private fun Description(
     )
 
     if (expandable) {
-      val rotation: Float by animateFloatAsState(if (expanded) 0F else -360F)
+      val rotation: Float by animateFloatAsState(if (expanded) 180f else 0f)
       Icon(
-        imageVector = if (expanded) Icons.Rounded.ExpandLess else Icons.Rounded.ExpandMore,
+        imageVector = Icons.Rounded.ExpandMore,
         contentDescription = null,
         modifier = Modifier
           .align(Alignment.CenterHorizontally)

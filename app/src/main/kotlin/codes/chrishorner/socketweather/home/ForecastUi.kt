@@ -76,7 +76,7 @@ fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEven
       onClick = { onEvent(HomeEvent.ViewRainRadar) },
       modifier = Modifier
         .fillMaxWidth()
-        .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
+        .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
         .align(Alignment.End)
     ) {
       Icon(Icons.Rounded.Radar, contentDescription = null)
@@ -166,7 +166,7 @@ private fun HumidityWindUvSection(humidity: String?, windSpeed: String, uvWarnin
     horizontalArrangement = arrangement,
     modifier = Modifier
       .fillMaxWidth()
-      .padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp)
+      .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
     if (humidity != null) {
       SectionEntry(
@@ -212,7 +212,6 @@ private fun Description(
 
   Column(
     modifier = Modifier
-      .padding(start = 16.dp, end = 16.dp, bottom = 16.dp)
       .fillMaxWidth()
       .clickable(
         enabled = expandable,
@@ -224,6 +223,7 @@ private fun Description(
             R.string.home_collapsedDescriptionOnClickLabel
         )
       )
+      .padding(horizontal = 16.dp, vertical = 8.dp)
   ) {
     Text(
       text = text,

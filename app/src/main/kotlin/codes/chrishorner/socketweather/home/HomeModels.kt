@@ -44,10 +44,17 @@ data class FormattedConditions(
   val humidityPercent: String?,
   val windSpeed: String,
   val uvWarningTimes: String?,
-  val description: String?,
+  val description: Description?,
   val graphItems: List<TimeForecastGraphItem>,
   val upcomingForecasts: List<UpcomingForecast>,
-)
+) {
+
+  data class Description(
+    val short: String?,
+    val extended: String?,
+    val hasExtended: Boolean
+  )
+}
 
 data class TimeForecastGraphItem(
   val temperatureC: Int,

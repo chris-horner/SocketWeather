@@ -12,6 +12,7 @@ import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.LocationSelectionStore
+import codes.chrishorner.socketweather.home.FormattedConditions.Description
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
 import codes.chrishorner.socketweather.util.Strings
@@ -114,7 +115,7 @@ class HomeViewModel(
       TimeForecastGraphItem(
         temperatureC = hourlyForecast.temp,
         formattedTemperature = strings.formatDegrees(hourlyForecast.temp),
-        time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).toUpperCase(Locale.getDefault()),
+        time = timeFormatter.format(hourlyForecast.time.atZone(location.timezone)).uppercase(Locale.getDefault()),
         rainChancePercent = hourlyForecast.rain.chance,
         formattedRainChance = strings.formatPercent(hourlyForecast.rain.chance),
       )
@@ -161,7 +162,16 @@ class HomeViewModel(
       humidityPercent = humidity?.let { strings.formatPercent(it) },
       windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
       uvWarningTimes = uvWarningTimes,
-      description = todayForecast.extended_text ?: todayForecast.short_text,
+      description = todayForecast.run {
+        val short = short_text?.takeIf { it.isNotBlank() }
+        val extended = extended_text?.takeIf { it.isNotBlank() }
+        if (short == null && extended == null) return@run null
+        Description(
+          short = short ?: extended,
+          extended = extended ?: short,
+          hasExtended = short != null && extended != null && short != extended
+        )
+      },
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts
     )

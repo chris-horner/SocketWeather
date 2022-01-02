@@ -2,7 +2,7 @@ buildscript {
   ext.versions = [
       'compile_sdk'          : 31,
       'min_sdk'              : 24,
-      'android_gradle_plugin': '7.0.3',
+      'android_gradle_plugin': '7.0.4',
       'kotlin'               : '1.5.31',
       'coroutines'           : '1.5.2',
       'compose'              : '1.0.5',

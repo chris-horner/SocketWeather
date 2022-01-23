@@ -1,7 +1,12 @@
 package codes.chrishorner.socketweather.data
 
+import android.content.Context
+import android.content.Context.MODE_PRIVATE
 import androidx.datastore.core.CorruptionException
+import androidx.datastore.core.DataStore
+import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.Serializer
+import codes.chrishorner.socketweather.util.getOrCreateFile
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.Moshi
@@ -14,6 +19,20 @@ import okio.source
 import timber.log.Timber
 import java.io.InputStream
 import java.io.OutputStream
+
+@Suppress("FunctionName")
+inline fun <reified T> MoshiDataStore(
+  context: Context,
+  moshi: Moshi,
+  fileName: String,
+  default: T,
+  directoryName: String? = null,
+): DataStore<T> {
+  val directory = directoryName?.let { context.getDir(it, MODE_PRIVATE) } ?: context.filesDir
+  return DataStoreFactory.create(MoshiSerializer(moshi, default)) {
+    getOrCreateFile(directory, fileName)
+  }
+}
 
 @Suppress("BlockingMethodInNonBlockingContext", "FunctionName") // https://youtrack.jetbrains.com/issue/KTIJ-838
 inline fun <reified T> MoshiSerializer(moshi: Moshi, default: T): Serializer<T> = object : Serializer<T> {

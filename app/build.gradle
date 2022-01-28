@@ -73,23 +73,19 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion versions.compose
   }
-
-  lintOptions {
-    // It's fine for external libs to optionally link against invalid packages.
-    disable 'InvalidPackage'
-  }
-
   packagingOptions {
-    exclude '**/*.kotlin_metadata'
-    exclude 'META-INF/*.kotlin_module'
-    exclude 'META-INF/*.properties'
-    exclude '/*.properties'
+    resources {
+      excludes += ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
+    }
   }
 
   bundle {
     language {
       enableSplit = false // We currently only have one language.
     }
+  }
+  lint {
+    disable 'InvalidPackage'
   }
 }
 

@@ -3,6 +3,8 @@ package codes.chrishorner.socketweather
 import android.app.Application
 import android.content.Context
 import androidx.annotation.MainThread
+import codes.chrishorner.socketweather.data.AppDiskStores
+import codes.chrishorner.socketweather.data.AppStores
 import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.Forecaster
@@ -17,6 +19,7 @@ import java.time.Clock
  * the app.
  */
 interface Singletons {
+  val stores: AppStores
   val deviceLocator: DeviceLocator
   val locationSelectionStore: LocationSelectionStore
   val networkComponents: NetworkComponents
@@ -37,6 +40,7 @@ fun Application.initialiseSingletons() {
 }
 
 private class SingletonCache(app: Application) : Singletons {
+  override val stores = AppDiskStores()
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
   override val locationSelectionStore = LocationSelectionDiskStore(app, DataConfig.moshi)
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)

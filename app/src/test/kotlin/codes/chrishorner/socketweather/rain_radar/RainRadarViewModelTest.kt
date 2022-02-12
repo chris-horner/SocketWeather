@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import codes.chrishorner.socketweather.data.DefaultLocaleRule
 import codes.chrishorner.socketweather.data.runCancellingBlockingTest
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.test.advanceTimeBy
 import org.junit.Rule
 import org.junit.Test
 import java.time.Clock

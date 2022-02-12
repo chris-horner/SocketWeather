@@ -6,7 +6,7 @@ import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.test.TestCoroutineScope
-import kotlinx.coroutines.test.UncompletedCoroutinesError
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
 import org.junit.rules.TestRule
 import org.junit.runner.Description
@@ -21,7 +21,7 @@ import kotlin.coroutines.EmptyCoroutineContext
  * The same as [runBlockingTest], except the [TestCoroutineScope] is cancelled at the end of
  * `testBody`'s execution, along with any coroutines that are still running.
  *
- * The key difference is that `runBlockingTest` throws [UncompletedCoroutinesError] if it finishes
+ * The key difference is that `runBlockingTest` throws an exception if it finishes
  * with coroutines running, where as this function simply cancels them.
  *
  * This is useful when testing code that subscribes to unending streams (such as a [SharedFlow]),

@@ -67,11 +67,11 @@ fun rememberMapViewWithLifecycle(): MapView {
 private fun getMapLifecycleObserver(
   mapView: MapView
 ): LifecycleEventObserver = LifecycleEventObserver { _, event ->
-  @Suppress("NON_EXHAUSTIVE_WHEN") // osmdroid only cares about these events.
   when (event) {
     ON_RESUME -> mapView.onResume()
     ON_PAUSE -> mapView.onPause()
     ON_DESTROY -> mapView.onDetach()
+    else -> { /* osm droid only cares about the above events. */ }
   }
 }
 

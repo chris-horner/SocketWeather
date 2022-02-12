@@ -85,7 +85,7 @@ fun NavGraph(currentSelection: LocationSelection) {
 private inline fun <reified VM : ViewModel> createVm(crossinline creator: (context: Context) -> VM): VM {
   val context = LocalContext.current
   return viewModel(factory = object : ViewModelProvider.Factory {
-    override fun <T : ViewModel?> create(modelClass: Class<T>): T {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
       return creator(context) as T
     }
   })

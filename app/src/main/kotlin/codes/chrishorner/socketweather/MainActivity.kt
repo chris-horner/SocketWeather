@@ -15,10 +15,10 @@ class MainActivity : AppCompatActivity() {
 
     // Render under the status and navigation bars.
     WindowCompat.setDecorFitsSystemWindows(window, false)
+    val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
 
     setContent {
       RootContainer {
-        val locationSelection = appSingletons.locationSelectionStore.currentSelection.value
         NavGraph(currentSelection = locationSelection)
       }
     }
@@ -28,15 +28,14 @@ class MainActivity : AppCompatActivity() {
     super.onResume()
 
     val forecaster = appSingletons.forecaster
+    val state = forecaster.states.value
 
-    when (val state = forecaster.states.value) {
-      is Forecaster.LoadingState.Idle -> forecaster.refresh()
-
-      is Forecaster.LoadingState.Loaded -> {
-        val elapsedTime = Duration.between(state.forecast.updateTime, Instant.now())
-        if (elapsedTime.toMinutes() > 1) {
-          forecaster.refresh()
-        }
+    if (state is Forecaster.LoadingState.Idle) {
+      forecaster.refresh()
+    } else if (state is Forecaster.LoadingState.Loaded) {
+      val elapsedTime = Duration.between(state.forecast.updateTime, Instant.now())
+      if (elapsedTime.toMinutes() > 1) {
+        forecaster.refresh()
       }
     }
   }

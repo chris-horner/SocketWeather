@@ -5,7 +5,12 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import codes.chrishorner.socketweather.util.getOrCreateFile
 import com.squareup.moshi.Moshi
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.runBlocking
 
@@ -22,6 +27,7 @@ class AppDiskStores(
 ) : AppStores {
 
   private val directory = context.filesDir
+  private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
   override val forecast: Store<Forecast?> = blockingCreateStore("forecast", null)
   override val savedSelections: Store<Set<LocationSelection>> = blockingCreateStore("current_selection", emptySet())
@@ -33,7 +39,8 @@ class AppDiskStores(
     val dataStore = DataStoreFactory.create(MoshiSerializer(moshi, default)) {
       getOrCreateFile(directory, fileName)
     }
-    val values = runBlocking { dataStore.data.stateIn(this) }
+    val initialValue = runBlocking { dataStore.data.first() }
+    val values = dataStore.data.stateIn(scope, SharingStarted.Eagerly, initialValue)
     return DiskStore(default, dataStore, values)
   }
 

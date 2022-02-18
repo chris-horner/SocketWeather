@@ -26,6 +26,24 @@ data class Forecast(
 
 data class DeviceLocation(val latitude: Double, val longitude: Double)
 
-enum class ForecastError { DATA, NETWORK, LOCATION, NOT_AUSTRALIA }
+enum class ForecastError {
+  /**
+   * Nothing went wrong determining the location or making a request to the API, but it
+   * responded with something malformed.
+   */
+  DATA,
+  /**
+   * This means a communication error occurred between the app and API.
+   */
+  NETWORK,
+  /**
+   * Something went wrong resolving the location for the forecast.
+   */
+  LOCATION,
+  /**
+   * Tried to load a forecast using a location that's outside of Australia.
+   */
+  NOT_AUSTRALIA,
+}
 
 data class RainTimestamp(val timestamp: String, val label: String)

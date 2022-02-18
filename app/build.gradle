@@ -141,5 +141,6 @@ dependencies {
   testImplementation "app.cash.turbine:turbine:${versions.turbine}"
   testImplementation "com.google.truth:truth:${versions.truth}"
   testImplementation "com.squareup.okhttp3:mockwebserver:${versions.okhttp}"
+  testImplementation "com.google.testparameterinjector:test-parameter-injector:${versions.test_param_injector}"
   coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.jdk_desugar}"
 }

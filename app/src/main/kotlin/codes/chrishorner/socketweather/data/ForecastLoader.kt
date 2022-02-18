@@ -101,7 +101,7 @@ class RealForecastLoader(
     }
 
     val elapsedTime = Duration.between(current.updateTime, Instant.now(clock))
-    if (elapsedTime.toMinutes() > 1) {
+    if (elapsedTime.toMinutes() >= 1) {
       forceRefresh()
     }
   }

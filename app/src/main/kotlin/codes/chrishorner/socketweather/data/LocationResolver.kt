@@ -6,7 +6,6 @@ import android.location.LocationManager
 import android.location.LocationManager.NETWORK_PROVIDER
 import android.os.Build
 import androidx.core.content.getSystemService
-import codes.chrishorner.socketweather.data.LocationResolver.ErrorType
 import codes.chrishorner.socketweather.data.LocationResolver.Result
 import codes.chrishorner.socketweather.data.LocationResolver.Result.Failure
 import codes.chrishorner.socketweather.data.LocationResolver.Result.Success
@@ -21,10 +20,8 @@ interface LocationResolver {
 
   sealed class Result {
     data class Success(val location: Location) : Result()
-    data class Failure(val type: ErrorType) : Result()
+    data class Failure(val type: ForecastError) : Result()
   }
-
-  enum class ErrorType { NETWORK, LOCATION, NOT_AUSTRALIA }
 }
 
 private val australiaLatitudeRange = -44.057002..-9.763686
@@ -41,10 +38,10 @@ class RealLocationResolover(
 
     if (locationManager == null) {
       Timber.e("LocationManager not available.")
-      return Failure(ErrorType.LOCATION)
+      return Failure(ForecastError.LOCATION)
     }
 
-    val deviceLocation = suspendCoroutine<DeviceLocation?> { cont ->
+    val deviceLocation: DeviceLocation? = suspendCoroutine { cont ->
       val callback = LocationListener { location: DeviceLocation -> cont.resume(location) }
 
       try {
@@ -63,14 +60,14 @@ class RealLocationResolover(
 
     if (deviceLocation == null) {
       Timber.e("Failed to retrieve device location.")
-      return Failure(ErrorType.LOCATION)
+      return Failure(ForecastError.LOCATION)
     }
 
     val latitude = deviceLocation.latitude
     val longitude = deviceLocation.longitude
 
     if (latitude !in australiaLatitudeRange || longitude !in australiaLongitudeRange) {
-      return Failure(ErrorType.NOT_AUSTRALIA)
+      return Failure(ForecastError.NOT_AUSTRALIA)
     }
 
     return try {
@@ -79,7 +76,7 @@ class RealLocationResolover(
       Success(location)
     } catch (e: Exception) {
       Timber.e(e, "Failed to resolve location with BOM.")
-      Failure(ErrorType.NETWORK)
+      Failure(ForecastError.NETWORK)
     }
   }
 }

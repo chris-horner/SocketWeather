@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.data
 
+import codes.chrishorner.socketweather.test.DefaultLocaleRule
 import com.google.common.truth.Truth.assertThat
 import org.junit.Rule
 import org.junit.Test

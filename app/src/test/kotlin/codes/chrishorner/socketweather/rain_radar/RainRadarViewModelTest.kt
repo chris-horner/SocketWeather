@@ -1,8 +1,8 @@
 package codes.chrishorner.socketweather.rain_radar
 
 import app.cash.turbine.test
-import codes.chrishorner.socketweather.data.DefaultLocaleRule
-import codes.chrishorner.socketweather.data.runCancellingBlockingTest
+import codes.chrishorner.socketweather.test.DefaultLocaleRule
+import codes.chrishorner.socketweather.test.runCancellingBlockingTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.test.advanceTimeBy
 import org.junit.Rule

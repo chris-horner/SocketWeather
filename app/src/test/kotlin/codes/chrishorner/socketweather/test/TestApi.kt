@@ -1,6 +1,21 @@
-package codes.chrishorner.socketweather.data
+package codes.chrishorner.socketweather.test
 
+import codes.chrishorner.socketweather.data.CurrentInformation
+import codes.chrishorner.socketweather.data.CurrentObservations
+import codes.chrishorner.socketweather.data.DateForecast
+import codes.chrishorner.socketweather.data.DeviceLocation
+import codes.chrishorner.socketweather.data.Location
+import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.Rain.Amount
+import codes.chrishorner.socketweather.data.SearchResult
+import codes.chrishorner.socketweather.data.Station
+import codes.chrishorner.socketweather.data.ThreeHourlyForecast
+import codes.chrishorner.socketweather.data.Uv
+import codes.chrishorner.socketweather.data.WeatherApi
+import codes.chrishorner.socketweather.data.Wind
+import codes.chrishorner.socketweather.test.TestApi.ResponseMode.DATA_ERROR
+import codes.chrishorner.socketweather.test.TestApi.ResponseMode.NETWORK_ERROR
+import codes.chrishorner.socketweather.test.TestApi.ResponseMode.SUCCESS
 import com.squareup.moshi.JsonDataException
 import java.io.IOException
 import java.time.Clock
@@ -18,7 +33,7 @@ class TestApi(clock: Clock) : WeatherApi {
   private val firstDayInstant = LocalDate.now(clock).atTime(0, 0).toInstant(ZoneOffset.UTC)
   private val startingInstant = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC)
 
-  var responseMode: ResponseMode = ResponseMode.SUCCESS
+  var responseMode: ResponseMode = SUCCESS
   val deviceLocation1 = DeviceLocation(-37.798336, 144.978468)
   val deviceLocation2 = DeviceLocation(-37.829855, 144.886371)
   val location1 = Location(
@@ -348,7 +363,7 @@ class TestApi(clock: Clock) : WeatherApi {
   private fun Location.toSearchResult() = SearchResult(id, geohash, name, "TEST", state)
 
   private fun failIfNecessary() {
-    if (responseMode == ResponseMode.NETWORK_ERROR) throw IOException("TestApi failure.")
-    else if (responseMode == ResponseMode.DATA_ERROR) throw JsonDataException("TestApi failure.")
+    if (responseMode == NETWORK_ERROR) throw IOException("TestApi failure.")
+    else if (responseMode == DATA_ERROR) throw JsonDataException("TestApi failure.")
   }
 }

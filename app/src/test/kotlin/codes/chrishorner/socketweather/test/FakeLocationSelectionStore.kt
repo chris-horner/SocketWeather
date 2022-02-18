@@ -1,10 +1,13 @@
-package codes.chrishorner.socketweather.data
+package codes.chrishorner.socketweather.test
 
+import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.LocationSelection.None
+import codes.chrishorner.socketweather.data.LocationSelectionStore
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeLocationSelectionStore : LocationSelectionStore {
 
-  private val currentSelectionState = MutableStateFlow<LocationSelection>(LocationSelection.None)
+  private val currentSelectionState = MutableStateFlow<LocationSelection>(None)
   private val savedSelectionState = MutableStateFlow(emptySet<LocationSelection>())
 
   override val currentSelection = currentSelectionState
@@ -21,6 +24,6 @@ class FakeLocationSelectionStore : LocationSelectionStore {
 
   override suspend fun clear() {
     savedSelectionState.value = emptySet()
-    currentSelectionState.value = LocationSelection.None
+    currentSelectionState.value = None
   }
 }

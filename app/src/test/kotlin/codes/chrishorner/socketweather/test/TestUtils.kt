@@ -1,4 +1,4 @@
-package codes.chrishorner.socketweather.data
+package codes.chrishorner.socketweather.test
 
 import app.cash.turbine.FlowTurbine
 import com.google.common.truth.Subject
@@ -8,10 +8,6 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.test.TestCoroutineScope
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
-import org.junit.rules.TestRule
-import org.junit.runner.Description
-import org.junit.runners.model.Statement
-import java.util.Locale
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
@@ -58,27 +54,4 @@ inline fun <reified T> Any?.assertIsOfType() {
  */
 suspend inline fun <reified R> FlowTurbine<*>.awaitItemAs(): R {
   return awaitItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
-}
-
-/**
- * Enforce a particular default locale for a test. Resets back to default on completion.
- */
-class DefaultLocaleRule(val override: Locale) : TestRule {
-  override fun apply(
-    base: Statement,
-    description: Description
-  ): Statement {
-    return object : Statement() {
-      override fun evaluate() {
-        val default = Locale.getDefault()
-
-        try {
-          Locale.setDefault(override)
-          base.evaluate()
-        } finally {
-          Locale.setDefault(default)
-        }
-      }
-    }
-  }
 }

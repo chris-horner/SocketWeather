@@ -2,11 +2,11 @@ package codes.chrishorner.socketweather.choose_location
 
 import app.cash.turbine.test
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus
-import codes.chrishorner.socketweather.data.FakeLocationSelectionStore
 import codes.chrishorner.socketweather.data.LocationSelection
-import codes.chrishorner.socketweather.data.TestApi
-import codes.chrishorner.socketweather.data.TestApi.ResponseMode
-import codes.chrishorner.socketweather.data.runCancellingBlockingTest
+import codes.chrishorner.socketweather.test.FakeLocationSelectionStore
+import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.TestApi.ResponseMode
+import codes.chrishorner.socketweather.test.runCancellingBlockingTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.CoroutineScope
 import org.junit.Test

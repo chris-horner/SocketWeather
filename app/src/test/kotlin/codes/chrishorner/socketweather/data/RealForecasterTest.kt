@@ -6,7 +6,12 @@ import codes.chrishorner.socketweather.data.Forecaster.LoadingState.FindingLocat
 import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Loaded
 import codes.chrishorner.socketweather.data.Forecaster.LoadingState.LoadingForecast
 import codes.chrishorner.socketweather.data.Forecaster.LoadingState.Refreshing
-import codes.chrishorner.socketweather.data.TestApi.ResponseMode
+import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.TestApi.ResponseMode
+import codes.chrishorner.socketweather.test.assertIsOfType
+import codes.chrishorner.socketweather.test.awaitItemAs
+import codes.chrishorner.socketweather.test.isInstanceOf
+import codes.chrishorner.socketweather.test.runCancellingBlockingTest
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.emptyFlow

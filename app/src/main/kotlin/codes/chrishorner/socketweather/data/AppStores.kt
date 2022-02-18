@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.data
 
-import android.content.Context
+import android.app.Application
+import android.content.Context.MODE_PRIVATE
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import codes.chrishorner.socketweather.util.getOrCreateFile
@@ -18,24 +19,48 @@ interface AppStores {
   val forecast: Store<Forecast?>
   val savedSelections: Store<Set<LocationSelection>>
   val currentSelection: Store<LocationSelection>
-  val location: Store<Location?>
 }
 
+/**
+ * Initialising this class invokes a synchronous disk read.
+ */
 class AppDiskStores(
-  context: Context,
+  private val app: Application,
   private val moshi: Moshi,
 ) : AppStores {
 
-  private val directory = context.filesDir
   private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
-  override val forecast: Store<Forecast?> = blockingCreateStore("forecast", null)
-  override val savedSelections: Store<Set<LocationSelection>> = blockingCreateStore("current_selection", emptySet())
-  override val currentSelection: Store<LocationSelection> =
-    blockingCreateStore("saved_selections", LocationSelection.None)
-  override val location: Store<Location?> = blockingCreateStore("current_location", null)
+  override val forecast: Store<Forecast?> = blockingCreateStore(
+    fileName = "forecast",
+    default = null,
+  )
+  override val savedSelections: Store<Set<LocationSelection>> = blockingCreateStore(
+    fileName = "current_selection",
+    default = emptySet(),
+    overrideDir = "location_choices",
+  )
+  override val currentSelection: Store<LocationSelection> = blockingCreateStore(
+    fileName = "saved_selections",
+    default = LocationSelection.None,
+    overrideDir = "location_choices",
+  )
 
-  private inline fun <reified T> blockingCreateStore(fileName: String, default: T): Store<T> {
+  /**
+   * It would be simpler to keep all files in the same directory, but to maintain
+   * backwards compatibility some files need to be placed in their own directories.
+   */
+  private inline fun <reified T> blockingCreateStore(
+    fileName: String,
+    default: T,
+    overrideDir: String? = null
+  ): Store<T> {
+    val directory = if (overrideDir != null) {
+      app.getDir(overrideDir, MODE_PRIVATE)
+    } else {
+      app.filesDir
+    }
+
     val dataStore = DataStoreFactory.create(MoshiSerializer(moshi, default)) {
       getOrCreateFile(directory, fileName)
     }

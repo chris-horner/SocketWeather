@@ -2,10 +2,11 @@ package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.test
 import codes.chrishorner.socketweather.data.ForecastLoader.State
-import codes.chrishorner.socketweather.test.FakeLocationResolver
+import codes.chrishorner.socketweather.data.LocationResolver.Result
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.TestChannel
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -55,7 +56,7 @@ class RealForecastLoaderTest {
 
   @Test fun `successful refresh of LocationSelection-FollowMe updates state and store`() = runBlocking {
     locationSelectionStore.set(LocationSelection.FollowMe)
-    locationResolver.result.send(LocationResolver.Result.Success(api.location1))
+    locationResolver.result.send(Result.Success(api.location1))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -102,7 +103,7 @@ class RealForecastLoaderTest {
 
   @Test fun `location resolution failure produces error state`(@TestParameter type: ForecastError) = runBlocking {
     locationSelectionStore.set(LocationSelection.FollowMe)
-    locationResolver.result.send(LocationResolver.Result.Failure(type))
+    locationResolver.result.send(Result.Failure(type))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -136,6 +137,15 @@ class RealForecastLoaderTest {
       forecastLoader.forceRefresh()
       assertThat(awaitItem()).isEqualTo(State.LoadingForecast)
       assertThat(awaitItem()).isEqualTo(State.Error(ForecastError.DATA))
+    }
+  }
+
+  private class FakeLocationResolver : LocationResolver {
+
+    val result = TestChannel<Result>()
+
+    override suspend fun getDeviceLocation(): Result {
+      return result.awaitValue()
     }
   }
 }

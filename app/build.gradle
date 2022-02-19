@@ -1,5 +1,6 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'app.cash.molecule'
 apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 0
@@ -70,6 +71,10 @@ android {
     compose true
   }
 
+  testOptions {
+    unitTests.returnDefaultValues = true
+  }
+
   composeOptions {
     kotlinCompilerExtensionVersion versions.compose
   }
@@ -131,6 +136,7 @@ dependencies {
   implementation deps.leakcanary.objectWatcher
   debugImplementation deps.leakcanary.android
   implementation deps.lifecycle
+  testImplementation deps.molecule.testing
   implementation deps.moshi.core
   implementation deps.moshi.kotlin
   implementation deps.navigation
@@ -145,4 +151,5 @@ dependencies {
   implementation deps.timber
   testImplementation deps.truth
   testImplementation deps.turbine
+  implementation deps.voyager
 }

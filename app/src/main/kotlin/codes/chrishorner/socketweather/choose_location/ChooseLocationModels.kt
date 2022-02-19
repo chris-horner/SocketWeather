@@ -5,7 +5,7 @@ import codes.chrishorner.socketweather.data.SearchResult
 
 data class ChooseLocationState(
   val showCloseButton: Boolean,
-  val showFollowMe: Boolean,
+  val showFollowMeButton: Boolean,
   val query: String = "",
   val results: List<SearchResult> = emptyList(),
   val loadingStatus: LoadingStatus = Idle,

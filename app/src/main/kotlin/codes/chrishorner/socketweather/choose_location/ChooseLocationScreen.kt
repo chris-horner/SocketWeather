@@ -130,7 +130,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
             modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
           )
         }
-        AnimatedVisibility(visible = currentlyIdle && state.showFollowMe) {
+        AnimatedVisibility(visible = currentlyIdle && state.showFollowMeButton) {
           FollowMeButton { hasLocationPermission ->
             eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
           }
@@ -318,7 +318,7 @@ fun ChooseLocationPreview() {
       ChooseLocationUi(
         ChooseLocationState(
           showCloseButton = true,
-          showFollowMe = true,
+          showFollowMeButton = true,
           query = "",
           results = emptyList(),
           loadingStatus = Idle

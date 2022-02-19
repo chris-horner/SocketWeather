@@ -44,7 +44,7 @@ class ChooseLocationScreenModel(
 
   private val initialState = ChooseLocationState(
     showCloseButton = showCloseButton,
-    showFollowMe = !savedSelections.data.value.contains(LocationSelection.FollowMe),
+    showFollowMeButton = !savedSelections.data.value.contains(LocationSelection.FollowMe),
   )
 
   @Composable

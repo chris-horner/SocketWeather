@@ -40,7 +40,7 @@ class ChooseLocationViewModel(
 ) : ViewModel() {
 
   private val scope = overrideScope ?: viewModelScope
-  private val idleState = ChooseLocationState(showCloseButton, showFollowMe = !locationSelectionStore.hasFollowMeSaved)
+  private val idleState = ChooseLocationState(showCloseButton, showFollowMeButton = !locationSelectionStore.hasFollowMeSaved)
   private val stateFlow = MutableStateFlow(idleState)
   private val searchQueryFlow = MutableStateFlow("")
 

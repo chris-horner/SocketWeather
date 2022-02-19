@@ -95,13 +95,15 @@ play {
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
-  kotlinOptions.freeCompilerArgs += ['-Xopt-in=kotlin.Experimental',
-                                     '-Xopt-in=kotlinx.coroutines.FlowPreview',
-                                     '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
-                                     '-Xopt-in=kotlin.ExperimentalStdlibApi',
-                                     '-Xopt-in=kotlin.time.ExperimentalTime',
-                                     '-Xopt-in=androidx.compose.material.ExperimentalMaterialApi',
-                                     '-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi']
+  kotlinOptions.freeCompilerArgs += [
+    '-Xopt-in=kotlin.Experimental',
+    '-Xopt-in=kotlinx.coroutines.FlowPreview',
+    '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
+    '-Xopt-in=kotlin.ExperimentalStdlibApi',
+    '-Xopt-in=kotlin.time.ExperimentalTime',
+    '-Xopt-in=androidx.compose.material.ExperimentalMaterialApi',
+    '-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi'
+  ]
 }
 
 dependencies {

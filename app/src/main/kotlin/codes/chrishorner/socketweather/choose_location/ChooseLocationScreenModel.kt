@@ -23,7 +23,7 @@ import codes.chrishorner.socketweather.data.Store
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.util.CollectEffect
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
-import codes.chrishorner.socketweather.util.updateValue
+import codes.chrishorner.socketweather.util.update
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
@@ -64,7 +64,7 @@ class ChooseLocationScreenModel(
   private suspend fun search(query: String, state: MutableState<ChooseLocationState>) {
 
     val loadingStatus = if (query.isBlank()) Idle else Searching
-    state.updateValue { it.copy(query = query, loadingStatus = loadingStatus) }
+    state.update { it.copy(query = query, loadingStatus = loadingStatus) }
 
     if (query.length <= 2) return
 
@@ -77,9 +77,9 @@ class ChooseLocationScreenModel(
     }
 
     if (results == null) {
-      state.updateValue { it.copy(loadingStatus = SearchingError) }
+      state.update { it.copy(loadingStatus = SearchingError) }
     } else {
-      state.updateValue { it.copy(loadingStatus = SearchingDone, results = results) }
+      state.update { it.copy(loadingStatus = SearchingDone, results = results) }
     }
   }
 

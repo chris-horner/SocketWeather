@@ -25,6 +25,6 @@ inline fun <T> CollectEffect(flow: Flow<T>, crossinline block: CoroutineScope.(T
   }
 }
 
-fun <T> MutableState<T>.updateValue(block: (T) -> T) {
+fun <T> MutableState<T>.update(block: (T) -> T) {
   value = block(value)
 }

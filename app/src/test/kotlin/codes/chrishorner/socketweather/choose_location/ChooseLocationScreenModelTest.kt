@@ -5,11 +5,13 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Loadi
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestApi.ResponseMode
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import java.time.Clock
 import java.time.ZoneId
@@ -21,17 +23,32 @@ class ChooseLocationScreenModelTest {
   private val api: TestApi
   private val currentSelection = FakeStore<LocationSelection>(LocationSelection.None)
   private val savedSelections = FakeStore<Set<LocationSelection>>(emptySet())
-  private val screenModel: ChooseLocationScreenModel
 
   init {
     val fixedDateTime = ZonedDateTime.of(2022, 2, 20, 8, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = Clock.fixed(fixedDateTime.toInstant(), fixedDateTime.zone)
     api = TestApi(clock)
-    screenModel = ChooseLocationScreenModel(false, api, currentSelection, savedSelections)
+  }
+
+  private fun createScreenModel() = ChooseLocationScreenModel(
+    showCloseButton = false, api, currentSelection, savedSelections
+  )
+
+  @Test fun `Follow Me button only shows when LocationSelection-FollowMe not saved`() = runBlocking {
+    createScreenModel().test {
+      assertThat(awaitItem().showFollowMeButton).isTrue()
+    }
+
+    savedSelections.update { it + LocationSelection.FollowMe }
+    currentSelection.set(LocationSelection.FollowMe)
+
+    createScreenModel().test {
+      assertThat(awaitItem().showFollowMeButton).isFalse()
+    }
   }
 
   @Test fun `loading state changes to searching on character entry`() {
-    screenModel.test {
+    createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
       sendEvent(InputSearch("A"))
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
@@ -39,7 +56,7 @@ class ChooseLocationScreenModelTest {
   }
 
   @Test fun `search not executed until third character entered`() {
-    screenModel.test {
+    createScreenModel().test {
       assertThat(awaitItem().results).isEmpty()
       sendEvent(InputSearch("F"))
       assertThat(awaitItem().results).isEmpty()
@@ -55,7 +72,7 @@ class ChooseLocationScreenModelTest {
   }
 
   @Test fun `search with network failure shows error`() {
-    screenModel.test {
+    createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
       api.responseMode = ResponseMode.NETWORK_ERROR
@@ -70,7 +87,7 @@ class ChooseLocationScreenModelTest {
   }
 
   @Test fun `selecting search result saves selection`() {
-    screenModel.test {
+    createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
       // Searching for "Fakezroy" should emit a single search result from TestApi.
@@ -92,7 +109,7 @@ class ChooseLocationScreenModelTest {
   }
 
   @Test fun `selecting search result with network failure shows error`() {
-    screenModel.test {
+    createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
       // Searching for "Fakezroy" should emit a single search result from TestApi.

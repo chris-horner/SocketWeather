@@ -1,7 +1,9 @@
 package codes.chrishorner.socketweather.choose_location
 
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
@@ -64,6 +66,48 @@ class ChooseLocationScreenModelTest {
         assertThat(loadingStatus).isEqualTo(LoadingStatus.SearchingError)
         assertThat(results).isEmpty()
       }
+    }
+  }
+
+  @Test fun `selecting search result saves selection`() {
+    screenModel.test {
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      // Searching for "Fakezroy" should emit a single search result from TestApi.
+      sendEvent(InputSearch("Fakezroy"))
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
+      val item = awaitItem()
+      assertThat(item.loadingStatus).isEqualTo(LoadingStatus.SearchingDone)
+      val result = item.results.single()
+      assertThat(result.name).isEqualTo("Fakezroy")
+
+      // Selecting that result should change the loading status and save the selection.
+      sendEvent(ResultSelected(result))
+      // TODO: Work out how to assert Submitting state.
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitted)
+      val expectedSelection = LocationSelection.Static(api.location1)
+      assertThat(savedSelections.data.value).containsExactly(expectedSelection)
+      assertThat(currentSelection.data.value).isEqualTo(expectedSelection)
+    }
+  }
+
+  @Test fun `selecting search result with network failure shows error`() {
+    screenModel.test {
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      // Searching for "Fakezroy" should emit a single search result from TestApi.
+      sendEvent(InputSearch("Fakezroy"))
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
+      val item = awaitItem()
+      assertThat(item.loadingStatus).isEqualTo(LoadingStatus.SearchingDone)
+      val result = item.results.single()
+      assertThat(result.name).isEqualTo("Fakezroy")
+
+      api.responseMode = ResponseMode.NETWORK_ERROR
+
+      sendEvent(ResultSelected(result))
+      // TODO: Work out how to assert Submitting state.
+      assertThat(awaitItem().error).isEqualTo(Error.Submission)
     }
   }
 }

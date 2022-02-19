@@ -7,25 +7,32 @@ import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import codes.chrishorner.socketweather.appSingletons
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitted
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ClearInput
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.Store
 import codes.chrishorner.socketweather.data.WeatherApi
+import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.util.CollectEffect
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
 import codes.chrishorner.socketweather.util.update
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class ChooseLocationScreenModel(
@@ -42,6 +49,7 @@ class ChooseLocationScreenModel(
 
   @Composable
   override fun states(events: Flow<ChooseLocationUiEvent>): ChooseLocationState {
+    val scope = rememberCoroutineScope()
     val state = remember { mutableStateOf(initialState) }
     var query by remember { mutableStateOf("") }
 
@@ -50,7 +58,7 @@ class ChooseLocationScreenModel(
         is InputSearch -> query = event.query
         ClearInput -> query = ""
         is FollowMeClicked -> TODO()
-        is ResultSelected -> TODO()
+        is ResultSelected -> scope.launch { selectResult(event.result, state) }
         CloseClicked -> { /* Not handled by ScreenModel. */
         }
       }
@@ -80,6 +88,23 @@ class ChooseLocationScreenModel(
       state.update { it.copy(loadingStatus = SearchingError) }
     } else {
       state.update { it.copy(loadingStatus = SearchingDone, results = results) }
+    }
+  }
+
+  private suspend fun selectResult(result: SearchResult, state: MutableState<ChooseLocationState>) {
+    state.update { it.copy(loadingStatus = Submitting) }
+
+    try {
+      val location = api.getLocation(result.geohash)
+      val selection = LocationSelection.Static(location)
+      savedSelections.update { it + selection }
+      currentSelection.set(selection)
+      state.update { it.copy(loadingStatus = Submitted) }
+    } catch (e: Exception) {
+      Timber.e(e, "Failed to select location.")
+      state.update { it.copy(loadingStatus = SearchingDone, error = Submission) }
+      delay(1_500L)
+      state.update { it.copy(error = null) }
     }
   }
 

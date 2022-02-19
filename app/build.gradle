@@ -7,12 +7,12 @@ def versionMinor = 8
 def versionPatch = 0
 
 android {
-  compileSdkVersion versions.compile_sdk
+  compileSdkVersion versions.compileSdk
 
   defaultConfig {
     applicationId "codes.chrishorner.socketweather"
-    minSdkVersion versions.min_sdk
-    targetSdkVersion versions.compile_sdk
+    minSdkVersion versions.minSdk
+    targetSdkVersion versions.compileSdk
     versionCode versionMajor * 10000 + versionMinor * 1000 + versionPatch
     versionName "${versionMajor}.${versionMinor}.${versionPatch}"
   }
@@ -105,42 +105,42 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
 }
 
 dependencies {
-  implementation "org.jetbrains.kotlin:kotlin-reflect:${versions.kotlin}"
-  implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:${versions.coroutines}"
-  implementation "androidx.compose.ui:ui:${versions.compose}"
-  implementation "androidx.compose.material:material:${versions.compose}"
-  implementation "androidx.compose.material:material-icons-core:${versions.compose}"
-  implementation "androidx.compose.material:material-icons-extended:${versions.compose}"
-  implementation "androidx.compose.ui:ui-tooling:${versions.compose}"
-  implementation "androidx.compose.ui:ui-graphics:${versions.compose}"
-  implementation "com.google.accompanist:accompanist-insets:${versions.accompanist}"
-  implementation "com.google.accompanist:accompanist-systemuicontroller:${versions.accompanist}"
-  implementation "androidx.navigation:navigation-compose:${versions.navigation}"
-  implementation "androidx.lifecycle:lifecycle-viewmodel-ktx:${versions.lifecycle}"
-  implementation "androidx.appcompat:appcompat:${versions.appcompat}"
-  implementation "org.osmdroid:osmdroid-android:${versions.osmdroid}"
-  implementation "androidx.glance:glance-appwidget:${versions.glance}"
-  implementation "androidx.core:core-ktx:${versions.androidx_core}"
-  implementation "androidx.activity:activity-compose:${versions.androidx_activity}"
-  implementation "androidx.datastore:datastore:${versions.datastore}"
-  debugImplementation "androidx.datastore:datastore-preferences:${versions.datastore}"
-  implementation "com.jakewharton.timber:timber:${versions.timber}"
-  implementation "com.squareup.leakcanary:leakcanary-object-watcher-android:${versions.leakcanary}"
-  debugImplementation "com.squareup.leakcanary:leakcanary-android:${versions.leakcanary}"
-  implementation "com.squareup.moshi:moshi:${versions.moshi}"
-  implementation "com.squareup.moshi:moshi-kotlin:${versions.moshi}"
-  implementation "com.squareup.okhttp3:okhttp:${versions.okhttp}"
-  debugImplementation "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}"
-  implementation "com.squareup.retrofit2:retrofit:${versions.retrofit}"
-  debugImplementation "com.squareup.retrofit2:retrofit-mock:${versions.retrofit}"
-  implementation "com.squareup.retrofit2:converter-moshi:${versions.retrofit}"
-  debugImplementation "com.github.alorma:drawer-base:${versions.debugdrawer}"
-  debugImplementation "com.github.alorma:drawer-modules:${versions.debugdrawer}"
-  testImplementation "junit:junit:${versions.junit}"
-  testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:${versions.coroutines}"
-  testImplementation "app.cash.turbine:turbine:${versions.turbine}"
-  testImplementation "com.google.truth:truth:${versions.truth}"
-  testImplementation "com.squareup.okhttp3:mockwebserver:${versions.okhttp}"
-  testImplementation "com.google.testparameterinjector:test-parameter-injector:${versions.test_param_injector}"
-  coreLibraryDesugaring "com.android.tools:desugar_jdk_libs:${versions.jdk_desugar}"
+  implementation deps.accompanist.insets
+  implementation deps.accompanist.systemUiController
+  implementation deps.androidx.core
+  implementation deps.androidx.activityCompose
+  implementation deps.appcompat
+  implementation deps.compose.material.core
+  implementation deps.compose.material.icons
+  implementation deps.compose.material.iconsExtended
+  implementation deps.compose.ui
+  implementation deps.compose.uiGraphics
+  implementation deps.compose.uiTooling
+  implementation deps.coroutines.android
+  testImplementation deps.coroutines.test
+  implementation deps.datastore.core
+  debugImplementation deps.datastore.preferences
+  debugImplementation deps.debugDrawer.base
+  debugImplementation deps.debugDrawer.modules
+  implementation deps.glance
+  coreLibraryDesugaring deps.jdkDesugar
+  testImplementation deps.junit
+  implementation deps.kotlin.reflect
+  implementation deps.leakcanary.objectWatcher
+  debugImplementation deps.leakcanary.android
+  implementation deps.lifecycle
+  implementation deps.moshi.core
+  implementation deps.moshi.kotlin
+  implementation deps.navigation
+  implementation deps.okhttp.core
+  debugImplementation deps.okhttp.logging
+  testImplementation deps.okhttp.mock
+  implementation deps.osmdroid
+  implementation deps.retrofit.core
+  debugImplementation deps.retrofit.mock
+  implementation deps.retrofit.moshi
+  testImplementation deps.testParameterInjector
+  implementation deps.timber
+  testImplementation deps.truth
+  testImplementation deps.turbine
 }

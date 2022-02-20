@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.choose_location
 
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
@@ -125,6 +126,31 @@ class ChooseLocationScreenModelTest {
       sendEvent(ResultSelected(result))
       // TODO: Work out how to assert Submitting state.
       assertThat(awaitItem().error).isEqualTo(Error.Submission)
+    }
+  }
+
+  @Test fun `selecting Follow Me with location permission saves selection`() {
+    createScreenModel().test {
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      sendEvent(FollowMeClicked(hasLocationPermission = true))
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitted)
+      assertThat(savedSelections.data.value).containsExactly(LocationSelection.FollowMe)
+      assertThat(currentSelection.data.value).isEqualTo(LocationSelection.FollowMe)
+    }
+  }
+
+  @Test fun `selecing Follow Me without location permission shows error`() {
+    createScreenModel().test {
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+
+      sendEvent(FollowMeClicked(hasLocationPermission = false))
+      with(awaitItem()) {
+        assertThat(loadingStatus).isEqualTo(LoadingStatus.Idle)
+        assertThat(error).isEqualTo(Error.Permission)
+      }
+      assertThat(savedSelections.data.value).isEmpty()
+      assertThat(currentSelection.data.value).isEqualTo(LocationSelection.None)
     }
   }
 }

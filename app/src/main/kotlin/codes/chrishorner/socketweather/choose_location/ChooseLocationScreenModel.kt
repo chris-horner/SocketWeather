@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import codes.chrishorner.socketweather.appSingletons
+import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Permission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
@@ -57,7 +58,7 @@ class ChooseLocationScreenModel(
       when (event) {
         is InputSearch -> query = event.query
         ClearInput -> query = ""
-        is FollowMeClicked -> TODO()
+        is FollowMeClicked -> scope.launch { selectFollowMe(event.hasLocationPermission, state) }
         is ResultSelected -> scope.launch { selectResult(event.result, state) }
         CloseClicked -> { /* Not handled by ScreenModel. */
         }
@@ -103,6 +104,18 @@ class ChooseLocationScreenModel(
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
       state.update { it.copy(loadingStatus = SearchingDone, error = Submission) }
+      delay(1_500L)
+      state.update { it.copy(error = null) }
+    }
+  }
+
+  private suspend fun selectFollowMe(locationPermissionGranted: Boolean, state: MutableState<ChooseLocationState>) {
+    if (locationPermissionGranted) {
+      savedSelections.update { it + LocationSelection.FollowMe }
+      currentSelection.set(LocationSelection.FollowMe)
+      state.update { it.copy(loadingStatus = Submitted) }
+    } else {
+      state.update { it.copy(loadingStatus = Idle, error = Permission) }
       delay(1_500L)
       state.update { it.copy(error = null) }
     }

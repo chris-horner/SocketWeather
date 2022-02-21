@@ -15,4 +15,10 @@ class TestChannel<T> {
   }
 
   fun send(value: T) = channel.trySend(value)
+
+  fun assertEmpty() {
+    if (!channel.isEmpty) {
+      throw AssertionError("Asserted empty channel is not empty.")
+    }
+  }
 }

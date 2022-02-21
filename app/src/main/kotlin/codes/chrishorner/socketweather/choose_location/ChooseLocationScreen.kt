@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.choose_location
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivityResultRegistryOwner
@@ -69,11 +70,28 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Clo
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.util.MoleculeScreen
+import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
 import com.google.accompanist.insets.navigationBarsWithImePadding
 import com.google.accompanist.insets.statusBarsPadding
+
+data class ChooseLocationScreen(
+  val showCloseButton: Boolean
+) : MoleculeScreen<ChooseLocationUiEvent, ChooseLocationState>() {
+
+  override fun onCreateScreenModel(
+    context: Context,
+    navigator: Navigator,
+  ) = ChooseLocationScreenModel(showCloseButton, navigator, context)
+
+  @Composable
+  override fun Content(state: ChooseLocationState, onEvent: (ChooseLocationUiEvent) -> Unit) {
+    ChooseLocationUi(state, onEvent)
+  }
+}
 
 @Composable
 fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavController) {

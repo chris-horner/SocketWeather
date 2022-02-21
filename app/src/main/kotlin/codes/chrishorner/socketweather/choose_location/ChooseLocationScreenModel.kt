@@ -30,6 +30,7 @@ import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.util.CollectEffect
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
+import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.update
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -38,6 +39,7 @@ import timber.log.Timber
 
 class ChooseLocationScreenModel(
   showCloseButton: Boolean,
+  private val navigator: Navigator,
   private val api: WeatherApi,
   private val currentSelection: Store<LocationSelection>,
   private val savedSelections: Store<Set<LocationSelection>>,
@@ -60,8 +62,7 @@ class ChooseLocationScreenModel(
         ClearInput -> query = ""
         is FollowMeClicked -> scope.launch { selectFollowMe(event.hasLocationPermission, state) }
         is ResultSelected -> scope.launch { selectResult(event.result, state) }
-        CloseClicked -> { /* Not handled by ScreenModel. */
-        }
+        CloseClicked -> navigator.pop()
       }
     }
 
@@ -101,6 +102,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + selection }
       currentSelection.set(selection)
       state.update { it.copy(loadingStatus = Submitted) }
+      navigator.pop()
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
       state.update { it.copy(loadingStatus = SearchingDone, error = Submission) }
@@ -114,6 +116,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + LocationSelection.FollowMe }
       currentSelection.set(LocationSelection.FollowMe)
       state.update { it.copy(loadingStatus = Submitted) }
+      navigator.pop()
     } else {
       state.update { it.copy(loadingStatus = Idle, error = Permission) }
       delay(1_500L)
@@ -122,11 +125,14 @@ class ChooseLocationScreenModel(
   }
 
   companion object {
-    operator fun invoke(context: Context, showCloseButton: Boolean) = ChooseLocationScreenModel(
-      showCloseButton = showCloseButton,
-      api = context.appSingletons.networkComponents.api,
-      currentSelection = context.appSingletons.stores.currentSelection,
-      savedSelections = context.appSingletons.stores.savedSelections
-    )
+    operator fun invoke(showCloseButton: Boolean, navigator: Navigator, context: Context): ChooseLocationScreenModel {
+      return ChooseLocationScreenModel(
+        showCloseButton = showCloseButton,
+        navigator = navigator,
+        api = context.appSingletons.networkComponents.api,
+        currentSelection = context.appSingletons.stores.currentSelection,
+        savedSelections = context.appSingletons.stores.savedSelections
+      )
+    }
   }
 }

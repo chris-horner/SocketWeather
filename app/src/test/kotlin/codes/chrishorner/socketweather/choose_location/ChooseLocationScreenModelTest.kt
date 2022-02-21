@@ -1,18 +1,22 @@
 package codes.chrishorner.socketweather.choose_location
 
+import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus
+import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.update
+import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestApi.ResponseMode
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Test
 import java.time.Clock
 import java.time.ZoneId
@@ -22,6 +26,7 @@ class ChooseLocationScreenModelTest {
 
   private val clock: Clock
   private val api: TestApi
+  private val navigator = FakeNavigator()
   private val currentSelection = FakeStore<LocationSelection>(LocationSelection.None)
   private val savedSelections = FakeStore<Set<LocationSelection>>(emptySet())
 
@@ -32,8 +37,12 @@ class ChooseLocationScreenModelTest {
   }
 
   private fun createScreenModel() = ChooseLocationScreenModel(
-    showCloseButton = false, api, currentSelection, savedSelections
+    showCloseButton = false, navigator, api, currentSelection, savedSelections
   )
+
+  @Before fun setup() {
+    navigator.items.add(ChooseLocationScreen(showCloseButton = false))
+  }
 
   @Test fun `Follow Me button only shows when LocationSelection-FollowMe not saved`() = runBlocking {
     createScreenModel().test {
@@ -53,6 +62,17 @@ class ChooseLocationScreenModelTest {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
       sendEvent(InputSearch("A"))
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Searching)
+    }
+  }
+
+  @Test fun `clicking close pops screen`() {
+    createScreenModel().test {
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
+      sendEvent(CloseClicked)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Pop)
+        assertThat(items).isEmpty()
+      }
     }
   }
 
@@ -84,6 +104,7 @@ class ChooseLocationScreenModelTest {
         assertThat(loadingStatus).isEqualTo(LoadingStatus.SearchingError)
         assertThat(results).isEmpty()
       }
+      navigator.assertNoChanges()
     }
   }
 
@@ -106,6 +127,10 @@ class ChooseLocationScreenModelTest {
       val expectedSelection = LocationSelection.Static(api.location1)
       assertThat(savedSelections.data.value).containsExactly(expectedSelection)
       assertThat(currentSelection.data.value).isEqualTo(expectedSelection)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Pop)
+        assertThat(items).isEmpty()
+      }
     }
   }
 
@@ -126,6 +151,7 @@ class ChooseLocationScreenModelTest {
       sendEvent(ResultSelected(result))
       // TODO: Work out how to assert Submitting state.
       assertThat(awaitItem().error).isEqualTo(Error.Submission)
+      navigator.assertNoChanges()
     }
   }
 
@@ -137,10 +163,14 @@ class ChooseLocationScreenModelTest {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitted)
       assertThat(savedSelections.data.value).containsExactly(LocationSelection.FollowMe)
       assertThat(currentSelection.data.value).isEqualTo(LocationSelection.FollowMe)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Pop)
+        assertThat(items).isEmpty()
+      }
     }
   }
 
-  @Test fun `selecing Follow Me without location permission shows error`() {
+  @Test fun `selecting Follow Me without location permission shows error`() {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -151,6 +181,7 @@ class ChooseLocationScreenModelTest {
       }
       assertThat(savedSelections.data.value).isEmpty()
       assertThat(currentSelection.data.value).isEqualTo(LocationSelection.None)
+      navigator.assertNoChanges()
     }
   }
 }

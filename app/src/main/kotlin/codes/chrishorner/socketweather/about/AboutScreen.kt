@@ -30,10 +30,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import codes.chrishorner.socketweather.BuildConfig
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import com.google.accompanist.insets.navigationBarsPadding
+
+object AboutScreen : Screen {
+  @Composable
+  override fun Content() {
+    val navigator = LocalNavigator.currentOrThrow
+    AboutUi(onBack = { navigator.pop() })
+  }
+}
 
 @Composable
 fun AboutScreen(navController: NavController) {

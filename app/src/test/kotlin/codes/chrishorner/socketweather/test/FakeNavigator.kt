@@ -3,6 +3,7 @@ package codes.chrishorner.socketweather.test
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.util.Navigator
+import kotlinx.coroutines.yield
 
 class FakeNavigator : Navigator {
 
@@ -14,7 +15,8 @@ class FakeNavigator : Navigator {
     return changes.awaitValue()
   }
 
-  fun assertNoChanges() {
+  suspend fun assertNoChanges() {
+    yield() // Give other coroutines a chance to finish.
     changes.assertEmpty()
   }
 

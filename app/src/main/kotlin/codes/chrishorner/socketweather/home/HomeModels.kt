@@ -9,11 +9,13 @@ data class HomeState(
   val currentLocation: LocationEntry,
   val savedLocations: List<LocationEntry>,
   val content: Content,
+  val showRefreshingIndicator: Boolean = false,
 ) {
   sealed class Content {
     object Empty : Content()
     object Loading : Content()
     data class Loaded(val conditions: FormattedConditions) : Content()
+    // TODO: Remove once migration to Voyager is complete.
     data class Refreshing(val conditions: FormattedConditions) : Content()
     data class Error(val type: ForecastError) : Content()
   }

@@ -21,7 +21,7 @@ interface Strings {
     private val res = context.applicationContext.resources
     private val decimalFormat = DecimalFormat("0.#")
 
-    override fun get(key: Int): String = res.getString(key)
+    override operator fun get(key: Int): String = res.getString(key)
 
     override fun get(key: Int, vararg formatArgs: Any?): String {
       return res.getString(key, *formatArgs)

@@ -97,7 +97,7 @@ class TestApi(clock: Clock) : WeatherApi {
     return listOf(
       DateForecast(
         date = firstDayInstant,
-        temp_min = null,
+        temp_min = 18,
         temp_max = 20,
         extended_text = "Partly cloudy. Afternoon showers.",
         short_text = "Showers.",

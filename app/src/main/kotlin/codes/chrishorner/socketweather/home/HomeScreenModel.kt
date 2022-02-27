@@ -37,7 +37,7 @@ class HomeScreenModel(
   private val forecastLoader: ForecastLoader,
   private val forecast: StateFlow<Forecast?>,
   private val currentSelectionStore: Store<LocationSelection>,
-  private val allSelectionsStore: Store<Set<LocationSelection>>,
+  private val allSelections: StateFlow<Set<LocationSelection>>,
   private val strings: Strings,
   private val clock: Clock = Clock.systemDefaultZone(),
 ) : MoleculeScreenModel<HomeEvent, HomeState> {
@@ -51,7 +51,7 @@ class HomeScreenModel(
     val forecast by forecast.collectAsState()
     val loadingState by remember { forecastLoader.states }.collectAsState()
     val currentSelection by remember { currentSelectionStore.data }.collectAsState()
-    val allSelections by remember { allSelectionsStore.data }.collectAsState()
+    val allSelections by allSelections.collectAsState()
     val otherSelections = allSelections.minus(currentSelection).map { it.toLocationEntry() }
 
     LaunchedEffect(Unit) {
@@ -197,6 +197,10 @@ class HomeScreenModel(
       title = location.name,
       subtitle = location.state
     )
-    None -> error("Empty location selection cannot have an entry.")
+    None -> LocationEntry(
+      selection = this,
+      title = strings[R.string.switchLocation_noneTitle],
+      subtitle = strings[R.string.switchLocation_noneSubtitle]
+    )
   }
 }

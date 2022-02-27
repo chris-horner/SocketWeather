@@ -55,6 +55,8 @@
   <string name="switchLocation_followMeTitle">Follow me</string>
   <string name="switchLocation_followMeSubtitle">Forecast at your location</string>
   <string name="switchLocation_add">Add another location</string>
+  <string name="switchLocation_noneTitle">No location</string>
+  <string name="switchLocation_noneSubtitle">No location selected yet</string>
 
   <string name="rainRadar_backDesc">Back</string>
   <string name="rainRadar_title">Rain radar</string>

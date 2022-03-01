@@ -1,22 +1,29 @@
 package codes.chrishorner.socketweather.home
 
+import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.about.AboutScreen
+import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
+import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.TestChannel
 import codes.chrishorner.socketweather.test.isInstanceOf
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.Duration
@@ -28,6 +35,7 @@ class HomeScreenModelTest {
 
   @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
+  private val navigator = FakeNavigator()
   private val forecastLoader = FakeForecastLoader()
   private val forecast = MutableStateFlow<Forecast?>(null)
   private val currentSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
@@ -49,7 +57,13 @@ class HomeScreenModelTest {
     val startTime = ZonedDateTime.of(2022, 2, 27, 9, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = MutableClock(startTime.toOffsetDateTime())
     testApi = TestApi(clock)
-    screenModel = HomeScreenModel(forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock)
+    screenModel = HomeScreenModel(
+      navigator, forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock
+    )
+  }
+
+  @Before fun setup() {
+    navigator.items.add(HomeScreen)
   }
 
   @Test fun `null forecast with idle loading shows empty state`() {
@@ -139,6 +153,68 @@ class HomeScreenModelTest {
     }
   }
 
+  @Test fun `AddLocation event navigates to ChooseLocationScreen`() = runBlocking {
+    setTestDataWith(testApi.location1)
+
+    screenModel.test {
+      awaitItem()
+      sendEvent(HomeEvent.AddLocation)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Push)
+        assertThat(items.last()).isEqualTo(ChooseLocationScreen(showCloseButton = true))
+      }
+    }
+  }
+
+  @Test fun `Refresh event forces forecast to refresh`() = runBlocking {
+    setTestDataWith(testApi.location1)
+
+    screenModel.test {
+      awaitItem()
+      sendEvent(HomeEvent.Refresh)
+      forecastLoader.refreshCalls.awaitValue()
+    }
+  }
+
+  @Test fun `SwitchLocation event changes selection and forces refresh`() = runBlocking {
+    setTestDataWith(testApi.location1)
+
+    screenModel.test {
+      awaitItem()
+      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(testApi.location1))
+      sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(testApi.location2)))
+      forecastLoader.refreshCalls.awaitValue()
+      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(testApi.location2))
+      assertThat(awaitItem().currentLocation.selection).isEqualTo(LocationSelection.Static(testApi.location2))
+    }
+  }
+
+  @Test fun `ViewAbout event navigates to AboutScreen`() = runBlocking {
+    setTestDataWith(testApi.location1)
+
+    screenModel.test {
+      awaitItem()
+      sendEvent(HomeEvent.ViewAbout)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Push)
+        assertThat(items.last()).isEqualTo(AboutScreen)
+      }
+    }
+  }
+
+  @Test fun `ViewRainRadar event navigates to RainRadarScreen`() = runBlocking {
+    setTestDataWith(testApi.location1)
+
+    screenModel.test {
+      awaitItem()
+      sendEvent(HomeEvent.ViewRainRadar)
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Push)
+        assertThat(items.last()).isEqualTo(RainRadarScreen)
+      }
+    }
+  }
+
   private suspend fun setTestDataWith(location: Location) {
     val locationSelection = LocationSelection.Static(location)
     currentSelectionStore.set(locationSelection)
@@ -173,10 +249,13 @@ class HomeScreenModelTest {
 
   private class FakeForecastLoader : ForecastLoader {
 
+    val refreshCalls = TestChannel<Unit>()
     override val states = MutableStateFlow<State>(State.Idle)
 
     override fun refreshIfNecessary() = Unit
 
-    override fun forceRefresh() = Unit
+    override fun forceRefresh() {
+      refreshCalls.send(Unit)
+    }
   }
 }

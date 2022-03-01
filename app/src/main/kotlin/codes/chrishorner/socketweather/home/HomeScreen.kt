@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.home
 
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
+import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.animation.AnimatedVisibility
@@ -64,9 +65,24 @@ import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import codes.chrishorner.socketweather.util.MoleculeScreen
+import codes.chrishorner.socketweather.util.MoleculeScreenModel
+import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
 import com.google.accompanist.insets.ProvideWindowInsets
 import com.google.accompanist.insets.navigationBarsPadding
+
+object HomeScreen : MoleculeScreen<HomeEvent, HomeState>() {
+
+  override fun onCreateScreenModel(context: Context, navigator: Navigator): MoleculeScreenModel<HomeEvent, HomeState> {
+    return HomeScreenModel(context, navigator)
+  }
+
+  @Composable
+  override fun Content(state: HomeState, onEvent: (HomeEvent) -> Unit) {
+    HomeUi(state, onEvent)
+  }
+}
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {

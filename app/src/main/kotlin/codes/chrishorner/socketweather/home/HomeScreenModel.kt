@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.home
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -8,6 +9,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.about.AboutScreen
+import codes.chrishorner.socketweather.appSingletons
+import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.ForecastLoader.State.Error
@@ -19,12 +23,22 @@ import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.Store
+import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
+import codes.chrishorner.socketweather.home.HomeEvent.Refresh
+import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
+import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
+import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
+import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
+import codes.chrishorner.socketweather.util.CollectEffect
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
+import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.Strings
+import codes.chrishorner.socketweather.util.Strings.AndroidStrings
 import codes.chrishorner.socketweather.util.localTimeAtZone
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.launch
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -34,6 +48,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 class HomeScreenModel(
+  private val navigator: Navigator,
   private val forecastLoader: ForecastLoader,
   private val forecast: StateFlow<Forecast?>,
   private val currentSelectionStore: Store<LocationSelection>,
@@ -60,6 +75,19 @@ class HomeScreenModel(
       while (true) {
         delay(10_000)
         currentInstant = clock.instant()
+      }
+    }
+
+    CollectEffect(events) { event ->
+      when (event) {
+        AddLocation -> navigator.push(ChooseLocationScreen(showCloseButton = true))
+        Refresh -> forecastLoader.forceRefresh()
+        is SwitchLocation -> launch {
+          currentSelectionStore.set(event.selection)
+          forecastLoader.forceRefresh()
+        }
+        ViewAbout -> navigator.push(AboutScreen)
+        ViewRainRadar -> navigator.push(RainRadarScreen)
       }
     }
 
@@ -202,5 +230,20 @@ class HomeScreenModel(
       title = strings[R.string.switchLocation_noneTitle],
       subtitle = strings[R.string.switchLocation_noneSubtitle]
     )
+  }
+
+  companion object {
+    operator fun invoke(context: Context, navigator: Navigator): HomeScreenModel {
+      val singletons = context.appSingletons
+      val stores = singletons.stores
+      return HomeScreenModel(
+        navigator = navigator,
+        forecastLoader = singletons.forecastLoader,
+        forecast = stores.forecast.data,
+        currentSelectionStore = stores.currentSelection,
+        allSelections = stores.savedSelections.data,
+        strings = AndroidStrings(context),
+      )
+    }
   }
 }

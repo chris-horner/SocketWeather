@@ -3,15 +3,20 @@ package codes.chrishorner.socketweather
 import android.app.Application
 import android.content.Context
 import androidx.annotation.MainThread
+import codes.chrishorner.socketweather.data.AndroidDeviceLocator
 import codes.chrishorner.socketweather.data.AppDiskStores
 import codes.chrishorner.socketweather.data.AppStores
 import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DeviceLocator
+import codes.chrishorner.socketweather.data.DeviceLocator2
+import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.Forecaster
 import codes.chrishorner.socketweather.data.LocationSelectionDiskStore
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.data.RealForecastLoader
 import codes.chrishorner.socketweather.data.RealForecaster
+import codes.chrishorner.socketweather.data.RealLocationResolver
 import java.time.Clock
 
 /**
@@ -21,9 +26,11 @@ import java.time.Clock
 interface Singletons {
   val stores: AppStores
   val deviceLocator: DeviceLocator
+  val deviceLocator2: DeviceLocator2
   val locationSelectionStore: LocationSelectionStore
   val networkComponents: NetworkComponents
   val forecaster: Forecaster
+  val forecastLoader: ForecastLoader
 }
 
 private var singletons: Singletons? = null
@@ -42,6 +49,7 @@ fun Application.initialiseSingletons() {
 private class SingletonCache(app: Application) : Singletons {
   override val stores = AppDiskStores(app, DataConfig.moshi)
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
+  override val deviceLocator2 = AndroidDeviceLocator(app)
   override val locationSelectionStore = LocationSelectionDiskStore(app, DataConfig.moshi)
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
   override val forecaster = RealForecaster(
@@ -49,5 +57,12 @@ private class SingletonCache(app: Application) : Singletons {
     api = networkComponents.api,
     locationSelections = locationSelectionStore.currentSelection,
     deviceLocations = deviceLocator.observeDeviceLocation()
+  )
+  override val forecastLoader = RealForecastLoader(
+    clock = Clock.systemDefaultZone(),
+    api = networkComponents.api,
+    locationResolver = RealLocationResolver(deviceLocator2, networkComponents.api),
+    forecastStore = stores.forecast,
+    locationSelectionStore = stores.currentSelection,
   )
 }

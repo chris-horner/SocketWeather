@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.rain_radar
 
+import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_VIEW
 import android.graphics.PorterDuff
@@ -47,10 +48,28 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.CopyrightTextStyle
 import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import codes.chrishorner.socketweather.util.MoleculeScreen
+import codes.chrishorner.socketweather.util.MoleculeScreenModel
+import codes.chrishorner.socketweather.util.Navigator
 import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.TilesOverlay
+
+object RainRadarScreen : MoleculeScreen<RainRadarBackPressEvent, RainRadarState>() {
+
+  override fun onCreateScreenModel(
+    context: Context,
+    navigator: Navigator
+  ): MoleculeScreenModel<RainRadarBackPressEvent, RainRadarState> {
+    TODO("Not yet implemented")
+  }
+
+  @Composable
+  override fun Content(state: RainRadarState, onEvent: (RainRadarBackPressEvent) -> Unit) {
+    RainRadarUi(state) { onEvent(RainRadarBackPressEvent) }
+  }
+}
 
 @Composable
 fun RainRadarScreen(viewModel: RainRadarViewModel, navController: NavController) {

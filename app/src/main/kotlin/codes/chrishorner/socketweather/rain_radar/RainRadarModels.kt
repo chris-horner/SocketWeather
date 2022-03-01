@@ -15,3 +15,5 @@ data class RainRadarLocation(
   val timezone: ZoneId,
   val zoom: Double,
 )
+
+object RainRadarBackPressEvent

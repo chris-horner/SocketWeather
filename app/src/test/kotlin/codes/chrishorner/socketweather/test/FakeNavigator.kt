@@ -5,7 +5,7 @@ import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.util.Navigator
 import kotlinx.coroutines.yield
 
-class FakeNavigator : Navigator {
+class FakeNavigator(vararg initialScreens: Screen) : Navigator {
 
   data class Change(val event: StackEvent, val items: List<Screen>)
 
@@ -39,6 +39,10 @@ class FakeNavigator : Navigator {
 
   override val size: Int
     get() = items.size
+
+  init {
+    items.addAll(initialScreens)
+  }
 
   override fun clearEvent() {
     lastEvent = StackEvent.Idle

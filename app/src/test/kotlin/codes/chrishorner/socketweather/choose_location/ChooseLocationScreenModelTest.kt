@@ -16,7 +16,6 @@ import codes.chrishorner.socketweather.test.TestApi.ResponseMode
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Test
 import java.time.Clock
 import java.time.ZoneId
@@ -26,7 +25,7 @@ class ChooseLocationScreenModelTest {
 
   private val clock: Clock
   private val api: TestApi
-  private val navigator = FakeNavigator()
+  private val navigator = FakeNavigator(ChooseLocationScreen(showCloseButton = false))
   private val currentSelection = FakeStore<LocationSelection>(LocationSelection.None)
   private val savedSelections = FakeStore<Set<LocationSelection>>(emptySet())
 
@@ -39,10 +38,6 @@ class ChooseLocationScreenModelTest {
   private fun createScreenModel() = ChooseLocationScreenModel(
     showCloseButton = false, navigator, api, currentSelection, savedSelections
   )
-
-  @Before fun setup() {
-    navigator.items.add(ChooseLocationScreen(showCloseButton = false))
-  }
 
   @Test fun `Follow Me button only shows when LocationSelection-FollowMe not saved`() = runBlocking {
     createScreenModel().test {

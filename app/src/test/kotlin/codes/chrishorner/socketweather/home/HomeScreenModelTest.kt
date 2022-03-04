@@ -23,7 +23,6 @@ import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import java.time.Duration
@@ -35,7 +34,7 @@ class HomeScreenModelTest {
 
   @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
-  private val navigator = FakeNavigator()
+  private val navigator = FakeNavigator(HomeScreen)
   private val forecastLoader = FakeForecastLoader()
   private val forecast = MutableStateFlow<Forecast?>(null)
   private val currentSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
@@ -60,10 +59,6 @@ class HomeScreenModelTest {
     screenModel = HomeScreenModel(
       navigator, forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock
     )
-  }
-
-  @Before fun setup() {
-    navigator.items.add(HomeScreen)
   }
 
   @Test fun `null forecast with idle loading shows empty state`() {

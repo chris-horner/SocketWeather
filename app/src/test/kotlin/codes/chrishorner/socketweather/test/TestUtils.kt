@@ -1,17 +1,23 @@
 package codes.chrishorner.socketweather.test
 
 import app.cash.turbine.FlowTurbine
+import app.cash.turbine.test
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestCoroutineScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runBlockingTest
 import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.coroutineContext
 
 /**
  * The same as [runBlockingTest], except the [TestCoroutineScope] is cancelled at the end of
@@ -35,6 +41,12 @@ fun runCancellingBlockingTest(
   testBody(scope)
   scope.advanceUntilIdle()
   job.cancel()
+}
+
+suspend fun <T> Flow<T>.testWithScheduler(validate: suspend FlowTurbine<T>.() -> Unit) {
+  val testScheduler = coroutineContext[TestCoroutineScheduler]
+    ?: error("testWithScheduler must be run inside runTest {}.")
+  flowOn(UnconfinedTestDispatcher(testScheduler)).test(validate = validate)
 }
 
 inline fun <reified T> Subject.isInstanceOf() {

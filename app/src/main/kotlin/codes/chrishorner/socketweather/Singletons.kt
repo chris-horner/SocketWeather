@@ -11,7 +11,6 @@ import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.DeviceLocator2
 import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.RealForecastLoader
 import codes.chrishorner.socketweather.data.RealLocationResolver
@@ -25,7 +24,6 @@ interface Singletons {
   val stores: AppStores
   val deviceLocator: DeviceLocator
   val deviceLocator2: DeviceLocator2
-  val locationSelectionStore: LocationSelectionStore
   val networkComponents: NetworkComponents
   val forecaster: Forecaster
   val forecastLoader: ForecastLoader
@@ -48,7 +46,6 @@ private class SingletonCache(app: Application) : Singletons {
   override val stores = AppDiskStores(app, DataConfig.moshi)
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
   override val deviceLocator2 = AndroidDeviceLocator(app)
-  override val locationSelectionStore = LocationSelectionStore.Crash
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
   override val forecaster = Forecaster.Crash
   override val forecastLoader = RealForecastLoader(

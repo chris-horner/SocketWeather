@@ -26,11 +26,12 @@ class RainRadarScreenModel(
   private val navigator: Navigator,
   private val location: RainRadarLocation,
   private val clock: Clock = Clock.systemDefaultZone(),
-) : MoleculeScreenModel<RainRadarBackPressEvent, RainRadarState> {
+) : MoleculeScreenModel<RainRadarBackPressEvent, RainRadarState>() {
 
   @Composable
   override fun states(events: Flow<RainRadarBackPressEvent>): RainRadarState {
     var rainTimestamps by remember { mutableStateOf(generateRainRadarTimestamps(clock)) }
+    val states = remember(rainTimestamps) { generateRainRadarStates(location, rainTimestamps) }
 
     // Every minute, generate a new list of rain radar timestamps.
     LaunchedEffect(Unit) {
@@ -42,7 +43,7 @@ class RainRadarScreenModel(
 
     CollectEffect(events) { navigator.pop() }
 
-    return generateRainRadarStates(location, rainTimestamps).collectAsState(getState(location, rainTimestamps)).value
+    return states.collectAsState(getState(location, rainTimestamps)).value
   }
 
   companion object {

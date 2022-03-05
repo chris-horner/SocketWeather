@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.rain_radar
 
 import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
+import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.test
@@ -21,7 +22,7 @@ class RainRadarScreenModelTest {
 
   @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
-  private val navigator = FakeNavigator(RainRadarScreen)
+  private val navigator = FakeNavigator(HomeScreen, RainRadarScreen)
   private val zone: ZoneId = ZoneId.of("Australia/Melbourne")
   private val location = RainRadarLocation(
     latitude = -37.80052185058594,
@@ -117,7 +118,7 @@ class RainRadarScreenModelTest {
       sendEvent(RainRadarBackPressEvent)
       with(navigator.awaitChange()) {
         assertThat(event).isEqualTo(StackEvent.Pop)
-        assertThat(items).isEmpty()
+        assertThat(items).containsExactly(HomeScreen)
       }
     }
   }

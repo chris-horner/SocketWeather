@@ -21,6 +21,25 @@ interface LocationSelectionStore {
   fun saveAndSelect(selection: LocationSelection)
   fun select(selection: LocationSelection)
   suspend fun clear()
+
+  object Crash : LocationSelectionStore {
+    override val currentSelection: StateFlow<LocationSelection>
+      get() = TODO("Not yet implemented")
+    override val savedSelections: StateFlow<Set<LocationSelection>>
+      get() = TODO("Not yet implemented")
+
+    override fun saveAndSelect(selection: LocationSelection) {
+      TODO("Not yet implemented")
+    }
+
+    override fun select(selection: LocationSelection) {
+      TODO("Not yet implemented")
+    }
+
+    override suspend fun clear() {
+      TODO("Not yet implemented")
+    }
+  }
 }
 
 /**

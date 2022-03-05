@@ -19,6 +19,7 @@ interface AppStores {
   val forecast: Store<Forecast?>
   val savedSelections: Store<Set<LocationSelection>>
   val currentSelection: Store<LocationSelection>
+  suspend fun clear()
 }
 
 /**
@@ -36,15 +37,21 @@ class AppDiskStores(
     default = null,
   )
   override val savedSelections: Store<Set<LocationSelection>> = blockingCreateStore(
-    fileName = "current_selection",
+    fileName = "saved_selections",
     default = emptySet(),
     overrideDir = "location_choices",
   )
   override val currentSelection: Store<LocationSelection> = blockingCreateStore(
-    fileName = "saved_selections",
+    fileName = "current_selection",
     default = LocationSelection.None,
     overrideDir = "location_choices",
   )
+
+  override suspend fun clear() {
+    forecast.clear()
+    savedSelections.clear()
+    currentSelection.clear()
+  }
 
   /**
    * It would be simpler to keep all files in the same directory, but to maintain

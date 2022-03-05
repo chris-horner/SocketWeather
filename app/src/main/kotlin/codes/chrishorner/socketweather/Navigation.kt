@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather
 
+import android.annotation.SuppressLint
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
@@ -11,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import cafe.adriel.voyager.navigator.Navigator
 import codes.chrishorner.socketweather.about.AboutScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationViewModel
@@ -41,6 +43,17 @@ sealed class Screen(val routeDefinition: String) {
   object RainRadar : Screen("rain_radar") {
     fun getRoute() = routeDefinition
   }
+}
+
+@SuppressLint("StateFlowValueCalledInComposition") // We only want to calculate initialScreen once.
+@Composable
+fun Navigation() {
+  val currentSelection = LocalContext.current.appSingletons.stores.currentSelection.data.value
+  val initialScreen =
+    if (currentSelection != LocationSelection.None) HomeScreen
+    else ChooseLocationScreen(showCloseButton = false)
+
+  Navigator(initialScreen)
 }
 
 @Composable

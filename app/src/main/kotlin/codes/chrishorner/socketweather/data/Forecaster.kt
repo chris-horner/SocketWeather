@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.onStart
@@ -45,6 +44,17 @@ interface Forecaster {
   val states: StateFlow<LoadingState>
   val forecast: StateFlow<Forecast?>
   fun refresh()
+
+  object Crash : Forecaster {
+    override val states: StateFlow<LoadingState>
+      get() = TODO("Not yet implemented")
+    override val forecast: StateFlow<Forecast?>
+      get() = TODO("Not yet implemented")
+
+    override fun refresh() {
+      TODO("Not yet implemented")
+    }
+  }
 }
 
 class RealForecaster(

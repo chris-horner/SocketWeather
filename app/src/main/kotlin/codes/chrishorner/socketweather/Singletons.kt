@@ -11,11 +11,9 @@ import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.DeviceLocator2
 import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.Forecaster
-import codes.chrishorner.socketweather.data.LocationSelectionDiskStore
 import codes.chrishorner.socketweather.data.LocationSelectionStore
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.RealForecastLoader
-import codes.chrishorner.socketweather.data.RealForecaster
 import codes.chrishorner.socketweather.data.RealLocationResolver
 import java.time.Clock
 
@@ -50,14 +48,9 @@ private class SingletonCache(app: Application) : Singletons {
   override val stores = AppDiskStores(app, DataConfig.moshi)
   override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
   override val deviceLocator2 = AndroidDeviceLocator(app)
-  override val locationSelectionStore = LocationSelectionDiskStore(app, DataConfig.moshi)
+  override val locationSelectionStore = LocationSelectionStore.Crash
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
-  override val forecaster = RealForecaster(
-    clock = Clock.systemDefaultZone(),
-    api = networkComponents.api,
-    locationSelections = locationSelectionStore.currentSelection,
-    deviceLocations = deviceLocator.observeDeviceLocation()
-  )
+  override val forecaster = Forecaster.Crash
   override val forecastLoader = RealForecastLoader(
     clock = Clock.systemDefaultZone(),
     api = networkComponents.api,

@@ -35,7 +35,9 @@ class SocketWeatherApp : Application() {
     // If our API environment ever changes, remove all saved location selections.
     appSingletons.networkComponents.addEnvironmentChangeAction {
       allowMainThreadDiskOperations {
-        runBlocking { appSingletons.locationSelectionStore.clear() }
+        runBlocking {
+          appSingletons.stores.clear()
+        }
       }
     }
   }

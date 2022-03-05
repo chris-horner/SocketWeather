@@ -98,6 +98,9 @@ buildscript {
     'timber': "com.jakewharton.timber:timber:${versions.timber}",
     'truth': "com.google.truth:truth:${versions.truth}",
     'turbine': "app.cash.turbine:turbine:${versions.turbine}",
-    'voyager': "cafe.adriel.voyager:voyager-navigator:${versions.voyager}",
+    'voyager': [
+      'navigator': "cafe.adriel.voyager:voyager-navigator:${versions.voyager}",
+      'transitions': "cafe.adriel.voyager:voyager-transitions:${versions.voyager}",
+    ],
   ]
 }

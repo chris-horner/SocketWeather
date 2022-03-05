@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.transitions.ScaleTransition
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
@@ -16,5 +17,5 @@ fun Navigation() {
     if (currentSelection != LocationSelection.None) HomeScreen
     else ChooseLocationScreen(showCloseButton = false)
 
-  Navigator(initialScreen)
+  Navigator(initialScreen) { navigator -> ScaleTransition(navigator) }
 }

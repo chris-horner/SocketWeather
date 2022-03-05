@@ -150,5 +150,6 @@ dependencies {
   implementation deps.timber
   testImplementation deps.truth
   testImplementation deps.turbine
-  implementation deps.voyager
+  implementation deps.voyager.navigator
+  implementation deps.voyager.transitions
 }

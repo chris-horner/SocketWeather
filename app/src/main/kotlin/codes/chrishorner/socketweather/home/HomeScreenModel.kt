@@ -55,7 +55,7 @@ class HomeScreenModel(
   private val allSelections: StateFlow<Set<LocationSelection>>,
   private val strings: Strings,
   private val clock: Clock = Clock.systemDefaultZone(),
-) : MoleculeScreenModel<HomeEvent, HomeState> {
+) : MoleculeScreenModel<HomeEvent, HomeState>() {
 
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
 

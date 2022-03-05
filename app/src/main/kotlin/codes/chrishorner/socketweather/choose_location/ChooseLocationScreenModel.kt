@@ -43,7 +43,7 @@ class ChooseLocationScreenModel(
   private val api: WeatherApi,
   private val currentSelection: Store<LocationSelection>,
   private val savedSelections: Store<Set<LocationSelection>>,
-) : MoleculeScreenModel<ChooseLocationUiEvent, ChooseLocationState> {
+) : MoleculeScreenModel<ChooseLocationUiEvent, ChooseLocationState>() {
 
   private val initialState = ChooseLocationState(
     showCloseButton = showCloseButton,
@@ -102,6 +102,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + selection }
       currentSelection.set(selection)
       state.update { it.copy(loadingStatus = Submitted) }
+      // TODO: This should do more than pop.
       navigator.pop()
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
@@ -116,6 +117,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + LocationSelection.FollowMe }
       currentSelection.set(LocationSelection.FollowMe)
       state.update { it.copy(loadingStatus = Submitted) }
+      // TODO: This should do more than pop.
       navigator.pop()
     } else {
       state.update { it.copy(loadingStatus = Idle, error = Permission) }

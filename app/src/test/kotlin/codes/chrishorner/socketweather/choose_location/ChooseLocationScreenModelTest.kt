@@ -9,6 +9,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Inp
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.update
+import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
@@ -61,12 +62,14 @@ class ChooseLocationScreenModelTest {
   }
 
   @Test fun `clicking close pops screen`() {
+    navigator.items.clear()
+    navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
       sendEvent(CloseClicked)
       with(navigator.awaitChange()) {
         assertThat(event).isEqualTo(StackEvent.Pop)
-        assertThat(items).isEmpty()
+        assertThat(items).containsExactly(HomeScreen)
       }
     }
   }
@@ -123,8 +126,8 @@ class ChooseLocationScreenModelTest {
       assertThat(savedSelections.data.value).containsExactly(expectedSelection)
       assertThat(currentSelection.data.value).isEqualTo(expectedSelection)
       with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Pop)
-        assertThat(items).isEmpty()
+        assertThat(event).isEqualTo(StackEvent.Replace)
+        assertThat(items).containsExactly(HomeScreen)
       }
     }
   }
@@ -159,8 +162,8 @@ class ChooseLocationScreenModelTest {
       assertThat(savedSelections.data.value).containsExactly(LocationSelection.FollowMe)
       assertThat(currentSelection.data.value).isEqualTo(LocationSelection.FollowMe)
       with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Pop)
-        assertThat(items).isEmpty()
+        assertThat(event).isEqualTo(StackEvent.Replace)
+        assertThat(items).containsExactly(HomeScreen)
       }
     }
   }
@@ -177,6 +180,39 @@ class ChooseLocationScreenModelTest {
       assertThat(savedSelections.data.value).isEmpty()
       assertThat(currentSelection.data.value).isEqualTo(LocationSelection.None)
       navigator.assertNoChanges()
+    }
+  }
+
+  @Test fun `selecting Follow Me pops to HomeScreen if possible`() {
+    navigator.items.clear()
+    navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
+
+    createScreenModel().test {
+      awaitItem()
+      sendEvent(FollowMeClicked(hasLocationPermission = true))
+      awaitItem()
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Pop)
+        assertThat(items).containsExactly(HomeScreen)
+      }
+    }
+  }
+
+  @Test fun `selecting search result pops to HomeScreen if possible`() {
+    navigator.items.clear()
+    navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
+
+    createScreenModel().test {
+      awaitItem()
+      sendEvent(InputSearch("Fakezroy"))
+      awaitItem()
+      val result = awaitItem().results.single()
+      sendEvent(ResultSelected(result))
+      awaitItem()
+      with(navigator.awaitChange()) {
+        assertThat(event).isEqualTo(StackEvent.Pop)
+        assertThat(items).containsExactly(HomeScreen)
+      }
     }
   }
 }

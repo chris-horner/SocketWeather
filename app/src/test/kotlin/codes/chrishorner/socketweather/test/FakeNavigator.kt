@@ -26,7 +26,7 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
     private set
 
   override val canPop: Boolean
-    get() = items.isNotEmpty()
+    get() = items.size > 1
 
   override val isEmpty: Boolean
     get() = items.isEmpty()

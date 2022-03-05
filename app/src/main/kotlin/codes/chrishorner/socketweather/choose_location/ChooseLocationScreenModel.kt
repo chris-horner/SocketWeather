@@ -28,6 +28,7 @@ import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.Store
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.update
+import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.util.CollectEffect
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
 import codes.chrishorner.socketweather.util.Navigator
@@ -102,8 +103,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + selection }
       currentSelection.set(selection)
       state.update { it.copy(loadingStatus = Submitted) }
-      // TODO: This should do more than pop.
-      navigator.pop()
+      if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
       state.update { it.copy(loadingStatus = SearchingDone, error = Submission) }
@@ -117,8 +117,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + LocationSelection.FollowMe }
       currentSelection.set(LocationSelection.FollowMe)
       state.update { it.copy(loadingStatus = Submitted) }
-      // TODO: This should do more than pop.
-      navigator.pop()
+      if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
     } else {
       state.update { it.copy(loadingStatus = Idle, error = Permission) }
       delay(1_500L)

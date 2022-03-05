@@ -1,6 +1,8 @@
 package codes.chrishorner.socketweather.data
 
 import android.app.Application
+import codes.chrishorner.socketweather.data.DebugDeviceLocator.Mode.MOCK
+import codes.chrishorner.socketweather.data.DebugDeviceLocator.Mode.REAL
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.DEVICE_LOCATION
 import codes.chrishorner.socketweather.debug.DebugPreferenceKeys.DEVICE_LOCATION_MODE
 import codes.chrishorner.socketweather.debug.blockingGet
@@ -10,12 +12,9 @@ import codes.chrishorner.socketweather.debug.getEnum
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 
 class DebugDeviceLocator(app: Application) : DeviceLocator {
@@ -23,39 +22,29 @@ class DebugDeviceLocator(app: Application) : DeviceLocator {
   enum class Mode { REAL, MOCK }
 
   private val preferenceStore = app.debugPreferences
-  private val realLocator = RealDeviceLocator(app)
+  private val androidDeviceLocator = AndroidDeviceLocator(app)
 
-  private val modeFlow: StateFlow<Mode>
-  private val locationNameFlow: StateFlow<String>
+  private val modes: StateFlow<Mode>
+  private val mockLocationChoices: StateFlow<String>
 
   init {
-    val mode = preferenceStore.blockingGet().getEnum(DEVICE_LOCATION_MODE) ?: Mode.REAL
+    val mode = preferenceStore.blockingGet().getEnum(DEVICE_LOCATION_MODE) ?: REAL
     val locationName = preferenceStore.blockingGetValue(DEVICE_LOCATION) ?: mockLocations.entries.first().key
     val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-    modeFlow = preferenceStore.data
-      .map { preferences -> preferences.getEnum(DEVICE_LOCATION_MODE) ?: Mode.REAL }
+    modes = preferenceStore.data
+      .map { preferences -> preferences.getEnum(DEVICE_LOCATION_MODE) ?: REAL }
       .stateIn(scope, SharingStarted.Eagerly, mode)
 
-    locationNameFlow = preferenceStore.data
+    mockLocationChoices = preferenceStore.data
       .map { preferences -> preferences[DEVICE_LOCATION] ?: mockLocations.entries.first().key }
       .stateIn(scope, SharingStarted.Eagerly, locationName)
   }
 
-  override fun enable() {
-    if (modeFlow.value == Mode.REAL) realLocator.enable()
-  }
-
-  override fun disable() {
-    if (modeFlow.value == Mode.REAL) realLocator.disable()
-  }
-
-  override fun observeDeviceLocation(): Flow<DeviceLocation> {
-    return modeFlow.flatMapLatest { mode ->
-      when (mode) {
-        Mode.REAL -> realLocator.observeDeviceLocation()
-        Mode.MOCK -> locationNameFlow.map { mockLocations.getValue(it) }.onEach { println("Emitting $it") }
-      }
+  override suspend fun getLocation(): DeviceLocation? {
+    return when (modes.value) {
+      REAL -> androidDeviceLocator.getLocation()
+      MOCK -> mockLocations[mockLocationChoices.value]
     }
   }
 

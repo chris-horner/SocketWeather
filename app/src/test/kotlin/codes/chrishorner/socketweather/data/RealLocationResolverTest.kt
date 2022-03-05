@@ -56,7 +56,7 @@ class RealLocationResolverTest {
     assertThat(result).isEqualTo(Result.Failure(ForecastError.NETWORK))
   }
 
-  private class FakeDeviceLocator : DeviceLocator2 {
+  private class FakeDeviceLocator : DeviceLocator {
 
     val location = TestChannel<DeviceLocation?>()
 

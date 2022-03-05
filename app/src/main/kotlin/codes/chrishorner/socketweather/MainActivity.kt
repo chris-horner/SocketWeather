@@ -24,14 +24,4 @@ class MainActivity : AppCompatActivity() {
     super.onResume()
     appSingletons.forecastLoader.refreshIfNecessary()
   }
-
-  override fun onStart() {
-    super.onStart()
-    appSingletons.deviceLocator.enable()
-  }
-
-  override fun onStop() {
-    super.onStop()
-    appSingletons.deviceLocator.disable()
-  }
 }

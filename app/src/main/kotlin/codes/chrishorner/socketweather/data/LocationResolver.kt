@@ -20,7 +20,7 @@ private val australiaLatitudeRange = -44.057002..-9.763686
 private val australiaLongitudeRange = 112.169980..154.927992
 
 class RealLocationResolver(
-  private val deviceLocator: DeviceLocator2,
+  private val deviceLocator: DeviceLocator,
   private val api: WeatherApi,
 ) : LocationResolver {
 

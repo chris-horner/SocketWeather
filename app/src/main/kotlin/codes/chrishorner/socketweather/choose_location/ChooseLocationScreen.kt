@@ -43,8 +43,6 @@ import androidx.compose.material.icons.rounded.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,16 +52,13 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Permission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Searching
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingDone
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.SearchingError
-import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitted
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Submitting
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ClearInput
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.CloseClicked
@@ -90,21 +85,6 @@ data class ChooseLocationScreen(
   @Composable
   override fun Content(state: ChooseLocationState, onEvent: (ChooseLocationUiEvent) -> Unit) {
     ChooseLocationUi(state, onEvent)
-  }
-}
-
-@Composable
-fun ChooseLocationScreen(viewModel: ChooseLocationViewModel, navController: NavController) {
-  val state: ChooseLocationState by viewModel.states.collectAsState()
-
-  if (state.loadingStatus == Submitted) navController.navigate(Screen.Home.getRoute()) {
-    launchSingleTop = true
-    popUpTo(Screen.ChooseLocation.routeDefinition) { inclusive = true }
-  }
-
-  ChooseLocationUi(state) { event ->
-    viewModel.handle(event)
-    if (event == CloseClicked) navController.popBackStack()
   }
 }
 

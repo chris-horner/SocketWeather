@@ -139,7 +139,6 @@ dependencies {
   testImplementation deps.molecule.testing
   implementation deps.moshi.core
   implementation deps.moshi.kotlin
-  implementation deps.navigation
   implementation deps.okhttp.core
   debugImplementation deps.okhttp.logging
   testImplementation deps.okhttp.mock

@@ -37,7 +37,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -53,15 +52,11 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.LocationSelection
-import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
-import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
@@ -81,19 +76,6 @@ object HomeScreen : MoleculeScreen<HomeEvent, HomeState>() {
   @Composable
   override fun Content(state: HomeState, onEvent: (HomeEvent) -> Unit) {
     HomeUi(state, onEvent)
-  }
-}
-
-@Composable
-fun HomeScreen(viewModel: HomeViewModel, navController: NavController) {
-  val state: HomeState by viewModel.states.collectAsState()
-  HomeUi(state) { event ->
-    when (event) {
-      AddLocation -> navController.navigate(Screen.ChooseLocation.getRoute())
-      ViewAbout -> navController.navigate(Screen.About.getRoute())
-      ViewRainRadar -> navController.navigate(Screen.RainRadar.getRoute())
-      else -> viewModel.handleEvent(event)
-    }
   }
 }
 

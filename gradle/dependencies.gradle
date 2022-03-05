@@ -19,7 +19,6 @@ buildscript {
     'lifecycle': '2.4.1',
     'molecule': '0.2.0',
     'moshi': '1.12.0',
-    'navigation': '2.4.1',
     'okhttp': '4.10.0-RC1',
     'osmdroid': '6.1.10',
     'playPublisher': '3.7.0',
@@ -83,7 +82,6 @@ buildscript {
       'core': "com.squareup.moshi:moshi:${versions.moshi}",
       'kotlin': "com.squareup.moshi:moshi-kotlin:${versions.moshi}",
     ],
-    'navigation': "androidx.navigation:navigation-compose:${versions.navigation}",
     'okhttp': [
       'core': "com.squareup.okhttp3:okhttp:${versions.okhttp}",
       'logging': "com.squareup.okhttp3:logging-interceptor:${versions.okhttp}",

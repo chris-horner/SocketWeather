@@ -164,7 +164,7 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
     }
 
     AnimatedVisibility(
-      visible = state.content is Content.Refreshing,
+      visible = state.showRefreshingIndicator,
       enter = fadeIn(),
       exit = fadeOut()
     ) {
@@ -181,7 +181,6 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
 private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit) {
   when (state) {
     is Content.Error -> Error(state.type) { onEvent(Refresh) }
-    is Content.Refreshing -> ForecastUi(state.conditions, scrollState, onEvent)
     is Content.Loaded -> ForecastUi(state.conditions, scrollState, onEvent)
     else -> Loading()
   }

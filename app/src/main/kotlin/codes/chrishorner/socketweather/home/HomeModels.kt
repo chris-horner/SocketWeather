@@ -15,8 +15,6 @@ data class HomeState(
     object Empty : Content()
     object Loading : Content()
     data class Loaded(val conditions: FormattedConditions) : Content()
-    // TODO: Remove once migration to Voyager is complete.
-    data class Refreshing(val conditions: FormattedConditions) : Content()
     data class Error(val type: ForecastError) : Content()
   }
 }

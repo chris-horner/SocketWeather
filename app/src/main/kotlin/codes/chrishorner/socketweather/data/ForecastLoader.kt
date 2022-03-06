@@ -72,6 +72,7 @@ class RealForecastLoader(
           }
         }
       }
+      println("refreshing with $location")
 
       statesFlow.value = State.LoadingForecast
 

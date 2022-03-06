@@ -6,13 +6,9 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import codes.chrishorner.socketweather.util.getOrCreateFile
 import com.squareup.moshi.Moshi
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.runBlocking
 
 interface AppStores {
@@ -29,8 +25,6 @@ class AppDiskStores(
   private val app: Application,
   private val moshi: Moshi,
 ) : AppStores {
-
-  private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
   override val forecast: Store<Forecast?> = blockingCreateStore(
     fileName = "forecast",
@@ -71,23 +65,30 @@ class AppDiskStores(
     val dataStore = DataStoreFactory.create(MoshiSerializer(moshi, default)) {
       getOrCreateFile(directory, fileName)
     }
-    val initialValue = runBlocking { dataStore.data.first() }
-    val values = dataStore.data.stateIn(scope, SharingStarted.Eagerly, initialValue)
-    return DiskStore(default, dataStore, values)
+    val initial = runBlocking { dataStore.data.first() }
+    return DiskStore(default, initial, dataStore)
   }
 
   private class DiskStore<T>(
     private val default: T,
+    initial: T,
     private val dataStore: DataStore<T>,
-    override val data: StateFlow<T>
   ) : Store<T> {
 
+    override val data = MutableStateFlow(initial)
+
     override suspend fun set(value: T) {
-      dataStore.updateData { value }
+      dataStore.updateData {
+        data.update { value }
+        value
+      }
     }
 
     override suspend fun clear() {
-      dataStore.updateData { default }
+      dataStore.updateData {
+        data.update { default }
+        default
+      }
     }
   }
 }

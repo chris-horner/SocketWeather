@@ -116,13 +116,12 @@ dependencies {
   implementation deps.accompanist.systemUiController
   implementation deps.androidx.core
   implementation deps.androidx.activityCompose
-  implementation deps.appcompat
   implementation deps.compose.material.core
   implementation deps.compose.material.icons
   implementation deps.compose.material.iconsExtended
   implementation deps.compose.ui
   implementation deps.compose.uiGraphics
-  implementation deps.compose.uiTooling
+  debugImplementation deps.compose.uiTooling
   implementation deps.coroutines.android
   testImplementation deps.coroutines.test
   implementation deps.datastore.core

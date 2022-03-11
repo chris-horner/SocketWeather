@@ -4,7 +4,6 @@
     android:height="48dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
-    android:tint="?attr/colorControlNormal"
     >
 
   <path

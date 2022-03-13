@@ -10,6 +10,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Res
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.home.HomeScreen
+import codes.chrishorner.socketweather.test.FakeForecastLoader
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
@@ -27,6 +28,7 @@ class ChooseLocationScreenModelTest {
   private val clock: Clock
   private val api: TestApi
   private val navigator = FakeNavigator(ChooseLocationScreen(showCloseButton = false))
+  private val forecastLoader = FakeForecastLoader()
   private val currentSelection = FakeStore<LocationSelection>(LocationSelection.None)
   private val savedSelections = FakeStore<Set<LocationSelection>>(emptySet())
 
@@ -37,7 +39,7 @@ class ChooseLocationScreenModelTest {
   }
 
   private fun createScreenModel() = ChooseLocationScreenModel(
-    showCloseButton = false, navigator, api, currentSelection, savedSelections
+    showCloseButton = false, navigator, api, forecastLoader, currentSelection, savedSelections
   )
 
   @Test fun `Follow Me button only shows when LocationSelection-FollowMe not saved`() = runBlocking {
@@ -213,6 +215,27 @@ class ChooseLocationScreenModelTest {
         assertThat(event).isEqualTo(StackEvent.Pop)
         assertThat(items).containsExactly(HomeScreen)
       }
+    }
+  }
+
+  @Test fun `selecting search result triggers refresh`() {
+    createScreenModel().test {
+      awaitItem()
+      sendEvent(InputSearch("Fakezroy"))
+      awaitItem()
+      val result = awaitItem().results.single()
+      sendEvent(ResultSelected(result))
+      awaitItem()
+      forecastLoader.refreshCalls.awaitValue()
+    }
+  }
+
+  @Test fun `selecting Follow Me triggers refresh`() {
+    createScreenModel().test {
+      awaitItem()
+      sendEvent(FollowMeClicked(hasLocationPermission = true))
+      awaitItem()
+      forecastLoader.refreshCalls.awaitValue()
     }
   }
 }

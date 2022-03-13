@@ -23,6 +23,7 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Clo
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.FollowMeClicked
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.InputSearch
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
+import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.Store
@@ -42,6 +43,7 @@ class ChooseLocationScreenModel(
   showCloseButton: Boolean,
   private val navigator: Navigator,
   private val api: WeatherApi,
+  private val forecastLoader: ForecastLoader,
   private val currentSelection: Store<LocationSelection>,
   private val savedSelections: Store<Set<LocationSelection>>,
 ) : MoleculeScreenModel<ChooseLocationUiEvent, ChooseLocationState>() {
@@ -103,6 +105,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + selection }
       currentSelection.set(selection)
       state.update { it.copy(loadingStatus = Submitted) }
+      forecastLoader.forceRefresh()
       if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
@@ -117,6 +120,7 @@ class ChooseLocationScreenModel(
       savedSelections.update { it + LocationSelection.FollowMe }
       currentSelection.set(LocationSelection.FollowMe)
       state.update { it.copy(loadingStatus = Submitted) }
+      forecastLoader.forceRefresh()
       if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
     } else {
       state.update { it.copy(loadingStatus = Idle, error = Permission) }
@@ -131,6 +135,7 @@ class ChooseLocationScreenModel(
         showCloseButton = showCloseButton,
         navigator = navigator,
         api = context.appSingletons.networkComponents.api,
+        forecastLoader = context.appSingletons.forecastLoader,
         currentSelection = context.appSingletons.stores.currentSelection,
         savedSelections = context.appSingletons.stores.savedSelections
       )

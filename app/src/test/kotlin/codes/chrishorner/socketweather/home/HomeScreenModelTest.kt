@@ -6,18 +6,17 @@ import codes.chrishorner.socketweather.about.AboutScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.data.ForecastError
-import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
+import codes.chrishorner.socketweather.test.FakeForecastLoader
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
-import codes.chrishorner.socketweather.test.TestChannel
 import codes.chrishorner.socketweather.test.isInstanceOf
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
@@ -240,17 +239,5 @@ class HomeScreenModelTest {
       hourlyForecasts = hourlyForecasts,
       upcomingForecasts = dateForecasts,
     )
-  }
-
-  private class FakeForecastLoader : ForecastLoader {
-
-    val refreshCalls = TestChannel<Unit>()
-    override val states = MutableStateFlow<State>(State.Idle)
-
-    override fun refreshIfNecessary() = Unit
-
-    override fun forceRefresh() {
-      refreshCalls.send(Unit)
-    }
   }
 }

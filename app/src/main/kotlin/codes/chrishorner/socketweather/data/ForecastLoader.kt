@@ -6,6 +6,7 @@ import codes.chrishorner.socketweather.data.LocationResolver.Result.Success
 import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
+import codes.chrishorner.socketweather.widget.ForecastWidgetUpdater
 import com.squareup.moshi.JsonDataException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,6 +42,7 @@ class RealForecastLoader(
   private val locationResolver: LocationResolver,
   private val forecastStore: Store<Forecast?>,
   private val locationSelectionStore: Store<LocationSelection>,
+  private val forecastWidgetUpdater: ForecastWidgetUpdater,
   private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate),
 ) : ForecastLoader {
 
@@ -78,6 +80,7 @@ class RealForecastLoader(
       try {
         val forecast = loadForecast(api, clock, location)
         forecastStore.set(forecast)
+        forecastWidgetUpdater.update()
         statesFlow.value = State.Idle
       } catch (e: JsonDataException) {
         Timber.e(e, "API returned unexpected data.")

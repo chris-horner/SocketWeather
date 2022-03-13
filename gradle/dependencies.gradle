@@ -10,7 +10,7 @@ buildscript {
     'coroutines': '1.6.0',
     'datastore': '1.0.0',
     'debugdrawer': '0.23.0',
-    'glance': '1.0.0-alpha02',
+    'glance': '1.0.0-alpha03',
     'jdkDesugar': '1.1.5',
     'junit': '4.13.2',
     'kotlin': '1.6.10',

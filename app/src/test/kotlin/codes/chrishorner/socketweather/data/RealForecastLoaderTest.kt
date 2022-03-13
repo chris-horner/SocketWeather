@@ -7,6 +7,7 @@ import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestChannel
+import codes.chrishorner.socketweather.widget.ForecastWidgetUpdater
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.junit.testparameterinjector.TestParameter
 import com.google.testing.junit.testparameterinjector.TestParameterInjector
@@ -24,6 +25,7 @@ class RealForecastLoaderTest {
   private val locationResolver = FakeLocationResolver()
   private val forecastStore = FakeStore<Forecast?>(null)
   private val locationSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
+  private val forecastWidgetUpdater = FakeForecastWidgetUpdater()
   private val clock: MutableClock
   private val api: TestApi
 
@@ -34,7 +36,7 @@ class RealForecastLoaderTest {
   }
 
   private fun create(scope: CoroutineScope) = RealForecastLoader(
-    clock, api, locationResolver, forecastStore, locationSelectionStore, scope
+    clock, api, locationResolver, forecastStore, locationSelectionStore, forecastWidgetUpdater, scope
   )
 
   @Test fun `successful refresh of LocationSelection-Static updates state and store`() = runBlocking {
@@ -71,6 +73,14 @@ class RealForecastLoaderTest {
     val forecast = forecastStore.data.value!!
     assertThat(forecast.location).isEqualTo(api.location1)
     assertThat(forecast.updateTime).isEqualTo(clock.instant())
+  }
+
+  @Test fun `successful refresh updates widget`() = runBlocking {
+    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    val forecastLoader = create(this)
+
+    forecastLoader.forceRefresh()
+    forecastWidgetUpdater.updateCalls.awaitValue()
   }
 
   @Test fun `loader only refreshes when forecast is stale`() = runBlocking {
@@ -146,6 +156,15 @@ class RealForecastLoaderTest {
 
     override suspend fun getDeviceLocation(): Result {
       return result.awaitValue()
+    }
+  }
+
+  private class FakeForecastWidgetUpdater : ForecastWidgetUpdater {
+
+    val updateCalls = TestChannel<Unit>()
+
+    override fun update() {
+      updateCalls.send(Unit)
     }
   }
 }

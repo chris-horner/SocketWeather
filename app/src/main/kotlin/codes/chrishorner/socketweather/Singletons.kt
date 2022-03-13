@@ -11,6 +11,7 @@ import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.NetworkComponents
 import codes.chrishorner.socketweather.data.RealForecastLoader
 import codes.chrishorner.socketweather.data.RealLocationResolver
+import codes.chrishorner.socketweather.widget.RealForecastWidgetUpdater
 import java.time.Clock
 
 /**
@@ -47,5 +48,6 @@ private class SingletonCache(app: Application) : Singletons {
     locationResolver = RealLocationResolver(deviceLocator, networkComponents.api),
     forecastStore = stores.forecast,
     locationSelectionStore = stores.currentSelection,
+    forecastWidgetUpdater = RealForecastWidgetUpdater(app),
   )
 }

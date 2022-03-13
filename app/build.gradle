@@ -126,8 +126,15 @@ dependencies {
   testImplementation deps.coroutines.test
   implementation deps.datastore.core
   debugImplementation deps.datastore.preferences
-  debugImplementation deps.debugDrawer.base
-  debugImplementation deps.debugDrawer.modules
+  debugImplementation (deps.debugDrawer.base) {
+    // Remove once this is merged: https://github.com/alorma/Compose-Debug-Drawer/pull/21/files
+    exclude group: 'androidx.compose.ui', module: 'ui-test-junit4'
+    exclude group: 'androidx.compose.ui', module: 'ui-test-manifest'
+  }
+  debugImplementation (deps.debugDrawer.modules) {
+    exclude group: 'androidx.compose.ui', module: 'ui-test-junit4'
+    exclude group: 'androidx.compose.ui', module: 'ui-test-manifest'
+  }
   implementation deps.glance
   coreLibraryDesugaring deps.jdkDesugar
   testImplementation deps.junit

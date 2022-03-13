@@ -24,6 +24,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons.Rounded
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -43,10 +44,12 @@ import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.CopyrightTextStyle
+import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import codes.chrishorner.socketweather.util.MoleculeScreen
 import codes.chrishorner.socketweather.util.Navigator
 import com.google.accompanist.insets.systemBarsPadding
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.TilesOverlay
 
@@ -59,7 +62,24 @@ object RainRadarScreen : MoleculeScreen<RainRadarBackPressEvent, RainRadarState>
 
   @Composable
   override fun Content(state: RainRadarState, onEvent: (RainRadarBackPressEvent) -> Unit) {
-    RainRadarUi(state) { onEvent(RainRadarBackPressEvent) }
+    val systemUiController = rememberSystemUiController()
+    val useDarkIcons = MaterialTheme.colors.isLight
+
+    // Force dark system icons while viewing this screen.
+    DisposableEffect(Unit) {
+      systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = true)
+      onDispose {
+        systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
+      }
+    }
+
+    // Force a light theme while viewing this screen.
+    MaterialTheme(
+      colors = LightColors,
+      typography = MaterialTheme.typography,
+    ) {
+      RainRadarUi(state) { onEvent(RainRadarBackPressEvent) }
+    }
   }
 }
 

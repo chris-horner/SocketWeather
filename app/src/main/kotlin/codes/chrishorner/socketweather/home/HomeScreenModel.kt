@@ -83,10 +83,7 @@ class HomeScreenModel(
         AddLocation -> navigator.push(ChooseLocationScreen(showCloseButton = true))
         Refresh -> forecastLoader.forceRefresh()
         is SwitchLocation -> launch {
-          println("setting location: ${event.selection}")
           currentSelectionStore.set(event.selection)
-          println("finished setting ${event.selection}. beginning refresh...")
-          println("beginning refresh...")
           forecastLoader.forceRefresh()
         }
         ViewAbout -> navigator.push(AboutScreen)

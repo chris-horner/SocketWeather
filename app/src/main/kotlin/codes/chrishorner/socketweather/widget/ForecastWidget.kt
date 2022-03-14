@@ -116,7 +116,7 @@ private fun TinyRow(forecast: Forecast?) {
     Image(
       provider = ImageProvider(iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.fillMaxHeight().width(48.dp),
+      modifier = GlanceModifier.fillMaxHeight().width(56.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
     Column {
@@ -155,7 +155,7 @@ private fun SmallRow(forecast: Forecast?) {
     Image(
       provider = ImageProvider(iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.width(48.dp).fillMaxHeight(),
+      modifier = GlanceModifier.width(56.dp).fillMaxHeight(),
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
     Column(
@@ -212,7 +212,7 @@ private fun Row(forecast: Forecast?) {
     Image(
       provider = ImageProvider(iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.width(48.dp).fillMaxHeight(),
+      modifier = GlanceModifier.width(56.dp).fillMaxHeight(),
     )
     Spacer(modifier = GlanceModifier.width(24.dp))
     Column(
@@ -231,6 +231,7 @@ private fun Row(forecast: Forecast?) {
           style = TextStyle(fontSize = 14.sp),
         )
       }
+      Spacer(modifier = GlanceModifier.defaultWeight())
       Text(
         text = forecast?.todayForecast?.short_text ?: "",
         maxLines = 1,

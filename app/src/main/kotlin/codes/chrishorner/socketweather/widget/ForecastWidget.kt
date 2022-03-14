@@ -116,7 +116,7 @@ private fun TinyRow(forecast: Forecast?) {
     Image(
       provider = ImageProvider(iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.fillMaxHeight().width(56.dp),
+      modifier = GlanceModifier.fillMaxHeight().width(48.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
     Column {
@@ -175,27 +175,7 @@ private fun SmallRow(forecast: Forecast?) {
       )
     }
     Spacer(modifier = GlanceModifier.defaultWeight())
-    Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = GlanceModifier.fillMaxHeight(),
-    ) {
-      Text(
-        text = strings.formatDegrees(forecast?.highTemp),
-        maxLines = 1,
-        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-        modifier = GlanceModifier.padding(top = 6.dp),
-      )
-      Image(
-        provider = ImageProvider(R.drawable.bg_line),
-        contentDescription = null,
-        modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
-      )
-      Text(
-        text = strings.formatDegrees(forecast?.lowTemp),
-        maxLines = 1,
-        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-      )
-    }
+    VerticallyStackedTemps(forecast)
   }
 }
 
@@ -239,27 +219,34 @@ private fun Row(forecast: Forecast?) {
       )
     }
     Spacer(modifier = GlanceModifier.defaultWeight())
-    Column(
-      horizontalAlignment = Alignment.CenterHorizontally,
-      modifier = GlanceModifier.fillMaxHeight(),
-    ) {
-      Text(
-        text = strings.formatDegrees(forecast?.highTemp),
-        maxLines = 1,
-        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-        modifier = GlanceModifier.padding(top = 6.dp),
-      )
-      Image(
-        provider = ImageProvider(R.drawable.bg_line),
-        contentDescription = null,
-        modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
-      )
-      Text(
-        text = strings.formatDegrees(forecast?.lowTemp),
-        maxLines = 1,
-        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
-      )
-    }
+    VerticallyStackedTemps(forecast)
+  }
+}
+
+@Composable
+private fun VerticallyStackedTemps(forecast: Forecast?) {
+  val strings = AndroidStrings(LocalContext.current)
+
+  Column(
+    horizontalAlignment = Alignment.CenterHorizontally,
+    modifier = GlanceModifier.fillMaxHeight(),
+  ) {
+    Text(
+      text = strings.formatDegrees(forecast?.highTemp),
+      maxLines = 1,
+      style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+      modifier = GlanceModifier.padding(top = 6.dp),
+    )
+    Image(
+      provider = ImageProvider(R.drawable.bg_line),
+      contentDescription = null,
+      modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
+    )
+    Text(
+      text = strings.formatDegrees(forecast?.lowTemp),
+      maxLines = 1,
+      style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+    )
   }
 }
 

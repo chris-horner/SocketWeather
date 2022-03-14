@@ -4,7 +4,7 @@ import androidx.annotation.DrawableRes
 import codes.chrishorner.socketweather.R
 
 @DrawableRes
-fun weatherIconRes(descriptor: String, night: Boolean = false): Int = when (descriptor) {
+fun weatherIconRes(descriptor: String?, night: Boolean = false): Int = when (descriptor) {
   "sunny" -> R.drawable.ic_weather_sunny_24dp
   "clear" -> if (night) R.drawable.ic_weather_clear_night_24dp else R.drawable.ic_weather_sunny_24dp
   "mostly_sunny", "partly_cloudy" -> if (night) R.drawable.ic_weather_partly_cloudy_night_24dp else R.drawable.ic_weather_partly_cloudy_24dp

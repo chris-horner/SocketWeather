@@ -26,12 +26,12 @@ class FakeStrings(vararg mapping: Pair<Int, String>) : Strings {
     return "Relative time string"
   }
 
-  override fun formatDegrees(value: Float): String {
-    return String.format("%s°", decimalFormat.format(value))
+  override fun formatDegrees(value: Float?): String {
+    return String.format("%s°", value?.let { decimalFormat.format(it) } ?: "--")
   }
 
-  override fun formatDegrees(value: Int): String {
-    return String.format("%s°", decimalFormat.format(value))
+  override fun formatDegrees(value: Int?): String {
+    return String.format("%s°", value?.let { decimalFormat.format(it) } ?: "--")
   }
 
   override fun formatPercent(value: Int): String {

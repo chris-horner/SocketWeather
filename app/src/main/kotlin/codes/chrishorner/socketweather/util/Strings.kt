@@ -12,8 +12,8 @@ interface Strings {
   operator fun get(@StringRes key: Int): String
   fun get(@StringRes key: Int, vararg formatArgs: Any?): String
   fun getRelativeTimeSpanString(time: Instant): String
-  fun formatDegrees(value: Float): String
-  fun formatDegrees(value: Int): String
+  fun formatDegrees(value: Float?): String
+  fun formatDegrees(value: Int?): String
   fun formatPercent(value: Int): String
 
   class AndroidStrings(context: Context) : Strings {
@@ -31,12 +31,14 @@ interface Strings {
       return DateUtils.getRelativeTimeSpanString(time.toEpochMilli()).toString()
     }
 
-    override fun formatDegrees(value: Float): String {
-      return res.getString(R.string.temperatureFormat, decimalFormat.format(value))
+    override fun formatDegrees(value: Float?): String {
+      val number = if (value == null) "--" else decimalFormat.format(value)
+      return res.getString(R.string.temperatureFormat, number)
     }
 
-    override fun formatDegrees(value: Int): String {
-      return res.getString(R.string.temperatureFormat, decimalFormat.format(value))
+    override fun formatDegrees(value: Int?): String {
+      val number = if (value == null) "--" else decimalFormat.format(value)
+      return res.getString(R.string.temperatureFormat, number)
     }
 
     override fun formatPercent(value: Int): String {

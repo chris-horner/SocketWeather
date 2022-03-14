@@ -67,6 +67,7 @@
   <string name="about_chrisWebsite">Chris\' website</string>
   <string name="about_bomWebsite">Bureau of Meteorology</string>
 
-  <string name="widgetDescription">Forecast from Socket Weather</string>
+  <string name="widget_description">Forecast from Socket Weather</string>
+  <string name="widget_feels">Feels %s</string>
 
 </resources>

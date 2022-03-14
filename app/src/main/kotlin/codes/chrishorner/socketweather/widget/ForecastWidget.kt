@@ -47,11 +47,12 @@ class ForecastWidget : GlanceAppWidget() {
 
   companion object {
     private val TINY_BOX = DpSize(48.dp, 48.dp)
-    private val SMALL_ROW = DpSize(96.dp, 48.dp)
+    private val TINY_ROW = DpSize(96.dp, 48.dp)
+    private val SMALL_ROW = DpSize(160.dp, 48.dp)
   }
 
   override val sizeMode = SizeMode.Responsive(
-    setOf(TINY_BOX, SMALL_ROW)
+    setOf(TINY_BOX, TINY_ROW, SMALL_ROW)
   )
 
   @SuppressLint("StateFlowValueCalledInComposition") // Get the current forecast once per invalidation.
@@ -61,8 +62,9 @@ class ForecastWidget : GlanceAppWidget() {
     val forecast = context.appSingletons.stores.forecast.data.value
 
     when (LocalSize.current) {
-      TINY_BOX -> CurrentConditions(forecast)
-      SMALL_ROW -> CurrentConditionsWithTemps(forecast)
+      TINY_BOX -> TinyBox(forecast)
+      TINY_ROW -> TinyRow(forecast)
+      SMALL_ROW -> SmallRow(forecast)
     }
   }
 }
@@ -76,7 +78,7 @@ private val parentModifier: GlanceModifier
     .padding(8.dp)
 
 @Composable
-private fun CurrentConditions(forecast: Forecast?) {
+private fun TinyBox(forecast: Forecast?) {
   val strings = AndroidStrings(LocalContext.current)
   val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
 
@@ -87,7 +89,7 @@ private fun CurrentConditions(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[R.string.widgetDescription],
+      contentDescription = strings[R.string.widget_description],
       modifier = GlanceModifier.fillMaxWidth().height(44.dp),
     )
     Text(
@@ -100,7 +102,7 @@ private fun CurrentConditions(forecast: Forecast?) {
 }
 
 @Composable
-private fun CurrentConditionsWithTemps(forecast: Forecast?) {
+private fun TinyRow(forecast: Forecast?) {
   val strings = AndroidStrings(LocalContext.current)
   val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
 
@@ -111,7 +113,7 @@ private fun CurrentConditionsWithTemps(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[R.string.widgetDescription],
+      contentDescription = strings[R.string.widget_description],
       modifier = GlanceModifier.fillMaxHeight().width(48.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
@@ -125,15 +127,72 @@ private fun CurrentConditionsWithTemps(forecast: Forecast?) {
         Text(
           text = strings.formatDegrees(forecast?.lowTemp),
           maxLines = 1,
-          style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+          style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
         )
         Spacer(modifier = GlanceModifier.width(8.dp))
         Text(
           text = strings.formatDegrees(forecast?.highTemp),
           maxLines = 1,
-          style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+          style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
         )
       }
+    }
+  }
+}
+
+@Composable
+private fun SmallRow(forecast: Forecast?) {
+  val strings = AndroidStrings(LocalContext.current)
+  val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
+
+  Row(
+    modifier = parentModifier.padding(8.dp),
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+    Image(
+      provider = ImageProvider(iconRes),
+      contentDescription = strings[R.string.widget_description],
+      modifier = GlanceModifier.width(48.dp).fillMaxHeight(),
+    )
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    Column(
+      modifier = GlanceModifier.fillMaxHeight(),
+      verticalAlignment = Alignment.CenterVertically,
+    ) {
+      Text(
+        text = strings.formatDegrees(forecast?.currentTemp?.roundToInt()),
+        maxLines = 1,
+        style = TextStyle(fontSize = 36.sp, fontWeight = FontWeight.Medium),
+      )
+      Spacer(modifier = GlanceModifier.defaultWeight())
+      Text(
+        text = strings.get(R.string.widget_feels, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())),
+        maxLines = 1,
+        style = TextStyle(fontSize = 14.sp),
+      )
+    }
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    Column(
+      horizontalAlignment = Alignment.CenterHorizontally,
+      modifier = GlanceModifier.fillMaxHeight(),
+    ) {
+      Text(
+        text = strings.formatDegrees(forecast?.highTemp),
+        maxLines = 1,
+        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+        modifier = GlanceModifier.padding(top = 6.dp),
+      )
+      Image(
+        provider = ImageProvider(R.drawable.bg_line),
+        contentDescription = null,
+        modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
+      )
+      Text(
+        text = strings.formatDegrees(forecast?.lowTemp),
+        maxLines = 1,
+        style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+      )
     }
   }
 }

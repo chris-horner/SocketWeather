@@ -2,7 +2,7 @@
 
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:description="@string/widgetDescription"
+    android:description="@string/widget_description"
     android:maxResizeHeight="450dp"
     android:maxResizeWidth="570dp"
     android:minHeight="110dp"

@@ -28,7 +28,6 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.layout.padding
 import androidx.glance.layout.width
-import androidx.glance.layout.wrapContentHeight
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
@@ -36,7 +35,10 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.data.Forecast
+import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
+import java.time.format.TextStyle.SHORT
+import java.util.Locale
 import kotlin.math.roundToInt
 
 class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -50,10 +52,13 @@ class ForecastWidget : GlanceAppWidget() {
     private val TINY_ROW = DpSize(96.dp, 48.dp)
     private val SMALL_ROW = DpSize(144.dp, 48.dp)
     private val ROW = DpSize(220.dp, 48.dp)
+    private val TINY_COLUMN = DpSize(48.dp, 160.dp)
+    private val SMALL_COLUMN = DpSize(48.dp, 260.dp)
+    private val COLUMN = DpSize(48.dp, 360.dp)
   }
 
   override val sizeMode = SizeMode.Responsive(
-    setOf(TINY_BOX, TINY_ROW, SMALL_ROW, ROW)
+    setOf(TINY_BOX, TINY_ROW, SMALL_ROW, ROW, TINY_COLUMN, SMALL_COLUMN, COLUMN)
   )
 
   @SuppressLint("StateFlowValueCalledInComposition") // Get the current forecast once per invalidation.
@@ -63,10 +68,13 @@ class ForecastWidget : GlanceAppWidget() {
     val forecast = context.appSingletons.stores.forecast.data.value
 
     when (LocalSize.current) {
-      TINY_BOX -> TinyBox(forecast)
+      TINY_BOX -> Column(forecast, itemCount = 1)
       TINY_ROW -> TinyRow(forecast)
       SMALL_ROW -> SmallRow(forecast)
       ROW -> Row(forecast)
+      TINY_COLUMN -> Column(forecast, itemCount = 2)
+      SMALL_COLUMN -> Column(forecast, itemCount = 3)
+      COLUMN -> Column(forecast, itemCount = 4)
     }
   }
 }
@@ -78,30 +86,6 @@ private val parentModifier: GlanceModifier
     .appWidgetBackground()
     .appWidgetBackgroundRadius()
     .padding(8.dp)
-
-@Composable
-private fun TinyBox(forecast: Forecast?) {
-  val strings = AndroidStrings(LocalContext.current)
-  val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
-
-  Column(
-    modifier = parentModifier,
-    horizontalAlignment = Alignment.CenterHorizontally,
-    verticalAlignment = Alignment.CenterVertically,
-  ) {
-    Image(
-      provider = ImageProvider(iconRes),
-      contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.fillMaxWidth().height(44.dp),
-    )
-    Text(
-      text = strings.formatDegrees(forecast?.currentTemp?.roundToInt()),
-      maxLines = 1,
-      style = TextStyle(fontSize = 20.sp, fontWeight = FontWeight.Medium),
-      modifier = GlanceModifier.wrapContentHeight(),
-    )
-  }
-}
 
 @Composable
 private fun TinyRow(forecast: Forecast?) {
@@ -220,6 +204,84 @@ private fun Row(forecast: Forecast?) {
     }
     Spacer(modifier = GlanceModifier.defaultWeight())
     VerticallyStackedTemps(forecast)
+  }
+}
+
+@Composable
+private fun Column(forecast: Forecast?, itemCount: Int) {
+  val strings = AndroidStrings(LocalContext.current)
+
+  Column(
+    modifier = parentModifier,
+    horizontalAlignment = Alignment.CenterHorizontally,
+    verticalAlignment = Alignment.CenterVertically,
+  ) {
+
+    Spacer(modifier = GlanceModifier.defaultWeight())
+
+    // Glance caps widgets to 10 children max...
+    repeat(itemCount.coerceAtMost(4)) { index ->
+
+      if (index == 0) {
+        ColumnEntry(
+          strings,
+          title = strings[R.string.widget_today],
+          iconDescriptor = forecast?.iconDescriptor,
+          tempMin = forecast?.lowTemp,
+          tempMax = forecast?.highTemp,
+          isNight = forecast?.night ?: false,
+        )
+      } else {
+        val dateForecast = forecast?.upcomingForecasts?.getOrNull(index - 1)
+        val date = forecast?.location?.run { dateForecast?.date?.atZone(timezone) }
+        val title = date?.dayOfWeek?.getDisplayName(SHORT, Locale.getDefault())?.uppercase() ?: "--"
+        ColumnEntry(
+          strings,
+          title,
+          iconDescriptor = dateForecast?.icon_descriptor,
+          tempMin = dateForecast?.temp_min,
+          tempMax = dateForecast?.temp_max,
+        )
+      }
+
+      Spacer(modifier = GlanceModifier.defaultWeight())
+    }
+  }
+}
+
+@Composable
+private fun ColumnEntry(
+  strings: Strings,
+  title: String,
+  iconDescriptor: String?,
+  tempMin: Int?,
+  tempMax: Int?,
+  isNight: Boolean = false,
+) {
+  Column(horizontalAlignment = Alignment.CenterHorizontally) {
+    Text(
+      text = title,
+      maxLines = 1,
+      style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold),
+    )
+    Image(
+      provider = ImageProvider(weatherIconRes(iconDescriptor, isNight)),
+      contentDescription = strings[R.string.widget_description],
+      modifier = GlanceModifier.fillMaxWidth().height(36.dp),
+    )
+    Row(verticalAlignment = Alignment.CenterVertically) {
+      Text(
+        text = strings.formatDegrees(tempMin),
+        maxLines = 1,
+        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+      )
+      Spacer(modifier = GlanceModifier.width(4.dp))
+      Text(
+        text = strings.formatDegrees(tempMax),
+        maxLines = 1,
+        style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+      )
+    }
   }
 }
 

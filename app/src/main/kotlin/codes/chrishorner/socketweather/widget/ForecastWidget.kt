@@ -33,10 +33,9 @@ import androidx.glance.layout.size
 import androidx.glance.layout.width
 import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.R.drawable
-import codes.chrishorner.socketweather.R.string
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.data.Forecast
@@ -66,10 +65,11 @@ class ForecastWidget : GlanceAppWidget() {
     private val COLUMN = DpSize(48.dp, 360.dp)
     private val WIDE_BOX = DpSize(144.dp, 160.dp)
     private val WIDER_BOX = DpSize(280.dp, 160.dp)
+    private val BOX = DpSize(144.dp, 240.dp)
   }
 
   override val sizeMode = SizeMode.Responsive(
-    setOf(TINY_BOX, TINY_ROW, SMALL_ROW, ROW, TINY_COLUMN, SMALL_COLUMN, COLUMN, WIDE_BOX, WIDER_BOX)
+    setOf(TINY_BOX, TINY_ROW, SMALL_ROW, ROW, TINY_COLUMN, SMALL_COLUMN, COLUMN, WIDE_BOX, WIDER_BOX, BOX)
   )
 
   @SuppressLint("StateFlowValueCalledInComposition") // Get the current forecast once per invalidation.
@@ -89,6 +89,7 @@ class ForecastWidget : GlanceAppWidget() {
         COLUMN -> Column(forecast, itemCount = 4)
         WIDE_BOX -> WideBox(forecast, hourlyCount = 4)
         WIDER_BOX -> WideBox(forecast, hourlyCount = 5)
+        BOX -> Box(forecast, hourlyCount = 4, dayCount = 2)
       }
     }
   }
@@ -114,7 +115,7 @@ private fun TinyRow(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[string.widget_description],
+      contentDescription = strings[R.string.widget_description],
       modifier = GlanceModifier.fillMaxHeight().width(48.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
@@ -141,7 +142,7 @@ private fun SmallRow(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[string.widget_description],
+      contentDescription = strings[R.string.widget_description],
       modifier = GlanceModifier.width(56.dp).fillMaxHeight(),
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -151,7 +152,7 @@ private fun SmallRow(forecast: Forecast?) {
     ) {
       LargeTemp(forecast?.currentTemp?.roundToInt())
       Spacer(modifier = GlanceModifier.defaultWeight())
-      SmallText(strings.get(string.widget_feels_short, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())))
+      SmallText(strings.get(R.string.widget_feels_short, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())))
     }
     Spacer(modifier = GlanceModifier.defaultWeight())
     VerticalLowToHighTemps(forecast, modifier = GlanceModifier.padding(top = 6.dp))
@@ -213,6 +214,26 @@ private fun WideBox(forecast: Forecast?, hourlyCount: Int) {
 }
 
 @Composable
+private fun Box(forecast: Forecast?, hourlyCount: Int, dayCount: Int) {
+
+  val timezone = forecast?.location?.timezone ?: ZoneId.systemDefault()
+  val dayForecasts = forecast?.upcomingForecasts.orEmpty()
+  val maxDays = dayCount.coerceAtMost(dayForecasts.size)
+  val rowCount = maxDays.coerceAtMost(10) // Glance only supports up to 10 children per container.
+  val upcomingForecasts = dayForecasts.take(rowCount).map { it.formatForWidget(LocalStrings.current, timezone) }
+
+  Column(modifier = parentModifier.padding(8.dp)) {
+    CurrentConditionsRow(forecast)
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    HourlyForecastRow(forecast, entryCount = hourlyCount)
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    upcomingForecasts.take(rowCount).forEach { upcomingForecast ->
+      UpcomingForecastRow(upcomingForecast)
+    }
+  }
+}
+
+@Composable
 private fun CurrentConditionsRow(forecast: Forecast?) {
   val strings = LocalStrings.current
   val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
@@ -224,13 +245,13 @@ private fun CurrentConditionsRow(forecast: Forecast?) {
     Column(modifier = GlanceModifier.defaultWeight().padding(top = 4.dp)) {
       LargeText(forecast?.location?.name ?: "", fontWeight = FontWeight.Medium)
       SmallText(forecast?.todayForecast?.short_text ?: "")
-      SmallText(strings.get(string.widget_feels_long, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())))
+      SmallText(strings.get(R.string.widget_feels_long, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())))
     }
     Column(horizontalAlignment = Alignment.End) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
           provider = ImageProvider(iconRes),
-          contentDescription = strings[string.widget_description],
+          contentDescription = strings[R.string.widget_description],
           modifier = GlanceModifier.size(40.dp),
         )
         Spacer(modifier = GlanceModifier.width(8.dp))
@@ -254,6 +275,32 @@ private fun HourlyForecastRow(forecast: Forecast?, entryCount: Int) {
           modifier = GlanceModifier.padding(start = padding),
         )
       }
+  }
+}
+
+@Composable
+private fun UpcomingForecastRow(forecast: WidgetUpcomingForecast) {
+
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = GlanceModifier.fillMaxWidth(),
+  ) {
+    RegularText(forecast.day)
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    Image(
+      provider = ImageProvider(forecast.iconRes),
+      contentDescription = LocalStrings.current[R.string.widget_description],
+      modifier = GlanceModifier.size(24.dp),
+    )
+    Spacer(modifier = GlanceModifier.width(12.dp))
+    // TODO: Update widths to use sp.
+    RegularTemp(forecast.minTemp, modifier = GlanceModifier.width(28.dp))
+    Image(
+      provider = ImageProvider(R.drawable.bg_line),
+      contentDescription = null,
+      modifier = GlanceModifier.height(4.dp).width(32.dp).padding(horizontal = 6.dp),
+    )
+    RegularTemp(forecast.maxTemp, modifier = GlanceModifier.width(28.dp))
   }
 }
 
@@ -305,7 +352,7 @@ private fun HorizontalLowToHighTemps(forecast: Forecast?, modifier: GlanceModifi
   ) {
     SmallTemp(temp = forecast?.lowTemp)
     Image(
-      provider = ImageProvider(drawable.bg_line),
+      provider = ImageProvider(R.drawable.bg_line),
       contentDescription = null,
       modifier = GlanceModifier.height(4.dp).defaultWeight().padding(horizontal = 6.dp),
     )
@@ -374,6 +421,16 @@ private fun SmallText(
   Text(
     text = text,
     style = TextStyle(fontSize = 14.sp, fontWeight = fontWeight),
+    modifier = modifier,
+  )
+}
+
+@Composable
+private fun RegularTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
+  Text(
+    text = LocalStrings.current.formatDegrees(temp),
+    maxLines = 1,
+    style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End, fontWeight = FontWeight.Medium),
     modifier = modifier,
   )
 }

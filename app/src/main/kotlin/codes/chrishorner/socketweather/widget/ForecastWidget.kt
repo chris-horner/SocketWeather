@@ -5,7 +5,6 @@ import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -18,8 +17,8 @@ import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
 import androidx.glance.appwidget.appWidgetBackground
-import androidx.glance.appwidget.background
 import androidx.glance.appwidget.cornerRadius
+import androidx.glance.background
 import androidx.glance.layout.Alignment
 import androidx.glance.layout.Column
 import androidx.glance.layout.Row
@@ -35,6 +34,7 @@ import androidx.glance.text.FontWeight
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
+import androidx.glance.unit.ColorProvider
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.common.weatherIconRes
@@ -98,7 +98,7 @@ class ForecastWidget : GlanceAppWidget() {
 private val parentModifier: GlanceModifier
   @Composable get() = GlanceModifier
     .fillMaxSize()
-    .background(day = Color.White, night = Color.DarkGray)
+    .background(ImageProvider(R.drawable.bg_widget))
     .appWidgetBackground()
     .appWidgetBackgroundRadius()
     .padding(8.dp)
@@ -243,7 +243,7 @@ private fun CurrentConditionsRow(forecast: Forecast?) {
     modifier = GlanceModifier.fillMaxWidth(),
   ) {
     Column(modifier = GlanceModifier.defaultWeight().padding(top = 4.dp)) {
-      LargeText(forecast?.location?.name ?: "", fontWeight = FontWeight.Medium)
+      TitleText(forecast?.location?.name ?: "", fontWeight = FontWeight.Medium)
       SmallText(forecast?.todayForecast?.short_text ?: "")
       SmallText(strings.get(R.string.widget_feels_long, strings.formatDegrees(forecast?.tempFeelsLike?.roundToInt())))
     }
@@ -296,7 +296,7 @@ private fun UpcomingForecastRow(forecast: WidgetUpcomingForecast) {
     // TODO: Update widths to use sp.
     RegularTemp(forecast.minTemp, modifier = GlanceModifier.width(28.dp))
     Image(
-      provider = ImageProvider(R.drawable.bg_line),
+      provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
       modifier = GlanceModifier.height(4.dp).width(32.dp).padding(horizontal = 6.dp),
     )
@@ -336,7 +336,7 @@ private fun VerticalLowToHighTemps(forecast: Forecast?, modifier: GlanceModifier
   ) {
     SmallTemp(temp = forecast?.highTemp)
     Image(
-      provider = ImageProvider(R.drawable.bg_line),
+      provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
       modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
     )
@@ -352,7 +352,7 @@ private fun HorizontalLowToHighTemps(forecast: Forecast?, modifier: GlanceModifi
   ) {
     SmallTemp(temp = forecast?.lowTemp)
     Image(
-      provider = ImageProvider(R.drawable.bg_line),
+      provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
       modifier = GlanceModifier.height(4.dp).defaultWeight().padding(horizontal = 6.dp),
     )
@@ -390,7 +390,11 @@ private fun TinyTemp(temp: Int?) {
   Text(
     text = LocalStrings.current.formatDegrees(temp),
     maxLines = 1,
-    style = TextStyle(fontSize = 12.sp, fontWeight = FontWeight.Medium),
+    style = TextStyle(
+      fontSize = 12.sp,
+      fontWeight = FontWeight.Medium,
+      color = ColorProvider(R.color.widgetOnBackground),
+    ),
   )
 }
 
@@ -398,7 +402,11 @@ private fun TinyTemp(temp: Int?) {
 private fun TinyTitle(text: String) {
   Text(
     text = text,
-    style = TextStyle(fontSize = 10.sp, fontWeight = FontWeight.Bold),
+    style = TextStyle(
+      fontSize = 10.sp,
+      fontWeight = FontWeight.Bold,
+      color = ColorProvider(R.color.widgetOnBackground)
+    ),
   )
 }
 
@@ -407,7 +415,11 @@ private fun SmallTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
   Text(
     text = LocalStrings.current.formatDegrees(temp),
     maxLines = 1,
-    style = TextStyle(fontSize = 14.sp, fontWeight = FontWeight.Medium),
+    style = TextStyle(
+      fontSize = 14.sp,
+      fontWeight = FontWeight.Medium,
+      color = ColorProvider(R.color.widgetOnBackground),
+    ),
     modifier = modifier
   )
 }
@@ -420,7 +432,11 @@ private fun SmallText(
 ) {
   Text(
     text = text,
-    style = TextStyle(fontSize = 14.sp, fontWeight = fontWeight),
+    style = TextStyle(
+      fontSize = 14.sp,
+      fontWeight = fontWeight,
+      color = ColorProvider(R.color.widgetOnBackgroundSecondary),
+    ),
     modifier = modifier,
   )
 }
@@ -430,7 +446,12 @@ private fun RegularTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
   Text(
     text = LocalStrings.current.formatDegrees(temp),
     maxLines = 1,
-    style = TextStyle(fontSize = 18.sp, textAlign = TextAlign.End, fontWeight = FontWeight.Medium),
+    style = TextStyle(
+      fontSize = 18.sp,
+      textAlign = TextAlign.End,
+      fontWeight = FontWeight.Medium,
+      color = ColorProvider(R.color.widgetOnBackground),
+    ),
     modifier = modifier,
   )
 }
@@ -440,7 +461,11 @@ private fun LargeTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
   Text(
     text = LocalStrings.current.formatDegrees(temp),
     maxLines = 1,
-    style = TextStyle(fontSize = 34.sp, fontWeight = FontWeight.Medium),
+    style = TextStyle(
+      fontSize = 34.sp,
+      fontWeight = FontWeight.Medium,
+      color = ColorProvider(R.color.widgetAccent),
+    ),
     modifier = modifier,
   )
 }
@@ -453,20 +478,28 @@ private fun RegularText(
 ) {
   Text(
     text = text,
-    style = TextStyle(fontSize = 18.sp, fontWeight = fontWeight),
+    style = TextStyle(
+      fontSize = 18.sp,
+      fontWeight = fontWeight,
+      color = ColorProvider(R.color.widgetOnBackgroundSecondary),
+    ),
     modifier = modifier,
   )
 }
 
 @Composable
-private fun LargeText(
+private fun TitleText(
   text: String,
   modifier: GlanceModifier = GlanceModifier,
   fontWeight: FontWeight = FontWeight.Normal,
 ) {
   Text(
     text = text,
-    style = TextStyle(fontSize = 20.sp, fontWeight = fontWeight),
+    style = TextStyle(
+      fontSize = 20.sp,
+      fontWeight = fontWeight,
+      color = ColorProvider(R.color.widgetAccent),
+    ),
     modifier = modifier,
   )
 }

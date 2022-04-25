@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <color name="widgetBackground">#121212</color>
+  <color name="widgetOnBackground">#ffe6e1e5</color>
+  <color name="widgetOnBackgroundSecondary">#ffcac4d0</color>
+  <!-- Use underscore to match color resource file. -->
+  <color name="widget_line">#30e6e1e5</color>
+  <color name="widgetAccent">#ffc1e4ee</color>
+
+</resources>

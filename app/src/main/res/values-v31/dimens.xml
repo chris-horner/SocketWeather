@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<resources>
+
+  <dimen name="widgetBackgroundCornerRadius">@android:dimen/system_app_widget_background_radius</dimen>
+  <dimen name="widgetInnerCornerRadius">@android:dimen/system_app_widget_inner_radius</dimen>
+
+</resources>

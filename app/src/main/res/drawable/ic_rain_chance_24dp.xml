@@ -4,7 +4,7 @@
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24"
-    android:tint="?android:colorControlNormal"
+    android:tint="@color/widgetAccent"
     >
   <path
       android:fillColor="#FF00FF"
@@ -21,4 +21,5 @@
       android:fillType="nonZero"
       android:pathData="M15.7267,9.9758C14.4729,9.9758 13.4415,8.9444 13.4415,7.6906C13.4415,6.1671 15.7267,3.5962 15.7267,3.5962C15.7267,3.5962 18.0119,6.1671 18.0119,7.6906C18.0119,8.9444 16.9805,9.9758 15.7267,9.9758Z"
       />
+
 </vector>

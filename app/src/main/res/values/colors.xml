@@ -8,7 +8,8 @@
   <color name="translucentGrey">#5555</color>
   <color name="transparent">#00000000</color>
 
-  <color name="widgetBackground">#fffffbfe</color>
+  <color name="widgetBackground">#fffbffff</color>
+  <color name="widgetBackgroundInner">#ffbfedf2</color>
   <color name="widgetOnBackground">#ff1c1b1f</color>
   <color name="widgetOnBackgroundSecondary">#ff49454f</color>
   <!-- Use underscore to match color resource file. -->

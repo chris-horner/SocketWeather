@@ -3,6 +3,7 @@
 <resources>
 
   <color name="widgetBackground">#121212</color>
+  <color name="widgetBackgroundInner">#272727</color>
   <color name="widgetOnBackground">#ffe6e1e5</color>
   <color name="widgetOnBackgroundSecondary">#ffcac4d0</color>
   <!-- Use underscore to match color resource file. -->

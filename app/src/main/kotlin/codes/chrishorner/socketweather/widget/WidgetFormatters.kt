@@ -16,6 +16,7 @@ data class WidgetDateForecast(
   val day: String,
   val dayShort: String,
   @DrawableRes val iconRes: Int,
+  val description: String?,
   val minTemp: Int?,
   val maxTemp: Int?,
 )
@@ -23,6 +24,7 @@ data class WidgetDateForecast(
 data class WidgetHourlyForecast(
   val time: String,
   @DrawableRes val iconRes: Int,
+  val description: String?,
   val temp: Int?
 )
 
@@ -40,6 +42,7 @@ fun Forecast.getWidgetDateForecasts(
     day = strings[R.string.widget_today],
     dayShort = strings[R.string.widget_today],
     iconRes = weatherIconRes(todayForecast.icon_descriptor, night),
+    description = todayForecast.short_text,
     minTemp = lowTemp,
     maxTemp = highTemp,
   )
@@ -57,6 +60,7 @@ fun Forecast.getWidgetDateForecasts(
       day = dayText,
       dayShort = zonedDate.dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
       iconRes = weatherIconRes(it.icon_descriptor),
+      description = it.short_text,
       minTemp = it.temp_min,
       maxTemp = it.temp_max,
     )
@@ -73,6 +77,7 @@ fun Forecast.getWidgetHourlyForecasts(count: Int): List<WidgetHourlyForecast> {
     WidgetHourlyForecast(
       time = TimeFormatter.format(it.time.atZone(location.timezone)).uppercase(),
       iconRes = weatherIconRes(it.icon_descriptor, it.is_night),
+      description = null, // TODO: Get this data from BOM.
       temp = it.temp,
     )
   }

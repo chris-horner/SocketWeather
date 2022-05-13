@@ -48,7 +48,6 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
   override val glanceAppWidget = ForecastWidget()
 }
 
-// TODO: Fix content descriptions in this file.
 class ForecastWidget : GlanceAppWidget() {
 
   companion object {
@@ -144,7 +143,6 @@ private val parentModifier: GlanceModifier
 
 @Composable
 private fun TinyRow(forecast: Forecast?) {
-  val strings = LocalStrings.current
   val iconRes = weatherIconRes(forecast?.iconDescriptor, night = forecast?.night ?: false)
 
   Row(
@@ -154,7 +152,7 @@ private fun TinyRow(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[R.string.widget_description],
+      contentDescription = forecast?.todayForecast?.short_text,
       modifier = GlanceModifier.fillMaxHeight().width(48.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
@@ -272,7 +270,7 @@ private fun CurrentConditionsRow(forecast: Forecast?) {
       Row(verticalAlignment = Alignment.CenterVertically) {
         Image(
           provider = ImageProvider(iconRes),
-          contentDescription = strings[R.string.widget_description],
+          contentDescription = forecast?.todayForecast?.short_text,
           modifier = GlanceModifier.size(40.dp),
         )
         Spacer(modifier = GlanceModifier.width(8.dp))
@@ -295,7 +293,7 @@ private fun SmallCurrentConditionsRow(forecast: Forecast?) {
   ) {
     Image(
       provider = ImageProvider(iconRes),
-      contentDescription = strings[R.string.widget_description],
+      contentDescription = forecast?.todayForecast?.short_text,
       modifier = GlanceModifier.size(56.dp)
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -341,7 +339,7 @@ private fun UpcomingForecastRow(
     Spacer(modifier = GlanceModifier.defaultWeight())
     Image(
       provider = ImageProvider(forecast.iconRes),
-      contentDescription = LocalStrings.current[R.string.widget_description],
+      contentDescription = forecast.description,
       modifier = GlanceModifier.size(24.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
@@ -358,12 +356,11 @@ private fun UpcomingForecastRow(
 
 @Composable
 private fun ColumnEntry(dateForecast: WidgetDateForecast) {
-  val strings = LocalStrings.current
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
     TinyTitle(dateForecast.dayShort.uppercase())
     Image(
       provider = ImageProvider(dateForecast.iconRes),
-      contentDescription = strings[R.string.widget_description],
+      contentDescription = dateForecast.description,
       modifier = GlanceModifier.fillMaxWidth().height(36.dp),
     )
     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -376,14 +373,13 @@ private fun ColumnEntry(dateForecast: WidgetDateForecast) {
 
 @Composable
 private fun WideColumnEntry(dateForecast: WidgetDateForecast) {
-  val strings = LocalStrings.current
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = GlanceModifier.fillMaxWidth(),
   ) {
     Image(
       provider = ImageProvider(dateForecast.iconRes),
-      contentDescription = strings[R.string.widget_description],
+      contentDescription = dateForecast.description,
       modifier = GlanceModifier.size(44.dp),
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -443,7 +439,7 @@ private fun HourlyForecastEntry(entry: WidgetHourlyForecast, modifier: GlanceMod
     SmallText(entry.time)
     Image(
       provider = ImageProvider(entry.iconRes),
-      contentDescription = null,
+      contentDescription = entry.description,
       modifier = GlanceModifier.size(32.dp).padding(vertical = 4.dp)
     )
     SmallTemp(entry.temp)

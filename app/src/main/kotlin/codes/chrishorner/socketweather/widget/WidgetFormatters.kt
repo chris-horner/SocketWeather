@@ -11,6 +11,30 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL
 import java.time.format.TextStyle.SHORT
 import java.util.Locale
+import kotlin.math.roundToInt
+
+data class WidgetForecast(
+  val currentConditions: WidgetCurrentConditions,
+  val hourlyForecasts: List<WidgetHourlyForecast>,
+  val dateForecasts: List<WidgetDateForecast>,
+)
+
+data class WidgetCurrentConditions(
+  @DrawableRes val iconRes: Int,
+  val location: String,
+  val description: String,
+  val feelsLikeText: String,
+  val currentTemp: Int,
+  val minTemp: Int,
+  val maxTemp: Int
+)
+
+data class WidgetHourlyForecast(
+  val time: String,
+  @DrawableRes val iconRes: Int,
+  val description: String?,
+  val temp: Int?
+)
 
 data class WidgetDateForecast(
   val day: String,
@@ -21,20 +45,19 @@ data class WidgetDateForecast(
   val maxTemp: Int?,
 )
 
-data class WidgetHourlyForecast(
-  val time: String,
-  @DrawableRes val iconRes: Int,
-  val description: String?,
-  val temp: Int?
+fun Forecast.formatForWidget(
+  strings: Strings,
+  clock: Clock = Clock.systemDefaultZone(),
+) = WidgetForecast(
+  currentConditions = getWidgetCurrentConditions(strings),
+  hourlyForecasts = getWidgetHourlyForecasts(),
+  dateForecasts = getWidgetDateForecasts(strings, clock),
 )
 
-fun Forecast.getWidgetDateForecasts(
+private fun Forecast.getWidgetDateForecasts(
   strings: Strings,
-  count: Int,
   clock: Clock = Clock.systemDefaultZone(),
 ): List<WidgetDateForecast> {
-  if (count <= 0) return emptyList()
-
   val timezone = location.timezone
   val currentDate = LocalDate.now(clock.withZone(timezone))
 
@@ -47,7 +70,7 @@ fun Forecast.getWidgetDateForecasts(
     maxTemp = highTemp,
   )
 
-  val upcomingEntries = upcomingForecasts.take(count - 1).mapIndexed { index, it ->
+  val upcomingEntries = upcomingForecasts.mapIndexed { index, it ->
     val zonedDate = it.date.atZone(timezone).toLocalDate()
 
     val dayText = if (index == 0 && zonedDate == currentDate.plusDays(1)) {
@@ -66,14 +89,11 @@ fun Forecast.getWidgetDateForecasts(
     )
   }
 
-  return buildList(count) {
-    add(todayEntry)
-    addAll(upcomingEntries)
-  }
+  return listOf(todayEntry) + upcomingEntries
 }
 
-fun Forecast.getWidgetHourlyForecasts(count: Int): List<WidgetHourlyForecast> {
-  return hourlyForecasts.take(count).map {
+private fun Forecast.getWidgetHourlyForecasts(): List<WidgetHourlyForecast> {
+  return hourlyForecasts.map {
     WidgetHourlyForecast(
       time = TimeFormatter.format(it.time.atZone(location.timezone)).uppercase(),
       iconRes = weatherIconRes(it.icon_descriptor, it.is_night),
@@ -81,6 +101,18 @@ fun Forecast.getWidgetHourlyForecasts(count: Int): List<WidgetHourlyForecast> {
       temp = it.temp,
     )
   }
+}
+
+private fun Forecast.getWidgetCurrentConditions(strings: Strings): WidgetCurrentConditions {
+  return WidgetCurrentConditions(
+    iconRes = weatherIconRes(iconDescriptor, night = night),
+    location = location.name,
+    description = todayForecast.short_text ?: "",
+    feelsLikeText = strings.get(R.string.widget_feels_long, strings.formatDegrees(tempFeelsLike?.roundToInt())),
+    currentTemp = currentTemp.roundToInt(),
+    minTemp = lowTemp,
+    maxTemp = highTemp,
+  )
 }
 
 private val TimeFormatter = DateTimeFormatter.ofPattern("h a")

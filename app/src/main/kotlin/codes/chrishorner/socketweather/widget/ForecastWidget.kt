@@ -360,7 +360,7 @@ private fun UpcomingForecastRow(
 private fun ColumnEntry(dateForecast: WidgetDateForecast) {
   val strings = LocalStrings.current
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    TinyTitle(dateForecast.day.uppercase())
+    TinyTitle(dateForecast.dayShort.uppercase())
     Image(
       provider = ImageProvider(dateForecast.iconRes),
       contentDescription = strings[R.string.widget_description],
@@ -384,7 +384,7 @@ private fun WideColumnEntry(dateForecast: WidgetDateForecast) {
     Image(
       provider = ImageProvider(dateForecast.iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.size(48.dp),
+      modifier = GlanceModifier.size(44.dp),
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
     Column {

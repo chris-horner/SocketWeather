@@ -38,7 +38,7 @@ fun Forecast.getWidgetDateForecasts(
 
   val todayEntry = WidgetDateForecast(
     day = strings[R.string.widget_today],
-    dayShort = todayForecast.date.atZone(timezone).dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
+    dayShort = strings[R.string.widget_today],
     iconRes = weatherIconRes(todayForecast.icon_descriptor, night),
     minTemp = lowTemp,
     maxTemp = highTemp,

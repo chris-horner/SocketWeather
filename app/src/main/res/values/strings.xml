@@ -70,6 +70,7 @@
   <string name="widget_description">Forecast from Socket Weather</string>
   <string name="widget_feels_short">Feels %s</string>
   <string name="widget_feels_long">Feels like %s</string>
-  <string name="widget_today">TODAY</string>
+  <string name="widget_today">Today</string>
+  <string name="widget_tomorrow">Tomorrow</string>
 
 </resources>

@@ -45,8 +45,6 @@ import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle.SHORT
-import java.util.Locale
 import kotlin.math.roundToInt
 
 class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -57,19 +55,34 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
 class ForecastWidget : GlanceAppWidget() {
 
   companion object {
-    private val TINY_BOX = DpSize(48.dp, 48.dp)
-    private val TINY_ROW = DpSize(96.dp, 48.dp)
-    private val SMALL_ROW = DpSize(144.dp, 48.dp)
-    private val ROW = DpSize(220.dp, 48.dp)
-    private val TINY_COLUMN = DpSize(48.dp, 160.dp)
-    private val SMALL_COLUMN = DpSize(48.dp, 260.dp)
-    private val COLUMN = DpSize(48.dp, 360.dp)
-    private val SHORT_BOX = DpSize(96.dp, 96.dp)
-    private val WIDE_SHORT_BOX = DpSize(144.dp, 160.dp)
-    private val WIDER_SHORT_BOX = DpSize(280.dp, 160.dp)
-    private val BOX = DpSize(144.dp, 240.dp)
-    private val BIG_BOX = DpSize(280.dp, 240.dp)
-    private val TALL_BIG_BOX = DpSize(280.dp, 340.dp)
+    private val WIDTH_1U = 48.dp
+    private val WIDTH_2U = 96.dp
+    private val WIDTH_3U = 180.dp
+    private val WIDTH_4U = 220.dp
+    private val WIDTH_5U = 280.dp
+
+    private val HEIGHT_1U = 48.dp
+    private val HEIGHT_2U = 160.dp
+    private val HEIGHT_3U = 260.dp
+    private val HEIGHT_4U = 360.dp
+
+    private val TINY_BOX = DpSize(WIDTH_1U, HEIGHT_1U)
+    private val TINY_ROW = DpSize(WIDTH_2U, HEIGHT_1U)
+    private val SMALL_ROW = DpSize(WIDTH_3U, HEIGHT_1U)
+    private val ROW = DpSize(WIDTH_4U, HEIGHT_1U)
+    private val TINY_COLUMN = DpSize(WIDTH_1U, HEIGHT_2U)
+    private val SMALL_COLUMN = DpSize(WIDTH_1U, HEIGHT_3U)
+    private val COLUMN = DpSize(WIDTH_1U, HEIGHT_4U)
+    private val WIDE_TINY_COLUMN = DpSize(WIDTH_2U, HEIGHT_2U)
+    private val WIDE_SMALL_COLUMN = DpSize(WIDTH_2U, HEIGHT_3U)
+    private val WIDE_COLUMN = DpSize(WIDTH_2U, HEIGHT_4U)
+    private val SHORT_BOX = DpSize(WIDTH_2U, HEIGHT_2U)
+    private val WIDE_SHORT_BOX = DpSize(WIDTH_3U, HEIGHT_2U)
+    private val WIDER_SHORT_BOX = DpSize(WIDTH_5U, HEIGHT_2U)
+    private val BOX = DpSize(WIDTH_4U, HEIGHT_3U)
+    private val TALL_BOX = DpSize(WIDTH_4U, HEIGHT_4U)
+    private val BIG_BOX = DpSize(WIDTH_5U, HEIGHT_3U)
+    private val TALL_BIG_BOX = DpSize(WIDTH_5U, HEIGHT_4U)
   }
 
   override val sizeMode = SizeMode.Responsive(
@@ -81,12 +94,14 @@ class ForecastWidget : GlanceAppWidget() {
       TINY_COLUMN,
       SMALL_COLUMN,
       COLUMN,
-      /*
+      WIDE_TINY_COLUMN,
+      WIDE_SMALL_COLUMN,
+      WIDE_COLUMN,
       SHORT_BOX,
       WIDE_SHORT_BOX,
       WIDER_SHORT_BOX,
-       */
       BOX,
+      TALL_BOX,
       BIG_BOX,
       TALL_BIG_BOX
     )
@@ -107,10 +122,14 @@ class ForecastWidget : GlanceAppWidget() {
         TINY_COLUMN -> Column(forecast, itemCount = 2)
         SMALL_COLUMN -> Column(forecast, itemCount = 3)
         COLUMN -> Column(forecast, itemCount = 4)
-        SHORT_BOX -> ShortBox(forecast, isSmall = true, hourlyCount = 3)
+        WIDE_TINY_COLUMN -> Column(forecast, itemCount = 2, wide = true)
+        WIDE_SMALL_COLUMN -> Column(forecast, itemCount = 3, wide = true)
+        WIDE_COLUMN -> Column(forecast, itemCount = 4, wide = true)
+        SHORT_BOX -> Column(forecast, itemCount = 2)
         WIDE_SHORT_BOX -> ShortBox(forecast, hourlyCount = 4)
         WIDER_SHORT_BOX -> ShortBox(forecast, hourlyCount = 5)
-        BOX -> Box(forecast, hourlyCount = 4, dayCount = 2)
+        BOX -> Box(forecast, small = true, hourlyCount = 4, dayCount = 3)
+        TALL_BOX -> Box(forecast, small = true, hourlyCount = 4, dayCount = 6)
         BIG_BOX -> Box(forecast, hourlyCount = 5, dayCount = 3)
         TALL_BIG_BOX -> Box(forecast, hourlyCount = 5, dayCount = 6)
       }
@@ -162,53 +181,41 @@ private fun SmallRow(forecast: Forecast?) {
 
 @Composable
 private fun Row(forecast: Forecast?) {
-  Box(modifier = parentModifier.padding(8.dp)) {
+  Box(modifier = parentModifier.padding(8.dp), contentAlignment = Alignment.Center) {
     CurrentConditionsRow(forecast)
   }
 }
 
 @Composable
-private fun Column(forecast: Forecast?, itemCount: Int) {
+private fun Column(forecast: Forecast?, itemCount: Int, wide: Boolean = false) {
+  val dayForecasts = forecast?.upcomingForecasts.orEmpty()
+  val maxDays = itemCount.coerceAtMost(dayForecasts.size + 1) // +1 to account for today's forecast.
+  // Glance only supports up to 10 children per container. Because we want to space entries evenly, we can only have
+  // up to 4 entries, each surrounded by Spacer widgets.
+  val rowCount = maxDays.coerceAtMost(4)
+  val entries = forecast?.getWidgetDateForecasts(LocalStrings.current, rowCount) ?: emptyList()
+
   Column(
-    modifier = parentModifier,
+    modifier = parentModifier.padding(8.dp),
     horizontalAlignment = Alignment.CenterHorizontally,
     verticalAlignment = Alignment.CenterVertically,
   ) {
-
     Spacer(modifier = GlanceModifier.defaultWeight())
-
-    // Glance caps widgets to 10 children max...
-    repeat(itemCount.coerceAtMost(4)) { index ->
-
-      if (index == 0) {
-        ColumnEntry(
-          title = LocalStrings.current[R.string.widget_today],
-          iconDescriptor = forecast?.iconDescriptor,
-          tempMin = forecast?.lowTemp,
-          tempMax = forecast?.highTemp,
-          isNight = forecast?.night ?: false,
-        )
+    for (entry in entries) {
+      if (wide) {
+        WideColumnEntry(entry)
       } else {
-        val dateForecast = forecast?.upcomingForecasts?.getOrNull(index - 1)
-        val date = forecast?.location?.run { dateForecast?.date?.atZone(timezone) }
-        val title = date?.dayOfWeek?.getDisplayName(SHORT, Locale.getDefault())?.uppercase() ?: "--"
-        ColumnEntry(
-          title,
-          iconDescriptor = dateForecast?.icon_descriptor,
-          tempMin = dateForecast?.temp_min,
-          tempMax = dateForecast?.temp_max,
-        )
+        ColumnEntry(entry)
       }
-
       Spacer(modifier = GlanceModifier.defaultWeight())
     }
   }
 }
 
 @Composable
-private fun ShortBox(forecast: Forecast?, isSmall: Boolean = false, hourlyCount: Int) {
+private fun ShortBox(forecast: Forecast?, small: Boolean = false, hourlyCount: Int) {
   Column(modifier = parentModifier.padding(8.dp)) {
-    if (isSmall) {
+    if (small) {
       SmallCurrentConditionsRow(forecast)
     } else {
       CurrentConditionsRow(forecast)
@@ -219,20 +226,18 @@ private fun ShortBox(forecast: Forecast?, isSmall: Boolean = false, hourlyCount:
 }
 
 @Composable
-private fun Box(forecast: Forecast?, isSmall: Boolean = false, hourlyCount: Int, dayCount: Int) {
+private fun Box(forecast: Forecast?, small: Boolean = false, hourlyCount: Int, dayCount: Int) {
 
-  val timezone = forecast?.location?.timezone ?: ZoneId.systemDefault()
   val dayForecasts = forecast?.upcomingForecasts.orEmpty()
   val maxDays = dayCount.coerceAtMost(dayForecasts.size)
   val rowCount = maxDays.coerceAtMost(10) // Glance only supports up to 10 children per container.
-  val upcomingForecasts = dayForecasts.take(rowCount).map { it.formatForWidget(LocalStrings.current, timezone) }
+
+  val upcomingForecasts = forecast?.getWidgetDateForecasts(LocalStrings.current, maxCount = rowCount + 1)
+    ?.drop(1)
+    ?: emptyList()
 
   Column(modifier = parentModifier.padding(8.dp)) {
-    if (isSmall) {
-      SmallCurrentConditionsRow(forecast)
-    } else {
-      CurrentConditionsRow(forecast)
-    }
+    CurrentConditionsRow(forecast)
     Spacer(modifier = GlanceModifier.defaultWeight())
     HourlyForecastRow(forecast, entryCount = hourlyCount)
     Spacer(modifier = GlanceModifier.defaultWeight())
@@ -242,7 +247,11 @@ private fun Box(forecast: Forecast?, isSmall: Boolean = false, hourlyCount: Int,
         .padding(start = 16.dp, end = 16.dp, top = 12.dp)
     ) {
       upcomingForecasts.take(rowCount).forEach { upcomingForecast ->
-        UpcomingForecastRow(upcomingForecast, modifier = GlanceModifier.padding(bottom = 12.dp))
+        UpcomingForecastRow(
+          forecast = upcomingForecast,
+          isSmall = small,
+          modifier = GlanceModifier.padding(bottom = 12.dp),
+        )
       }
     }
   }
@@ -290,11 +299,11 @@ private fun SmallCurrentConditionsRow(forecast: Forecast?) {
     Image(
       provider = ImageProvider(iconRes),
       contentDescription = strings[R.string.widget_description],
-      modifier = GlanceModifier.width(56.dp).fillMaxHeight(),
+      modifier = GlanceModifier.size(56.dp)
     )
     Spacer(modifier = GlanceModifier.defaultWeight())
     Column(
-      modifier = GlanceModifier.fillMaxHeight(),
+      modifier = GlanceModifier,
       verticalAlignment = Alignment.CenterVertically,
     ) {
       LargeTemp(forecast?.currentTemp?.roundToInt())
@@ -323,13 +332,17 @@ private fun HourlyForecastRow(forecast: Forecast?, entryCount: Int) {
 }
 
 @Composable
-private fun UpcomingForecastRow(forecast: WidgetUpcomingForecast, modifier: GlanceModifier = GlanceModifier) {
+private fun UpcomingForecastRow(
+  forecast: WidgetDateForecast,
+  isSmall: Boolean = false,
+  modifier: GlanceModifier = GlanceModifier,
+) {
 
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier.fillMaxWidth(),
   ) {
-    RegularText(forecast.day)
+    RegularText(if (isSmall) forecast.dayShort else forecast.day)
     Spacer(modifier = GlanceModifier.defaultWeight())
     Image(
       provider = ImageProvider(forecast.iconRes),
@@ -349,25 +362,47 @@ private fun UpcomingForecastRow(forecast: WidgetUpcomingForecast, modifier: Glan
 }
 
 @Composable
-private fun ColumnEntry(
-  title: String,
-  iconDescriptor: String?,
-  tempMin: Int?,
-  tempMax: Int?,
-  isNight: Boolean = false,
-) {
+private fun ColumnEntry(dateForecast: WidgetDateForecast) {
   val strings = LocalStrings.current
   Column(horizontalAlignment = Alignment.CenterHorizontally) {
-    TinyTitle(title)
+    TinyTitle(dateForecast.day.uppercase())
     Image(
-      provider = ImageProvider(weatherIconRes(iconDescriptor, isNight)),
+      provider = ImageProvider(dateForecast.iconRes),
       contentDescription = strings[R.string.widget_description],
       modifier = GlanceModifier.fillMaxWidth().height(36.dp),
     )
     Row(verticalAlignment = Alignment.CenterVertically) {
-      TinyTemp(tempMin)
+      TinyTemp(dateForecast.minTemp)
       Spacer(modifier = GlanceModifier.width(4.dp))
-      TinyTemp(tempMax)
+      TinyTemp(dateForecast.maxTemp)
+    }
+  }
+}
+
+@Composable
+private fun WideColumnEntry(dateForecast: WidgetDateForecast) {
+  val strings = LocalStrings.current
+  Row(
+    verticalAlignment = Alignment.CenterVertically,
+    modifier = GlanceModifier.fillMaxWidth(),
+  ) {
+    Image(
+      provider = ImageProvider(dateForecast.iconRes),
+      contentDescription = strings[R.string.widget_description],
+      modifier = GlanceModifier.size(48.dp),
+    )
+    Spacer(modifier = GlanceModifier.defaultWeight())
+    Column {
+      RegularText(dateForecast.day)
+      Row(verticalAlignment = Alignment.CenterVertically) {
+        RegularTemp(dateForecast.minTemp)
+        Image(
+          provider = ImageProvider(R.drawable.bg_widget_line),
+          contentDescription = null,
+          modifier = GlanceModifier.width(32.dp).height(4.dp).padding(horizontal = 6.dp),
+        )
+        RegularTemp(dateForecast.maxTemp)
+      }
     }
   }
 }
@@ -376,13 +411,13 @@ private fun ColumnEntry(
 private fun VerticalLowToHighTemps(forecast: Forecast?, modifier: GlanceModifier = GlanceModifier) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
-    modifier = modifier.fillMaxHeight(),
+    modifier = modifier,
   ) {
     SmallTemp(temp = forecast?.highTemp)
     Image(
       provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
-      modifier = GlanceModifier.width(4.dp).defaultWeight().padding(vertical = 6.dp),
+      modifier = GlanceModifier.width(4.dp).height(28.dp).padding(vertical = 6.dp),
     )
     SmallTemp(forecast?.lowTemp)
   }

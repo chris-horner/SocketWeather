@@ -7,16 +7,31 @@ import codes.chrishorner.socketweather.data.Forecast
 import codes.chrishorner.socketweather.util.Strings
 import java.time.Clock
 import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL
 import java.time.format.TextStyle.SHORT
 import java.util.Locale
 
+data class WidgetDateForecast(
+  val day: String,
+  val dayShort: String,
+  @DrawableRes val iconRes: Int,
+  val minTemp: Int?,
+  val maxTemp: Int?,
+)
+
+data class WidgetHourlyForecast(
+  val time: String,
+  @DrawableRes val iconRes: Int,
+  val temp: Int?
+)
+
 fun Forecast.getWidgetDateForecasts(
   strings: Strings,
-  maxCount: Int,
+  count: Int,
   clock: Clock = Clock.systemDefaultZone(),
 ): List<WidgetDateForecast> {
-  if (maxCount <= 0) return emptyList()
+  if (count <= 0) return emptyList()
 
   val timezone = location.timezone
   val currentDate = LocalDate.now(clock.withZone(timezone))
@@ -29,7 +44,7 @@ fun Forecast.getWidgetDateForecasts(
     maxTemp = highTemp,
   )
 
-  val upcomingEntries = upcomingForecasts.take(maxCount - 1).mapIndexed { index, it ->
+  val upcomingEntries = upcomingForecasts.take(count - 1).mapIndexed { index, it ->
     val zonedDate = it.date.atZone(timezone).toLocalDate()
 
     val dayText = if (index == 0 && zonedDate == currentDate.plusDays(1)) {
@@ -47,16 +62,20 @@ fun Forecast.getWidgetDateForecasts(
     )
   }
 
-  return buildList(maxCount) {
+  return buildList(count) {
     add(todayEntry)
     addAll(upcomingEntries)
   }
 }
 
-data class WidgetDateForecast(
-  val day: String,
-  val dayShort: String,
-  @DrawableRes val iconRes: Int,
-  val minTemp: Int?,
-  val maxTemp: Int?,
-)
+fun Forecast.getWidgetHourlyForecasts(count: Int): List<WidgetHourlyForecast> {
+  return hourlyForecasts.take(count).map {
+    WidgetHourlyForecast(
+      time = TimeFormatter.format(it.time.atZone(location.timezone)).uppercase(),
+      iconRes = weatherIconRes(it.icon_descriptor, it.is_night),
+      temp = it.temp,
+    )
+  }
+}
+
+private val TimeFormatter = DateTimeFormatter.ofPattern("h a")

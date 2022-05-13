@@ -40,11 +40,8 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.common.weatherIconRes
 import codes.chrishorner.socketweather.data.Forecast
-import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import kotlin.math.roundToInt
 
 class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -232,7 +229,7 @@ private fun Box(forecast: Forecast?, small: Boolean = false, hourlyCount: Int, d
   val maxDays = dayCount.coerceAtMost(dayForecasts.size)
   val rowCount = maxDays.coerceAtMost(10) // Glance only supports up to 10 children per container.
 
-  val upcomingForecasts = forecast?.getWidgetDateForecasts(LocalStrings.current, maxCount = rowCount + 1)
+  val upcomingForecasts = forecast?.getWidgetDateForecasts(LocalStrings.current, count = rowCount + 1)
     ?.drop(1)
     ?: emptyList()
 
@@ -318,13 +315,11 @@ private fun SmallCurrentConditionsRow(forecast: Forecast?) {
 @Composable
 private fun HourlyForecastRow(forecast: Forecast?, entryCount: Int) {
   Row {
-    forecast?.hourlyForecasts
-      ?.take(entryCount.coerceAtMost(forecast.hourlyForecasts.size))
+    forecast?.getWidgetHourlyForecasts(entryCount)
       ?.forEachIndexed { index, entry ->
         val padding = if (index != 0) 24.dp else 0.dp
         HourlyForecastEntry(
           entry,
-          zone = forecast.location.timezone,
           modifier = GlanceModifier.padding(start = padding),
         )
       }
@@ -440,14 +435,14 @@ private fun HorizontalLowToHighTemps(forecast: Forecast?, modifier: GlanceModifi
 }
 
 @Composable
-private fun HourlyForecastEntry(entry: ThreeHourlyForecast, zone: ZoneId, modifier: GlanceModifier = GlanceModifier) {
+private fun HourlyForecastEntry(entry: WidgetHourlyForecast, modifier: GlanceModifier = GlanceModifier) {
   Column(
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = modifier,
   ) {
-    SmallText(TimeFormatter.format(entry.time.atZone(zone)).uppercase())
+    SmallText(entry.time)
     Image(
-      provider = ImageProvider(weatherIconRes(entry.icon_descriptor, entry.is_night)),
+      provider = ImageProvider(entry.iconRes),
       contentDescription = null,
       modifier = GlanceModifier.size(32.dp).padding(vertical = 4.dp)
     )
@@ -584,4 +579,3 @@ private fun TitleText(
 }
 
 private val LocalStrings = staticCompositionLocalOf<Strings> { error("No Strings provided.") }
-private val TimeFormatter = DateTimeFormatter.ofPattern("h a")

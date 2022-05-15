@@ -3,8 +3,6 @@ package codes.chrishorner.socketweather.widget
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -38,7 +36,6 @@ import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.appSingletons
-import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
 
 class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
@@ -108,26 +105,24 @@ class ForecastWidget : GlanceAppWidget() {
     val strings = AndroidStrings(context)
     val formattedForecast = forecast.formatForWidget(strings)
 
-    CompositionLocalProvider(LocalStrings provides strings) {
-      when (LocalSize.current) {
-        TINY_BOX -> Column(formattedForecast.dateForecasts, itemCount = 1)
-        TINY_ROW -> TinyRow(formattedForecast.currentConditions)
-        SMALL_ROW -> SmallRow(formattedForecast.currentConditions)
-        ROW -> Row(formattedForecast.currentConditions)
-        TINY_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2)
-        SMALL_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3)
-        COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4)
-        WIDE_TINY_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2, wide = true)
-        WIDE_SMALL_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3, wide = true)
-        WIDE_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4, wide = true)
-        SHORT_BOX -> Column(formattedForecast.dateForecasts, itemCount = 2)
-        WIDE_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 4)
-        WIDER_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 5)
-        BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 3)
-        TALL_BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 6)
-        BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 3)
-        TALL_BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 6)
-      }
+    when (LocalSize.current) {
+      TINY_BOX -> Column(formattedForecast.dateForecasts, itemCount = 1)
+      TINY_ROW -> TinyRow(formattedForecast.currentConditions)
+      SMALL_ROW -> SmallRow(formattedForecast.currentConditions)
+      ROW -> Row(formattedForecast.currentConditions)
+      TINY_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2)
+      SMALL_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3)
+      COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4)
+      WIDE_TINY_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2, wide = true)
+      WIDE_SMALL_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3, wide = true)
+      WIDE_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4, wide = true)
+      SHORT_BOX -> Column(formattedForecast.dateForecasts, itemCount = 2)
+      WIDE_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 4)
+      WIDER_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 5)
+      BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 3)
+      TALL_BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 6)
+      BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 3)
+      TALL_BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 6)
     }
   }
 }
@@ -260,7 +255,7 @@ private fun CurrentConditionsRow(conditions: WidgetCurrentConditions) {
           modifier = GlanceModifier.size(40.dp),
         )
         Spacer(modifier = GlanceModifier.width(8.dp))
-        LargeTemp(temp = conditions.currentTemp)
+        LargeTemp(conditions.currentTemp)
       }
       HorizontalLowToHighTemps(conditions, modifier = GlanceModifier.width(80.dp))
     }
@@ -386,7 +381,7 @@ private fun VerticalLowToHighTemps(conditions: WidgetCurrentConditions, modifier
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = modifier,
   ) {
-    SmallTemp(temp = conditions.minTemp)
+    SmallTemp(conditions.minTemp)
     Image(
       provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
@@ -402,7 +397,7 @@ private fun HorizontalLowToHighTemps(conditions: WidgetCurrentConditions, modifi
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier,
   ) {
-    RegularTemp(temp = conditions.minTemp)
+    RegularTemp(conditions.minTemp)
     Image(
       provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
@@ -438,9 +433,9 @@ private fun GlanceModifier.appWidgetBackgroundRadius(): GlanceModifier {
 }
 
 @Composable
-private fun TinyTemp(temp: Int?) {
+private fun TinyTemp(text: String) {
   Text(
-    text = LocalStrings.current.formatDegrees(temp),
+    text = text,
     maxLines = 1,
     style = TextStyle(
       fontSize = 12.sp,
@@ -463,9 +458,9 @@ private fun TinyTitle(text: String) {
 }
 
 @Composable
-private fun SmallTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
+private fun SmallTemp(text: String, modifier: GlanceModifier = GlanceModifier) {
   Text(
-    text = LocalStrings.current.formatDegrees(temp),
+    text = text,
     maxLines = 1,
     style = TextStyle(
       fontSize = 14.sp,
@@ -494,9 +489,9 @@ private fun SmallText(
 }
 
 @Composable
-private fun RegularTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
+private fun RegularTemp(text: String, modifier: GlanceModifier = GlanceModifier) {
   Text(
-    text = LocalStrings.current.formatDegrees(temp),
+    text = text,
     maxLines = 1,
     style = TextStyle(
       fontSize = 18.sp,
@@ -509,9 +504,9 @@ private fun RegularTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
 }
 
 @Composable
-private fun LargeTemp(temp: Int?, modifier: GlanceModifier = GlanceModifier) {
+private fun LargeTemp(text: String, modifier: GlanceModifier = GlanceModifier) {
   Text(
-    text = LocalStrings.current.formatDegrees(temp),
+    text = text,
     maxLines = 1,
     style = TextStyle(
       fontSize = 34.sp,
@@ -555,5 +550,3 @@ private fun TitleText(
     modifier = modifier,
   )
 }
-
-private val LocalStrings = staticCompositionLocalOf<Strings> { error("No Strings provided.") }

@@ -24,16 +24,16 @@ data class WidgetCurrentConditions(
   val location: String,
   val description: String,
   val feelsLikeText: String,
-  val currentTemp: Int,
-  val minTemp: Int,
-  val maxTemp: Int
+  val currentTemp: String,
+  val minTemp: String,
+  val maxTemp: String,
 )
 
 data class WidgetHourlyForecast(
   val time: String,
   @DrawableRes val iconRes: Int,
   val description: String?,
-  val temp: Int?
+  val temp: String,
 )
 
 data class WidgetDateForecast(
@@ -41,8 +41,8 @@ data class WidgetDateForecast(
   val dayShort: String,
   @DrawableRes val iconRes: Int,
   val description: String?,
-  val minTemp: Int?,
-  val maxTemp: Int?,
+  val minTemp: String,
+  val maxTemp: String,
 )
 
 fun Forecast.formatForWidget(
@@ -50,7 +50,7 @@ fun Forecast.formatForWidget(
   clock: Clock = Clock.systemDefaultZone(),
 ) = WidgetForecast(
   currentConditions = getWidgetCurrentConditions(strings),
-  hourlyForecasts = getWidgetHourlyForecasts(),
+  hourlyForecasts = getWidgetHourlyForecasts(strings),
   dateForecasts = getWidgetDateForecasts(strings, clock),
 )
 
@@ -66,8 +66,8 @@ private fun Forecast.getWidgetDateForecasts(
     dayShort = strings[R.string.widget_today],
     iconRes = weatherIconRes(todayForecast.icon_descriptor, night),
     description = todayForecast.short_text,
-    minTemp = lowTemp,
-    maxTemp = highTemp,
+    minTemp = strings.formatDegrees(lowTemp),
+    maxTemp = strings.formatDegrees(highTemp),
   )
 
   val upcomingEntries = upcomingForecasts.mapIndexed { index, it ->
@@ -84,21 +84,21 @@ private fun Forecast.getWidgetDateForecasts(
       dayShort = zonedDate.dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
       iconRes = weatherIconRes(it.icon_descriptor),
       description = it.short_text,
-      minTemp = it.temp_min,
-      maxTemp = it.temp_max,
+      minTemp = strings.formatDegrees(it.temp_min),
+      maxTemp = strings.formatDegrees(it.temp_max),
     )
   }
 
   return listOf(todayEntry) + upcomingEntries
 }
 
-private fun Forecast.getWidgetHourlyForecasts(): List<WidgetHourlyForecast> {
+private fun Forecast.getWidgetHourlyForecasts(strings: Strings): List<WidgetHourlyForecast> {
   return hourlyForecasts.map {
     WidgetHourlyForecast(
       time = TimeFormatter.format(it.time.atZone(location.timezone)).uppercase(),
       iconRes = weatherIconRes(it.icon_descriptor, it.is_night),
       description = null, // TODO: Get this data from BOM.
-      temp = it.temp,
+      temp = strings.formatDegrees(it.temp),
     )
   }
 }
@@ -109,9 +109,9 @@ private fun Forecast.getWidgetCurrentConditions(strings: Strings): WidgetCurrent
     location = location.name,
     description = todayForecast.short_text ?: "",
     feelsLikeText = strings.get(R.string.widget_feels_long, strings.formatDegrees(tempFeelsLike?.roundToInt())),
-    currentTemp = currentTemp.roundToInt(),
-    minTemp = lowTemp,
-    maxTemp = highTemp,
+    currentTemp = strings.formatDegrees(currentTemp.roundToInt()),
+    minTemp = strings.formatDegrees(lowTemp),
+    maxTemp = strings.formatDegrees(highTemp),
   )
 }
 

@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.test
 
 import codes.chrishorner.socketweather.data.ForecastLoader
+import codes.chrishorner.socketweather.data.ForecastLoader.Result
 import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.ForecastLoader.State.Idle
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,4 +16,6 @@ class FakeForecastLoader : ForecastLoader {
   override fun forceRefresh() {
     refreshCalls.send(Unit)
   }
+
+  override suspend fun synchronousRefresh(): Result = Result.Success
 }

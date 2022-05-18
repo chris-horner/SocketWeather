@@ -1,8 +1,7 @@
 package codes.chrishorner.socketweather.data
 
+import codes.chrishorner.socketweather.data.ForecastLoader.Result
 import codes.chrishorner.socketweather.data.ForecastLoader.State
-import codes.chrishorner.socketweather.data.LocationResolver.Result.Failure
-import codes.chrishorner.socketweather.data.LocationResolver.Result.Success
 import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
@@ -17,6 +16,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.supervisorScope
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 import java.time.Clock
 import java.time.Duration
@@ -27,12 +28,18 @@ interface ForecastLoader {
   val states: StateFlow<State>
   fun forceRefresh()
   fun refreshIfNecessary()
+  suspend fun synchronousRefresh(): Result
 
   sealed class State {
     object Idle : State()
     object FindingLocation : State()
     object LoadingForecast : State()
     data class Error(val type: ForecastError) : State()
+  }
+
+  sealed class Result {
+    object Success : Result()
+    data class Failure(val type: ForecastError) : Result()
   }
 }
 
@@ -48,47 +55,54 @@ class RealForecastLoader(
 
   private val statesFlow = MutableStateFlow<State>(State.Idle)
   private var refreshJob: Job? = null
+  private val stateMutex = Mutex()
 
   override val states: StateFlow<State> = statesFlow
+
+  override suspend fun synchronousRefresh(): Result = stateMutex.withLock {
+    val location = when (val locationSelection = locationSelectionStore.data.value) {
+      // No location selected yet. Give up.
+      None -> return Result.Success
+      // Easy. Grab the static selected location.
+      is Static -> locationSelection.location
+      // Update the state to FindingLocation and attempt to resolve it.
+      FollowMe -> {
+        statesFlow.value = State.FindingLocation
+
+        when (val locationResult = locationResolver.getDeviceLocation()) {
+          // If we fail to resolve the location, give up.
+          is LocationResolver.Result.Failure -> {
+            statesFlow.value = State.Error(locationResult.type)
+            return Result.Failure(locationResult.type)
+          }
+          is LocationResolver.Result.Success -> locationResult.location
+        }
+      }
+    }
+
+    statesFlow.value = State.LoadingForecast
+
+    return try {
+      val forecast = loadForecast(api, clock, location)
+      forecastStore.set(forecast)
+      forecastWidgetUpdater.update()
+      statesFlow.value = State.Idle
+      Result.Success
+    } catch (e: JsonDataException) {
+      Timber.e(e, "API returned unexpected data.")
+      statesFlow.value = State.Error(ForecastError.DATA)
+      Result.Failure(ForecastError.DATA)
+    } catch (e: Exception) {
+      Timber.e(e, "Failed to load forecast.")
+      statesFlow.value = State.Error(ForecastError.NETWORK)
+      Result.Failure(ForecastError.NETWORK)
+    }
+  }
 
   override fun forceRefresh() {
     refreshJob?.cancel()
     refreshJob = scope.launch {
-
-      val location = when (val locationSelection = locationSelectionStore.data.value) {
-        // No location selected yet. Give up.
-        None -> return@launch
-        // Easy. Grab the static selected location.
-        is Static -> locationSelection.location
-        // Update the state to FindingLocation and attempt to resolve it.
-        FollowMe -> {
-          statesFlow.value = State.FindingLocation
-
-          when (val locationResult = locationResolver.getDeviceLocation()) {
-            // If we fail to resolve the location, give up.
-            is Failure -> {
-              statesFlow.value = State.Error(locationResult.type)
-              return@launch
-            }
-            is Success -> locationResult.location
-          }
-        }
-      }
-
-      statesFlow.value = State.LoadingForecast
-
-      try {
-        val forecast = loadForecast(api, clock, location)
-        forecastStore.set(forecast)
-        forecastWidgetUpdater.update()
-        statesFlow.value = State.Idle
-      } catch (e: JsonDataException) {
-        Timber.e(e, "API returned unexpected data.")
-        statesFlow.value = State.Error(ForecastError.DATA)
-      } catch (e: Exception) {
-        Timber.e(e, "Failed to load forecast.")
-        statesFlow.value = State.Error(ForecastError.NETWORK)
-      }
+      synchronousRefresh()
     }
   }
 

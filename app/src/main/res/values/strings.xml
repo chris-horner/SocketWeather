@@ -73,4 +73,7 @@
   <string name="widget_today">Today</string>
   <string name="widget_tomorrow">Tomorrow</string>
 
+  <string name="notification_name">Background sync</string>
+  <string name="notification_title">Updating weather forecast</string>
+
 </resources>

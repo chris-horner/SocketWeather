@@ -116,6 +116,7 @@ dependencies {
   implementation deps.accompanist.systemUiController
   implementation deps.androidx.core
   implementation deps.androidx.activityCompose
+  implementation deps.androidx.workManager
   implementation deps.compose.material.core
   implementation deps.compose.material.icons
   implementation deps.compose.material.iconsExtended

@@ -7,6 +7,7 @@ import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestChannel
+import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.widget.ForecastWidgetUpdater
 import com.google.common.truth.Truth.assertThat
 import com.google.testing.junit.testparameterinjector.TestParameter
@@ -40,7 +41,7 @@ class RealForecastLoaderTest {
   )
 
   @Test fun `successful refresh of LocationSelection-Static updates state and store`() = runBlocking {
-    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    locationSelectionStore.set(LocationSelection.Static(TestData.location1))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -52,13 +53,13 @@ class RealForecastLoaderTest {
 
     // Verify that the forecast loaded matches the input test data.
     val forecast = forecastStore.data.value!!
-    assertThat(forecast.location).isEqualTo(api.location1)
+    assertThat(forecast.location).isEqualTo(TestData.location1)
     assertThat(forecast.updateTime).isEqualTo(clock.instant())
   }
 
   @Test fun `successful refresh of LocationSelection-FollowMe updates state and store`() = runBlocking {
     locationSelectionStore.set(LocationSelection.FollowMe)
-    locationResolver.result.send(Result.Success(api.location1))
+    locationResolver.result.send(Result.Success(TestData.location1))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -71,12 +72,12 @@ class RealForecastLoaderTest {
 
     // Verify that the forecast loaded matches the input test data.
     val forecast = forecastStore.data.value!!
-    assertThat(forecast.location).isEqualTo(api.location1)
+    assertThat(forecast.location).isEqualTo(TestData.location1)
     assertThat(forecast.updateTime).isEqualTo(clock.instant())
   }
 
   @Test fun `successful refresh updates widget`() = runBlocking {
-    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    locationSelectionStore.set(LocationSelection.Static(TestData.location1))
     val forecastLoader = create(this)
 
     forecastLoader.forceRefresh()
@@ -84,7 +85,7 @@ class RealForecastLoaderTest {
   }
 
   @Test fun `loader only refreshes when forecast is stale`() = runBlocking {
-    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    locationSelectionStore.set(LocationSelection.Static(TestData.location1))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -125,7 +126,7 @@ class RealForecastLoaderTest {
   }
 
   @Test fun `network failure produces error state`() = runBlocking {
-    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    locationSelectionStore.set(LocationSelection.Static(TestData.location1))
     api.responseMode = TestApi.ResponseMode.NETWORK_ERROR
     val forecastLoader = create(this)
 
@@ -138,7 +139,7 @@ class RealForecastLoaderTest {
   }
 
   @Test fun `malformed data produces error state`() = runBlocking {
-    locationSelectionStore.set(LocationSelection.Static(api.location1))
+    locationSelectionStore.set(LocationSelection.Static(TestData.location1))
     api.responseMode = TestApi.ResponseMode.DATA_ERROR
     val forecastLoader = create(this)
 

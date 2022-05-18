@@ -3,7 +3,6 @@ package codes.chrishorner.socketweather.test
 import codes.chrishorner.socketweather.data.CurrentInformation
 import codes.chrishorner.socketweather.data.CurrentObservations
 import codes.chrishorner.socketweather.data.DateForecast
-import codes.chrishorner.socketweather.data.DeviceLocation
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.Rain.Amount
@@ -23,7 +22,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.Period
-import java.time.ZoneId
 import java.time.ZoneOffset
 
 class TestApi(clock: Clock) : WeatherApi {
@@ -34,27 +32,7 @@ class TestApi(clock: Clock) : WeatherApi {
   private val startingInstant = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC)
 
   var responseMode: ResponseMode = SUCCESS
-  val deviceLocation1 = DeviceLocation(-37.798336, 144.978468)
-  val deviceLocation2 = DeviceLocation(-37.829855, 144.886371)
-  val location1 = Location(
-    "1",
-    "1",
-    "Fakezroy",
-    "VIC",
-    deviceLocation1.latitude,
-    deviceLocation1.longitude,
-    ZoneId.of("Australia/Melbourne")
-  )
-  val location2 = Location(
-    "2",
-    "2",
-    "Mockswood",
-    "VIC",
-    deviceLocation2.latitude,
-    deviceLocation2.longitude,
-    ZoneId.of("Australia/Melbourne")
-  )
-  private val locations = listOf(location1, location2)
+  private val locations = listOf(TestData.location1, TestData.location2)
 
   override suspend fun searchForLocation(query: String): List<SearchResult> {
     failIfNecessary()
@@ -74,8 +52,8 @@ class TestApi(clock: Clock) : WeatherApi {
     failIfNecessary()
 
     return when (geohash) {
-      "1" -> location1
-      "2" -> location2
+      "1" -> TestData.location1
+      "2" -> TestData.location2
       else -> throw IllegalArgumentException()
     }
   }

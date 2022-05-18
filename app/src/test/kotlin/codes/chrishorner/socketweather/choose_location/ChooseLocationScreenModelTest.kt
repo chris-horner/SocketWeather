@@ -15,6 +15,7 @@ import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestApi.ResponseMode
+import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -124,7 +125,7 @@ class ChooseLocationScreenModelTest {
       sendEvent(ResultSelected(result))
       // TODO: Work out how to assert Submitting state.
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitted)
-      val expectedSelection = LocationSelection.Static(api.location1)
+      val expectedSelection = LocationSelection.Static(TestData.location1)
       assertThat(savedSelections.data.value).containsExactly(expectedSelection)
       assertThat(currentSelection.data.value).isEqualTo(expectedSelection)
       with(navigator.awaitChange()) {

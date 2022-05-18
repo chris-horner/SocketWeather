@@ -17,6 +17,7 @@ import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.test.isInstanceOf
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
@@ -68,13 +69,13 @@ class HomeScreenModelTest {
   }
 
   @Test fun `loaded forecast with idle loading shows loaded state`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       with(awaitItem()) {
-        assertThat(toolbarTitle).isEqualTo(testApi.location1.name)
+        assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
-        assertThat(currentLocation.selection).isEqualTo(LocationSelection.Static(testApi.location1))
+        assertThat(currentLocation.selection).isEqualTo(LocationSelection.Static(TestData.location1))
         assertThat(savedLocations).isEmpty()
         assertThat(showRefreshingIndicator).isFalse()
         assertThat(content).isInstanceOf<HomeState.Content.Loaded>()
@@ -83,12 +84,12 @@ class HomeScreenModelTest {
   }
 
   @Test fun `loaded forecast with loading show refreshing state`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.LoadingForecast
 
     screenModel.test {
       with(awaitItem()) {
-        assertThat(toolbarTitle).isEqualTo(testApi.location1.name)
+        assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updating now…")
         assertThat(showRefreshingIndicator).isEqualTo(true)
         assertThat(content).isInstanceOf<HomeState.Content.Loaded>()
@@ -122,12 +123,12 @@ class HomeScreenModelTest {
   }
 
   @Test fun `loaded forecast with error show error state`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.Error(ForecastError.NETWORK)
 
     screenModel.test {
       with(awaitItem()) {
-        assertThat(toolbarTitle).isEqualTo(testApi.location1.name)
+        assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
         assertThat(content).isEqualTo(HomeState.Content.Error(ForecastError.NETWORK))
       }
@@ -135,12 +136,12 @@ class HomeScreenModelTest {
   }
 
   @Test fun `loaded forecast over a minute ago shows update subtitle`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
     clock.advanceBy(Duration.ofMinutes(1))
 
     screenModel.test {
       with(awaitItem()) {
-        assertThat(toolbarTitle).isEqualTo(testApi.location1.name)
+        assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated Relative time string")
         assertThat(content).isInstanceOf<HomeState.Content.Loaded>()
       }
@@ -148,7 +149,7 @@ class HomeScreenModelTest {
   }
 
   @Test fun `AddLocation event navigates to ChooseLocationScreen`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       awaitItem()
@@ -161,7 +162,7 @@ class HomeScreenModelTest {
   }
 
   @Test fun `Refresh event forces forecast to refresh`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       awaitItem()
@@ -171,20 +172,20 @@ class HomeScreenModelTest {
   }
 
   @Test fun `SwitchLocation event changes selection and forces refresh`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       awaitItem()
-      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(testApi.location1))
-      sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(testApi.location2)))
+      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location1))
+      sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(TestData.location2)))
       forecastLoader.refreshCalls.awaitValue()
-      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(testApi.location2))
-      assertThat(awaitItem().currentLocation.selection).isEqualTo(LocationSelection.Static(testApi.location2))
+      assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location2))
+      assertThat(awaitItem().currentLocation.selection).isEqualTo(LocationSelection.Static(TestData.location2))
     }
   }
 
   @Test fun `ViewAbout event navigates to AboutScreen`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       awaitItem()
@@ -197,7 +198,7 @@ class HomeScreenModelTest {
   }
 
   @Test fun `ViewRainRadar event navigates to RainRadarScreen`() = runBlocking {
-    setTestDataWith(testApi.location1)
+    setTestDataWith(TestData.location1)
 
     screenModel.test {
       awaitItem()

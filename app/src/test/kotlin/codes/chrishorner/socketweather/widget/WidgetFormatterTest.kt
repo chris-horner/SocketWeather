@@ -102,7 +102,7 @@ class WidgetFormatterTest {
 
     val output = forecast.formatForWidget(
       strings = FakeStrings(
-        R.string.widget_feels_long to "Feels like %s",
+        R.string.widget_feelsLong to "Feels like %s",
         R.string.widget_today to "Today",
         R.string.widget_tomorrow to "Tomorrow",
       ),
@@ -139,7 +139,7 @@ class WidgetFormatterTest {
     assertThat(output.dateForecasts).containsExactly(
       WidgetDateForecast(
         day = "Today",
-        dayShort = "Today",
+        dayShort = "Fri.",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-7°",

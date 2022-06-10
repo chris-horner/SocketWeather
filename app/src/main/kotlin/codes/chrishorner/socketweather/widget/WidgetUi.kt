@@ -118,7 +118,8 @@ fun Box(forecast: WidgetForecast, small: Boolean = false, hourlyCount: Int, dayC
         .background(ImageProvider(R.drawable.bg_widget_inner))
         .padding(start = 16.dp, end = 16.dp, top = 12.dp)
     ) {
-      forecast.dateForecasts.take(rowCount).forEach { upcomingForecast ->
+      // Drop the first date, since we display today's forecast in elements above.
+      forecast.dateForecasts.drop(1).take(rowCount).forEach { upcomingForecast ->
         UpcomingForecastRow(
           forecast = upcomingForecast,
           isSmall = small,
@@ -254,6 +255,7 @@ private fun WideColumnEntry(dateForecast: WidgetDateForecast) {
     verticalAlignment = Alignment.CenterVertically,
     modifier = GlanceModifier.fillMaxWidth(),
   ) {
+    Spacer(modifier = GlanceModifier.defaultWeight())
     Image(
       provider = ImageProvider(dateForecast.iconRes),
       contentDescription = dateForecast.description,
@@ -272,6 +274,7 @@ private fun WideColumnEntry(dateForecast: WidgetDateForecast) {
         RegularTemp(dateForecast.maxTemp)
       }
     }
+    Spacer(modifier = GlanceModifier.defaultWeight())
   }
 }
 

@@ -60,10 +60,11 @@ private fun Forecast.getWidgetDateForecasts(
 ): List<WidgetDateForecast> {
   val timezone = location.timezone
   val currentDate = LocalDate.now(clock.withZone(timezone))
+  val forecastDate = todayForecast.date.atZone(timezone).toLocalDate()
 
   val todayEntry = WidgetDateForecast(
     day = strings[R.string.widget_today],
-    dayShort = strings[R.string.widget_today],
+    dayShort = forecastDate.dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
     iconRes = weatherIconRes(todayForecast.icon_descriptor, night),
     description = todayForecast.short_text,
     minTemp = strings.formatDegrees(lowTemp),
@@ -108,7 +109,7 @@ private fun Forecast.getWidgetCurrentConditions(strings: Strings): WidgetCurrent
     iconRes = weatherIconRes(iconDescriptor, night = night),
     location = location.name,
     description = todayForecast.short_text ?: "",
-    feelsLikeText = strings.get(R.string.widget_feels_long, strings.formatDegrees(tempFeelsLike?.roundToInt())),
+    feelsLikeText = strings.get(R.string.widget_feelsLong, strings.formatDegrees(tempFeelsLike?.roundToInt())),
     currentTemp = strings.formatDegrees(currentTemp.roundToInt()),
     minTemp = strings.formatDegrees(lowTemp),
     maxTemp = strings.formatDegrees(highTemp),

@@ -37,6 +37,7 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
       .build()
 
     WorkManager.getInstance(context).enqueue(request)
+    context.appSingletons.forecastLoader.refreshIfNecessary()
   }
 
   override fun onDisabled(context: Context) {

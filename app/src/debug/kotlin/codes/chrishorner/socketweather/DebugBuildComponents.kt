@@ -5,8 +5,10 @@ import androidx.annotation.MainThread
 import codes.chrishorner.socketweather.data.DataConfig
 import codes.chrishorner.socketweather.data.DebugDeviceLocator
 import codes.chrishorner.socketweather.data.DebugNetworkComponents
+import codes.chrishorner.socketweather.data.DeviceLocation
 import codes.chrishorner.socketweather.data.DeviceLocator
 import codes.chrishorner.socketweather.data.NetworkComponents
+import codes.chrishorner.socketweather.data.Store
 
 object CurrentBuildTypeComponents : BuildTypeComponents by DebugBuildComponents
 
@@ -15,9 +17,9 @@ private object DebugBuildComponents : BuildTypeComponents {
 
   private var deviceLocator: DebugDeviceLocator? = null
 
-  override fun createDeviceLocator(app: Application): DeviceLocator {
+  override fun createDeviceLocator(app: Application, lastKnownLocation: Store<DeviceLocation?>): DeviceLocator {
     deviceLocator?.let { return it }
-    return DebugDeviceLocator(app).also { deviceLocator = it }
+    return DebugDeviceLocator(app, lastKnownLocation).also { deviceLocator = it }
   }
 
   private var networkComponents: DebugNetworkComponents? = null

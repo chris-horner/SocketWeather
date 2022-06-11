@@ -15,7 +15,10 @@ interface DeviceLocator {
   suspend fun getLocation(): DeviceLocation?
 }
 
-class AndroidDeviceLocator(private val app: Application) : DeviceLocator {
+class AndroidDeviceLocator(
+  private val app: Application,
+  private val lastKnownLocation: Store<DeviceLocation?>,
+) : DeviceLocator {
 
   @Suppress("DEPRECATION") // Uses new API when possible.
   override suspend fun getLocation(): DeviceLocation? {
@@ -26,8 +29,13 @@ class AndroidDeviceLocator(private val app: Application) : DeviceLocator {
       return null
     }
 
-    val location: Location = suspendCoroutine { cont ->
-      val callback = LocationListener { location: Location -> cont.resume(location) }
+    val locationResult: Result<Location?> = suspendCoroutine { cont ->
+      val callback = LocationListener { location: Location? ->
+        // LocationManager.getCurrentLocation() and LocationManager.requestSingleUpdate() can
+        // both return null if invoked while the app is in the background. This is still
+        // treated as "success", and we fall back to the last known location.
+        cont.resume(Result.success(location))
+      }
 
       try {
         if (Build.VERSION.SDK_INT >= 30) {
@@ -39,10 +47,18 @@ class AndroidDeviceLocator(private val app: Application) : DeviceLocator {
         }
       } catch (e: SecurityException) {
         Timber.e(e, "Location permission not granted.")
-        cont.resume(null)
+        cont.resume(Result.failure(e))
       }
-    } ?: return null
+    }
 
-    return DeviceLocation(location.latitude, location.longitude)
+    if (locationResult.isFailure) return null
+
+    val deviceLocation = locationResult.getOrThrow()?.let { DeviceLocation(it.latitude, it.longitude) }
+    if (deviceLocation != null) {
+      lastKnownLocation.set(deviceLocation)
+    } else {
+      Timber.w("LocationManager delivered null location.")
+    }
+    return deviceLocation
   }
 }

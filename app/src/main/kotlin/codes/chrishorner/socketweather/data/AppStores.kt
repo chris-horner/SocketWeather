@@ -15,6 +15,7 @@ interface AppStores {
   val forecast: Store<Forecast?>
   val savedSelections: Store<Set<LocationSelection>>
   val currentSelection: Store<LocationSelection>
+  val lastKnownLocation: Store<DeviceLocation?>
   suspend fun clear()
 }
 
@@ -40,11 +41,16 @@ class AppDiskStores(
     default = LocationSelection.None,
     overrideDir = "location_choices",
   )
+  override val lastKnownLocation: Store<DeviceLocation?> = blockingCreateStore(
+    fileName = "last_known_location",
+    default = null,
+  )
 
   override suspend fun clear() {
     forecast.clear()
     savedSelections.clear()
     currentSelection.clear()
+    lastKnownLocation.clear()
   }
 
   /**

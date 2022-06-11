@@ -40,7 +40,10 @@ fun Application.initialiseSingletons() {
 
 private class SingletonCache(app: Application) : Singletons {
   override val stores = AppDiskStores(app, DataConfig.moshi)
-  override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(app)
+  override val deviceLocator: DeviceLocator = CurrentBuildTypeComponents.createDeviceLocator(
+    app,
+    stores.lastKnownLocation,
+  )
   override val networkComponents = CurrentBuildTypeComponents.createNetworkComponents(app)
   override val forecastLoader = RealForecastLoader(
     clock = Clock.systemDefaultZone(),

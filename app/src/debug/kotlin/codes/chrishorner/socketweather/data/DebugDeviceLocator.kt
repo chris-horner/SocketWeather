@@ -17,12 +17,12 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
-class DebugDeviceLocator(app: Application) : DeviceLocator {
+class DebugDeviceLocator(app: Application, lastKnownLocation: Store<DeviceLocation?>) : DeviceLocator {
 
   enum class Mode { REAL, MOCK }
 
   private val preferenceStore = app.debugPreferences
-  private val androidDeviceLocator = AndroidDeviceLocator(app)
+  private val androidDeviceLocator = AndroidDeviceLocator(app, lastKnownLocation)
 
   private val modes: StateFlow<Mode>
   private val mockLocationChoices: StateFlow<String>

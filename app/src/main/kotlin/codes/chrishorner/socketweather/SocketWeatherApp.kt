@@ -4,14 +4,12 @@ import android.app.Application
 import android.os.StrictMode
 import android.os.StrictMode.ThreadPolicy
 import android.os.StrictMode.VmPolicy
-import android.util.Log
-import androidx.work.Configuration
 import codes.chrishorner.socketweather.util.allowMainThreadDiskOperations
 import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @Suppress("unused") // It's used in AndroidManifest.xml.
-class SocketWeatherApp : Application(), Configuration.Provider {
+class SocketWeatherApp : Application() {
 
   override fun onCreate() {
     super.onCreate()
@@ -42,11 +40,5 @@ class SocketWeatherApp : Application(), Configuration.Provider {
         }
       }
     }
-  }
-
-  override fun getWorkManagerConfiguration(): Configuration {
-    return Configuration.Builder()
-      .setMinimumLoggingLevel(if (BuildConfig.DEBUG) Log.DEBUG else Log.ERROR)
-      .build()
   }
 }

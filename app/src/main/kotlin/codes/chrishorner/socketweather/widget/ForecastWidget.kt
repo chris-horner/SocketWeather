@@ -26,7 +26,7 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
 
   override fun onEnabled(context: Context) {
     // When widgets are placed, use WorkManager to try and update them every 2~ hours.
-    val request = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(Duration.ofHours(2), Duration.ofHours(1))
+    val request = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(Duration.ofHours(2), Duration.ofMinutes(30))
       .setConstraints(
         Constraints.Builder()
           .setRequiredNetworkType(NetworkType.CONNECTED)

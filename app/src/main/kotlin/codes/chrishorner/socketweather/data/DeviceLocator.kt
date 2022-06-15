@@ -54,11 +54,12 @@ class AndroidDeviceLocator(
     if (locationResult.isFailure) return null
 
     val deviceLocation = locationResult.getOrThrow()?.let { DeviceLocation(it.latitude, it.longitude) }
-    if (deviceLocation != null) {
+    return if (deviceLocation != null) {
       lastKnownLocation.set(deviceLocation)
+      deviceLocation
     } else {
       Timber.w("LocationManager delivered null location.")
+      lastKnownLocation.data.value
     }
-    return deviceLocation
   }
 }

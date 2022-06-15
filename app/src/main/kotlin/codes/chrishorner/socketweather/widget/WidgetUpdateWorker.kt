@@ -15,18 +15,10 @@ import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.ForecastLoader.Result.Failure
 import codes.chrishorner.socketweather.data.ForecastLoader.Result.Success
-import timber.log.Timber
 
 class WidgetUpdateWorker(context: Context, params: WorkerParameters) : CoroutineWorker(context, params) {
 
   override suspend fun doWork(): Result {
-    // Best effort to try and set the work as a foreground operation.
-    try {
-      setForeground(getForegroundInfo())
-    } catch (e: IllegalArgumentException) {
-      Timber.e(e, "Failed to run WidgetUpdateWorker in foreground.")
-    }
-
     val forecastLoader = applicationContext.appSingletons.forecastLoader
     return when (val result = forecastLoader.synchronousRefresh()) {
       Success -> Result.success()

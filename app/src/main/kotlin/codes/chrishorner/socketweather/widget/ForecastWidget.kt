@@ -10,15 +10,8 @@ import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
-import androidx.work.BackoffPolicy
-import androidx.work.Constraints
-import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
-import java.time.Duration
-import java.util.concurrent.TimeUnit.MINUTES
 
 class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
 
@@ -26,27 +19,12 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
 
   override fun onEnabled(context: Context) {
     // When widgets are placed, use WorkManager to try and update them every 2~ hours.
-    val request = PeriodicWorkRequestBuilder<WidgetUpdateWorker>(Duration.ofHours(2), Duration.ofMinutes(30))
-      .setConstraints(
-        Constraints.Builder()
-          .setRequiredNetworkType(NetworkType.CONNECTED)
-          .build()
-      )
-      .setBackoffCriteria(BackoffPolicy.EXPONENTIAL, 30, MINUTES)
-      .addTag(WORK_TAG)
-      .build()
-
-    WorkManager.getInstance(context).enqueue(request)
-    context.appSingletons.forecastLoader.refreshIfNecessary()
+    WidgetUpdateWorker.stop(context)
   }
 
   override fun onDisabled(context: Context) {
     // When all widgets are deleted, cancel the periodic updates.
-    WorkManager.getInstance(context).cancelAllWorkByTag(WORK_TAG)
-  }
-
-  companion object {
-    private const val WORK_TAG = "widget_update"
+    WidgetUpdateWorker.stop(context)
   }
 }
 

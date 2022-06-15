@@ -7,6 +7,8 @@ import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.action.actionStartActivity
+import androidx.glance.action.clickable
 import androidx.glance.appwidget.appWidgetBackground
 import androidx.glance.appwidget.cornerRadius
 import androidx.glance.background
@@ -27,7 +29,17 @@ import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import androidx.glance.unit.ColorProvider
+import codes.chrishorner.socketweather.MainActivity
 import codes.chrishorner.socketweather.R
+
+private val parentModifier: GlanceModifier
+  @Composable get() = GlanceModifier
+    .fillMaxSize()
+    .background(ImageProvider(R.drawable.bg_widget))
+    .appWidgetBackground()
+    .appWidgetBackgroundRadius()
+    .padding(8.dp)
+    .clickable(onClick = actionStartActivity<MainActivity>())
 
 @Composable
 fun TinyRow(conditions: WidgetCurrentConditions) {
@@ -129,14 +141,6 @@ fun Box(forecast: WidgetForecast, small: Boolean = false, hourlyCount: Int, dayC
     }
   }
 }
-
-private val parentModifier: GlanceModifier
-  @Composable get() = GlanceModifier
-    .fillMaxSize()
-    .background(ImageProvider(R.drawable.bg_widget))
-    .appWidgetBackground()
-    .appWidgetBackgroundRadius()
-    .padding(8.dp)
 
 @Composable
 private fun CurrentConditionsRow(conditions: WidgetCurrentConditions) {

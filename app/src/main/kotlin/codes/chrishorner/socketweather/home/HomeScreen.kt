@@ -37,6 +37,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowDropDown
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -83,7 +84,12 @@ object HomeScreen : MoleculeScreen<HomeEvent, HomeState>() {
 private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 
   val scrollState = rememberScrollState()
-  val toolbarElevation by animateDpAsState(targetValue = if (scrollState.value > 0) 4.dp else 0.dp)
+  val elevateToolbar by remember {
+    derivedStateOf {
+      scrollState.value > 0
+    }
+  }
+  val toolbarElevation by animateDpAsState(targetValue = if (elevateToolbar) 4.dp else 0.dp)
   var locationChooserVisible by rememberSaveable { mutableStateOf(false) }
 
   Box {

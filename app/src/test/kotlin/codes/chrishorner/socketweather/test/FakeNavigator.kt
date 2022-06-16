@@ -34,6 +34,7 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
   override val lastItemOrNull: Screen?
     get() = items.lastOrNull()
 
+  @Deprecated("Use 'lastItemOrNull' instead. Will be removed in 1.0.0.", replaceWith = ReplaceWith("lastItemOrNull"))
   override val lastOrNull: Screen?
     get() = items.lastOrNull()
 

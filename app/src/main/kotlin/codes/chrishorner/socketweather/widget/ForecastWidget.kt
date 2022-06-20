@@ -19,7 +19,9 @@ class ForecastWidgetReceiver : GlanceAppWidgetReceiver() {
 
   override fun onEnabled(context: Context) {
     // When widgets are placed, use WorkManager to try and update them every 2~ hours.
-    WidgetUpdateWorker.stop(context)
+    WidgetUpdateWorker.start(context)
+    // Also update now if we need to.
+    context.appSingletons.forecastLoader.refreshIfNecessary()
   }
 
   override fun onDisabled(context: Context) {

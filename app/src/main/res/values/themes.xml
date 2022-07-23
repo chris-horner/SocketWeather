@@ -13,4 +13,8 @@
     <item name="android:windowLightNavigationBar" tools:ignore="NewApi">true</item>
   </style>
 
+  <style name="Glance.AppWidget.Text" parent="" tools:override="true">
+    <item name="android:ellipsize">end</item>
+  </style>
+
 </resources>

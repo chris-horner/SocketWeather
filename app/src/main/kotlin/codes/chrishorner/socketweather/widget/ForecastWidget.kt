@@ -34,15 +34,16 @@ class ForecastWidget : GlanceAppWidget() {
 
   companion object {
     // Define breakpoints for different width and height configurations.
-    private val WIDTH_1U = 48.dp
-    private val WIDTH_2U = 96.dp
-    private val WIDTH_3U = 180.dp
-    private val WIDTH_4U = 220.dp
-    private val WIDTH_5U = 280.dp
-    private val HEIGHT_1U = 48.dp
-    private val HEIGHT_2U = 160.dp
-    private val HEIGHT_3U = 260.dp
-    private val HEIGHT_4U = 360.dp
+    private val WIDTH_1U = 57.dp
+    private val WIDTH_2U = 110.dp
+    private val WIDTH_3U = 203.dp
+    private val WIDTH_4U = 276.dp
+    private val WIDTH_5U = 349.dp
+    private val HEIGHT_0U = 48.dp
+    private val HEIGHT_1U = 102.dp
+    private val HEIGHT_2U = 200.dp
+    private val HEIGHT_3U = 337.dp
+    private val HEIGHT_4U = 440.dp
 
     // Using the breakpoints, define widget configurations.
     private val TINY_BOX = DpSize(WIDTH_1U, HEIGHT_1U)
@@ -104,12 +105,12 @@ class ForecastWidget : GlanceAppWidget() {
       TINY_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2, wide = true)
       SMALL_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3, wide = true)
       COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4, wide = true)
-      WIDE_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 4)
-      WIDER_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 5)
+      WIDE_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 3)
+      WIDER_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 4)
       BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 3)
-      TALL_BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 6)
-      BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 3)
-      TALL_BIG_BOX -> Box(formattedForecast, hourlyCount = 5, dayCount = 6)
+      TALL_BOX -> Box(formattedForecast, small = true, hourlyCount = 3, dayCount = 6)
+      BIG_BOX -> Box(formattedForecast, hourlyCount = 4, dayCount = 3)
+      TALL_BIG_BOX -> Box(formattedForecast, hourlyCount = 4, dayCount = 6)
     }
   }
 }

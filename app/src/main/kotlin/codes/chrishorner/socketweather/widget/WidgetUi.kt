@@ -2,11 +2,14 @@ package codes.chrishorner.socketweather.widget
 
 import android.os.Build
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.glance.GlanceModifier
 import androidx.glance.Image
 import androidx.glance.ImageProvider
+import androidx.glance.LocalContext
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.appWidgetBackground
@@ -67,7 +70,7 @@ fun TinyRow(conditions: WidgetCurrentConditions) {
 
 @Composable
 fun SmallRow(conditions: WidgetCurrentConditions) {
-  Box(modifier = parentModifier.padding(8.dp)) {
+  Box(modifier = parentModifier.padding(8.dp), contentAlignment = Alignment.Center) {
     SmallCurrentConditionsRow(conditions)
   }
 }
@@ -213,6 +216,11 @@ private fun UpcomingForecastRow(
   isSmall: Boolean = false,
   modifier: GlanceModifier = GlanceModifier,
 ) {
+  // The width of the temperature text needs to scale with SP.
+  val temperatureWidth = with(Density(LocalContext.current)) {
+    28.sp.toDp()
+  }
+
   Row(
     verticalAlignment = Alignment.CenterVertically,
     modifier = modifier.fillMaxWidth(),
@@ -225,14 +233,13 @@ private fun UpcomingForecastRow(
       modifier = GlanceModifier.size(24.dp),
     )
     Spacer(modifier = GlanceModifier.width(12.dp))
-    // TODO: Update widths to use sp.
-    RegularTemp(forecast.minTemp, modifier = GlanceModifier.width(28.dp))
+    RegularTemp(forecast.minTemp, modifier = GlanceModifier.width(temperatureWidth))
     Image(
       provider = ImageProvider(R.drawable.bg_widget_line),
       contentDescription = null,
       modifier = GlanceModifier.height(4.dp).width(32.dp).padding(horizontal = 6.dp),
     )
-    RegularTemp(forecast.maxTemp, modifier = GlanceModifier.width(28.dp))
+    RegularTemp(forecast.maxTemp, modifier = GlanceModifier.width(temperatureWidth))
   }
 }
 
@@ -416,7 +423,7 @@ private fun LargeTemp(text: String, modifier: GlanceModifier = GlanceModifier) {
     text = text,
     maxLines = 1,
     style = TextStyle(
-      fontSize = 34.sp,
+      fontSize = 34.dpAsSp,
       fontWeight = FontWeight.Medium,
       color = ColorProvider(R.color.widgetAccent),
     ),
@@ -433,7 +440,7 @@ private fun RegularText(
   Text(
     text = text,
     style = TextStyle(
-      fontSize = 18.sp,
+      fontSize = 16.sp,
       fontWeight = fontWeight,
       color = ColorProvider(R.color.widgetOnBackgroundSecondary),
     ),
@@ -450,10 +457,14 @@ private fun TitleText(
   Text(
     text = text,
     style = TextStyle(
-      fontSize = 20.sp,
+      fontSize = 20.dpAsSp,
       fontWeight = fontWeight,
       color = ColorProvider(R.color.widgetAccent),
     ),
     modifier = modifier,
   )
 }
+
+private val Int.dpAsSp
+  @Composable
+  get(): TextUnit = with(Density(LocalContext.current)) { this@dpAsSp.dp.toSp() }

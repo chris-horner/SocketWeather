@@ -77,7 +77,7 @@ fun SmallRow(conditions: WidgetCurrentConditions) {
 
 @Composable
 fun Row(conditions: WidgetCurrentConditions) {
-  Box(modifier = parentModifier.padding(8.dp), contentAlignment = Alignment.Center) {
+  Box(modifier = parentModifier.padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
     CurrentConditionsRow(conditions)
   }
 }
@@ -153,8 +153,7 @@ private fun CurrentConditionsRow(conditions: WidgetCurrentConditions) {
   ) {
     Column(modifier = GlanceModifier.defaultWeight().padding(top = 4.dp)) {
       TitleText(conditions.location, fontWeight = FontWeight.Medium)
-      SmallText(conditions.description)
-      SmallText(conditions.feelsLikeText)
+      RegularText(conditions.description)
     }
     Column(horizontalAlignment = Alignment.End) {
       Row(verticalAlignment = Alignment.CenterVertically) {
@@ -201,7 +200,7 @@ private fun SmallCurrentConditionsRow(conditions: WidgetCurrentConditions) {
 private fun HourlyForecastRow(hourlyForecasts: List<WidgetHourlyForecast>) {
   Row {
     hourlyForecasts.forEachIndexed { index, entry ->
-      val padding = if (index != 0) 24.dp else 0.dp
+      val padding = if (index != 0) 32.dp else 0.dp
       HourlyForecastEntry(
         entry,
         modifier = GlanceModifier.padding(start = padding),
@@ -218,7 +217,7 @@ private fun UpcomingForecastRow(
 ) {
   // The width of the temperature text needs to scale with SP.
   val temperatureWidth = with(Density(LocalContext.current)) {
-    28.sp.toDp()
+    30.sp.toDp()
   }
 
   Row(
@@ -327,13 +326,13 @@ private fun HourlyForecastEntry(entry: WidgetHourlyForecast, modifier: GlanceMod
     horizontalAlignment = Alignment.CenterHorizontally,
     modifier = modifier,
   ) {
-    SmallText(entry.time)
+    RegularText(entry.time)
     Image(
       provider = ImageProvider(entry.iconRes),
       contentDescription = entry.description,
       modifier = GlanceModifier.size(32.dp).padding(vertical = 4.dp)
     )
-    SmallTemp(entry.temp)
+    RegularTemp(entry.temp)
   }
 }
 
@@ -457,7 +456,7 @@ private fun TitleText(
   Text(
     text = text,
     style = TextStyle(
-      fontSize = 20.dpAsSp,
+      fontSize = 20.sp,
       fontWeight = fontWeight,
       color = ColorProvider(R.color.widgetAccent),
     ),

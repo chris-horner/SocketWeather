@@ -39,10 +39,9 @@ class ForecastWidget : GlanceAppWidget() {
     private val WIDTH_3U = 203.dp
     private val WIDTH_4U = 276.dp
     private val WIDTH_5U = 349.dp
-    private val HEIGHT_0U = 48.dp
     private val HEIGHT_1U = 102.dp
     private val HEIGHT_2U = 200.dp
-    private val HEIGHT_3U = 337.dp
+    private val HEIGHT_3U = 320.dp
     private val HEIGHT_4U = 440.dp
 
     // Using the breakpoints, define widget configurations.
@@ -107,7 +106,7 @@ class ForecastWidget : GlanceAppWidget() {
       COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 4, wide = true)
       WIDE_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 3)
       WIDER_SHORT_BOX -> ShortBox(formattedForecast, hourlyCount = 4)
-      BOX -> Box(formattedForecast, small = true, hourlyCount = 4, dayCount = 3)
+      BOX -> Box(formattedForecast, small = true, hourlyCount = 3, dayCount = 3)
       TALL_BOX -> Box(formattedForecast, small = true, hourlyCount = 3, dayCount = 6)
       BIG_BOX -> Box(formattedForecast, hourlyCount = 4, dayCount = 3)
       TALL_BIG_BOX -> Box(formattedForecast, hourlyCount = 4, dayCount = 6)

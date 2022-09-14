@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.ui.platform.AndroidUiDispatcher
 import androidx.compose.ui.platform.LocalContext
+import app.cash.molecule.RecompositionClock
 import app.cash.molecule.launchMolecule
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.ScreenModelStore
@@ -16,6 +16,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
@@ -45,7 +46,9 @@ abstract class MoleculeScreen<Event, State> : Screen {
 abstract class MoleculeScreenModel<Event, State> : ScreenModel {
 
   val events by lazy(NONE) { MutableSharedFlow<Event>(extraBufferCapacity = 1) }
-  val states by lazy(NONE) { moleculeScope.launchMolecule { states(events) } }
+  val states by lazy(NONE) {
+    moleculeScope.launchMolecule(RecompositionClock.Immediate) { states(events) }
+  }
 
   @Composable
   abstract fun states(events: Flow<Event>): State
@@ -55,6 +58,6 @@ private val ScreenModel.moleculeScope: CoroutineScope
   get() = ScreenModelStore.getOrPutDependency(
     screenModel = this,
     name = "ScreenModelMoleculeScope",
-    factory = { key -> CoroutineScope(SupervisorJob() + AndroidUiDispatcher.Main) + CoroutineName(key) },
+    factory = { key -> CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate) + CoroutineName(key) },
     onDispose = { scope -> scope.cancel() }
   )

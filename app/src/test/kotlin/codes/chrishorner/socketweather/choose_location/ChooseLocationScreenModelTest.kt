@@ -56,7 +56,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `loading state changes to searching on character entry`() {
+  @Test fun `loading state changes to searching on character entry`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
       sendEvent(InputSearch("A"))
@@ -64,7 +64,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `clicking close pops screen`() {
+  @Test fun `clicking close pops screen`() = runBlocking {
     navigator.items.clear()
     navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
     createScreenModel().test {
@@ -77,7 +77,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `search not executed until third character entered`() {
+  @Test fun `search not executed until third character entered`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().results).isEmpty()
       sendEvent(InputSearch("F"))
@@ -93,7 +93,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `search with network failure shows error`() {
+  @Test fun `search with network failure shows error`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -109,7 +109,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting search result saves selection`() {
+  @Test fun `selecting search result saves selection`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -135,7 +135,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting search result with network failure shows error`() {
+  @Test fun `selecting search result with network failure shows error`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -156,7 +156,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting Follow Me with location permission saves selection`() {
+  @Test fun `selecting Follow Me with location permission saves selection`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -171,7 +171,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting Follow Me without location permission shows error`() {
+  @Test fun `selecting Follow Me without location permission shows error`() = runBlocking {
     createScreenModel().test {
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Idle)
 
@@ -186,7 +186,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting Follow Me pops to HomeScreen if possible`() {
+  @Test fun `selecting Follow Me pops to HomeScreen if possible`() = runBlocking {
     navigator.items.clear()
     navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
 
@@ -201,7 +201,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting search result pops to HomeScreen if possible`() {
+  @Test fun `selecting search result pops to HomeScreen if possible`() = runBlocking {
     navigator.items.clear()
     navigator.items.addAll(listOf(HomeScreen, ChooseLocationScreen(showCloseButton = true)))
 
@@ -219,7 +219,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting search result triggers refresh`() {
+  @Test fun `selecting search result triggers refresh`() = runBlocking {
     createScreenModel().test {
       awaitItem()
       sendEvent(InputSearch("Fakezroy"))
@@ -231,7 +231,7 @@ class ChooseLocationScreenModelTest {
     }
   }
 
-  @Test fun `selecting Follow Me triggers refresh`() {
+  @Test fun `selecting Follow Me triggers refresh`() = runBlocking {
     createScreenModel().test {
       awaitItem()
       sendEvent(FollowMeClicked(hasLocationPermission = true))

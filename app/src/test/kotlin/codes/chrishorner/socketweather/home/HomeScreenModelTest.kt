@@ -61,7 +61,7 @@ class HomeScreenModelTest {
     )
   }
 
-  @Test fun `null forecast with idle loading shows empty state`() {
+  @Test fun `null forecast with idle loading shows empty state`() = runBlocking {
     screenModel.test {
       val state = awaitItem()
       assertThat(state.content).isEqualTo(HomeState.Content.Empty)

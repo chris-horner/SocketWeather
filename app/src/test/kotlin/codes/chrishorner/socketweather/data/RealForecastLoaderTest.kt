@@ -59,13 +59,13 @@ class RealForecastLoaderTest {
 
   @Test fun `successful refresh of LocationSelection-FollowMe updates state and store`() = runBlocking {
     locationSelectionStore.set(LocationSelection.FollowMe)
-    locationResolver.result.send(Result.Success(TestData.location1))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
       assertThat(awaitItem()).isEqualTo(State.Idle)
       forecastLoader.forceRefresh()
       assertThat(awaitItem()).isEqualTo(State.FindingLocation)
+      locationResolver.result.send(Result.Success(TestData.location1))
       assertThat(awaitItem()).isEqualTo(State.LoadingForecast)
       assertThat(awaitItem()).isEqualTo(State.Idle)
     }
@@ -114,13 +114,13 @@ class RealForecastLoaderTest {
 
   @Test fun `location resolution failure produces error state`(@TestParameter type: ForecastError) = runBlocking {
     locationSelectionStore.set(LocationSelection.FollowMe)
-    locationResolver.result.send(Result.Failure(type))
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
       assertThat(awaitItem()).isEqualTo(State.Idle)
       forecastLoader.forceRefresh()
       assertThat(awaitItem()).isEqualTo(State.FindingLocation)
+      locationResolver.result.send(Result.Failure(type))
       assertThat(awaitItem()).isEqualTo(State.Error(type))
     }
   }

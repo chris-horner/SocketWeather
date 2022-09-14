@@ -1,24 +1,26 @@
 package codes.chrishorner.socketweather.test
 
-import app.cash.molecule.testing.Event.Error
-import app.cash.molecule.testing.MoleculeTurbine
-import app.cash.molecule.testing.testMolecule
+import app.cash.molecule.RecompositionClock
+import app.cash.molecule.moleculeFlow
+import app.cash.turbine.ReceiveTurbine
+import app.cash.turbine.test
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
 import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.withTimeout
+import app.cash.turbine.Event as TurbineEvent
 
-fun <Event, State> MoleculeScreenModel<Event, State>.test(
+suspend fun <Event, State> MoleculeScreenModel<Event, State>.test(
   validate: suspend MoleculeScreenModelTester<Event, State>.() -> Unit,
 ) {
   val events = MutableSharedFlow<Event>(replay = 20)
-  testMolecule({ states(events) }) {
+  moleculeFlow(clock = RecompositionClock.Immediate) { states(events) }.test {
     val tester = MoleculeScreenModelTester(this, events)
     tester.validate()
     // TODO: Come up with a better way of asserting no unconsumed events. This _sucks_.
     try {
       val event = withTimeout(1) { awaitEvent() }
-      val cause = (event as? Error)?.throwable
+      val cause = (event as? TurbineEvent.Error)?.throwable
       throw AssertionError("Unconsumed event found. $event", cause)
     } catch (ignored: TimeoutCancellationException) {
     }
@@ -26,9 +28,9 @@ fun <Event, State> MoleculeScreenModel<Event, State>.test(
 }
 
 class MoleculeScreenModelTester<Event, State>(
-  private val turbine: MoleculeTurbine<State>,
+  private val turbine: ReceiveTurbine<State>,
   private val events: MutableSharedFlow<Event>,
-) : MoleculeTurbine<State> by turbine {
+) : ReceiveTurbine<State> by turbine {
 
   private var lastState: State? = null
 

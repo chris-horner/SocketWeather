@@ -8,6 +8,7 @@ import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.test
 import codes.chrishorner.socketweather.test.testWithScheduler
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Rule
@@ -89,7 +90,7 @@ class RainRadarScreenModelTest {
     }
   }
 
-  @Test fun `first state emission`() {
+  @Test fun `first state emission`() = runBlocking {
     // Generated timestamps are in UTC.
     val expectedTimestamps = listOf(
       "202108290500",
@@ -112,7 +113,7 @@ class RainRadarScreenModelTest {
     }
   }
 
-  @Test fun `back press navigates back`() {
+  @Test fun `back press navigates back`() = runBlocking {
     RainRadarScreenModel(navigator, location, clock).test {
       awaitItem()
       sendEvent(RainRadarBackPressEvent)

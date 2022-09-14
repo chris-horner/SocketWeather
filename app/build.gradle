@@ -74,9 +74,6 @@ android {
     unitTests.returnDefaultValues = true
   }
 
-  composeOptions {
-    kotlinCompilerExtensionVersion versions.compose
-  }
   packagingOptions {
     resources {
       excludes += ['**/*.kotlin_metadata', 'META-INF/*.kotlin_module', 'META-INF/*.properties', '/*.properties']
@@ -98,8 +95,9 @@ play {
   defaultToAppBundles = true
 }
 
-tasks.withType(org.jetbrains.kotlin.gradle.tasks.AbstractKotlinCompile).all {
+tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
   kotlinOptions.freeCompilerArgs += [
+    '-Xcontext-receivers',
     '-Xopt-in=kotlin.Experimental',
     '-Xopt-in=kotlinx.coroutines.FlowPreview',
     '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
@@ -142,7 +140,6 @@ dependencies {
   implementation deps.leakcanary.objectWatcher
   debugImplementation deps.leakcanary.android
   implementation deps.lifecycle
-  testImplementation deps.molecule.testing
   implementation deps.moshi.core
   implementation deps.moshi.kotlin
   implementation deps.okhttp.core

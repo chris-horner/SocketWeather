@@ -1,6 +1,6 @@
 package codes.chrishorner.socketweather.test
 
-import app.cash.turbine.FlowTurbine
+import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth.assertThat
@@ -12,7 +12,7 @@ import kotlin.contracts.ExperimentalContracts
 import kotlin.contracts.contract
 import kotlin.coroutines.coroutineContext
 
-suspend fun <T> Flow<T>.testWithScheduler(validate: suspend FlowTurbine<T>.() -> Unit) {
+suspend fun <T> Flow<T>.testWithScheduler(validate: suspend ReceiveTurbine<T>.() -> Unit) {
   val testScheduler = coroutineContext[TestCoroutineScheduler]
     ?: error("testWithScheduler must be run inside runTest {}.")
   flowOn(UnconfinedTestDispatcher(testScheduler)).test(validate = validate)
@@ -28,11 +28,4 @@ inline fun <reified T> Any?.assertIsOfType() {
     returns() implies (this@assertIsOfType is T)
   }
   assertThat(this).isInstanceOf<T>()
-}
-
-/**
- * Like [FlowTurbine.awaitItem], except asserts and returns the item as a different type.
- */
-suspend inline fun <reified R> FlowTurbine<*>.awaitItemAs(): R {
-  return awaitItem() as? R ?: throw AssertionError("Item isn't expected type ${R::class.simpleName}")
 }

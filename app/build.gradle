@@ -120,6 +120,7 @@ dependencies {
   implementation deps.compose.ui
   implementation deps.compose.uiGraphics
   debugImplementation deps.compose.uiTooling
+  implementation platform(deps.composeBom)
   implementation deps.coroutines.android
   testImplementation deps.coroutines.test
   implementation deps.datastore.core

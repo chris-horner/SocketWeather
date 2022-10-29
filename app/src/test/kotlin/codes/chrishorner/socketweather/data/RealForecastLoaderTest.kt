@@ -1,12 +1,12 @@
 package codes.chrishorner.socketweather.data
 
+import app.cash.turbine.Turbine
 import app.cash.turbine.test
 import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.LocationResolver.Result
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
-import codes.chrishorner.socketweather.test.TestChannel
 import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.widget.ForecastWidgetUpdater
 import com.google.common.truth.Truth.assertThat
@@ -65,7 +65,7 @@ class RealForecastLoaderTest {
       assertThat(awaitItem()).isEqualTo(State.Idle)
       forecastLoader.forceRefresh()
       assertThat(awaitItem()).isEqualTo(State.FindingLocation)
-      locationResolver.result.send(Result.Success(TestData.location1))
+      locationResolver.result.add(Result.Success(TestData.location1))
       assertThat(awaitItem()).isEqualTo(State.LoadingForecast)
       assertThat(awaitItem()).isEqualTo(State.Idle)
     }
@@ -81,7 +81,7 @@ class RealForecastLoaderTest {
     val forecastLoader = create(this)
 
     forecastLoader.forceRefresh()
-    forecastWidgetUpdater.updateCalls.awaitValue()
+    forecastWidgetUpdater.updateCalls.awaitItem()
   }
 
   @Test fun `loader only refreshes when forecast is stale`() = runBlocking {
@@ -120,7 +120,7 @@ class RealForecastLoaderTest {
       assertThat(awaitItem()).isEqualTo(State.Idle)
       forecastLoader.forceRefresh()
       assertThat(awaitItem()).isEqualTo(State.FindingLocation)
-      locationResolver.result.send(Result.Failure(type))
+      locationResolver.result.add(Result.Failure(type))
       assertThat(awaitItem()).isEqualTo(State.Error(type))
     }
   }
@@ -153,19 +153,19 @@ class RealForecastLoaderTest {
 
   private class FakeLocationResolver : LocationResolver {
 
-    val result = TestChannel<Result>()
+    val result = Turbine<Result>()
 
     override suspend fun getDeviceLocation(): Result {
-      return result.awaitValue()
+      return result.awaitItem()
     }
   }
 
   private class FakeForecastWidgetUpdater : ForecastWidgetUpdater {
 
-    val updateCalls = TestChannel<Unit>()
+    val updateCalls = Turbine<Unit>()
 
     override fun update() {
-      updateCalls.send(Unit)
+      updateCalls.add(Unit)
     }
   }
 }

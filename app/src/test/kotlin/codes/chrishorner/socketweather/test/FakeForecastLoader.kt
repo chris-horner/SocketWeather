@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.test
 
+import app.cash.turbine.Turbine
 import codes.chrishorner.socketweather.data.ForecastLoader
 import codes.chrishorner.socketweather.data.ForecastLoader.Result
 import codes.chrishorner.socketweather.data.ForecastLoader.State
@@ -8,13 +9,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 
 class FakeForecastLoader : ForecastLoader {
 
-  val refreshCalls = TestChannel<Unit>()
+  val refreshCalls = Turbine<Unit>()
   override val states = MutableStateFlow<State>(Idle)
 
   override fun refreshIfNecessary() = Unit
 
   override fun forceRefresh() {
-    refreshCalls.send(Unit)
+    refreshCalls.add(Unit)
   }
 
   override suspend fun synchronousRefresh(): Result = Result.Success

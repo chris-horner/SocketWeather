@@ -167,7 +167,7 @@ class HomeScreenModelTest {
     screenModel.test {
       awaitItem()
       sendEvent(HomeEvent.Refresh)
-      forecastLoader.refreshCalls.awaitValue()
+      forecastLoader.refreshCalls.awaitItem()
     }
   }
 
@@ -178,7 +178,7 @@ class HomeScreenModelTest {
       awaitItem()
       assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location1))
       sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(TestData.location2)))
-      forecastLoader.refreshCalls.awaitValue()
+      forecastLoader.refreshCalls.awaitItem()
       assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location2))
       assertThat(awaitItem().currentLocation.selection).isEqualTo(LocationSelection.Static(TestData.location2))
     }

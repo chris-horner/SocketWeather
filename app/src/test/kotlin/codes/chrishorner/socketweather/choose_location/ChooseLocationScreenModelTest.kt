@@ -227,7 +227,7 @@ class ChooseLocationScreenModelTest {
       val result = awaitItem().results.single()
       sendEvent(ResultSelected(result))
       awaitItem()
-      forecastLoader.refreshCalls.awaitValue()
+      forecastLoader.refreshCalls.awaitItem()
     }
   }
 
@@ -236,7 +236,7 @@ class ChooseLocationScreenModelTest {
       awaitItem()
       sendEvent(FollowMeClicked(hasLocationPermission = true))
       awaitItem()
-      forecastLoader.refreshCalls.awaitValue()
+      forecastLoader.refreshCalls.awaitItem()
     }
   }
 }

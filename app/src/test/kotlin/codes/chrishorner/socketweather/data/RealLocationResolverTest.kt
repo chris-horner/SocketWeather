@@ -1,8 +1,8 @@
 package codes.chrishorner.socketweather.data
 
+import app.cash.turbine.Turbine
 import codes.chrishorner.socketweather.data.LocationResolver.Result
 import codes.chrishorner.socketweather.test.TestApi
-import codes.chrishorner.socketweather.test.TestChannel
 import codes.chrishorner.socketweather.test.TestData
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -25,44 +25,44 @@ class RealLocationResolverTest {
   }
 
   @Test fun `valid device location produces location`() = runBlocking {
-    deviceLocator.location.send(TestData.deviceLocation1)
+    deviceLocator.location.add(TestData.deviceLocation1)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Success(TestData.location1))
   }
 
   @Test fun `no device location produces error`() = runBlocking {
-    deviceLocator.location.send(null)
+    deviceLocator.location.add(null)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.LOCATION))
   }
 
   @Test fun `location outside australia produces error`() = runBlocking {
     val tokyo = DeviceLocation(35.659478998452336, 139.7005600428793)
-    deviceLocator.location.send(tokyo)
+    deviceLocator.location.add(tokyo)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.NOT_AUSTRALIA))
   }
 
   @Test fun `malformed response produces error`() = runBlocking {
     api.responseMode = TestApi.ResponseMode.DATA_ERROR
-    deviceLocator.location.send(TestData.deviceLocation1)
+    deviceLocator.location.add(TestData.deviceLocation1)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.DATA))
   }
 
   @Test fun `network failure produces error`() = runBlocking {
     api.responseMode = TestApi.ResponseMode.NETWORK_ERROR
-    deviceLocator.location.send(TestData.deviceLocation1)
+    deviceLocator.location.add(TestData.deviceLocation1)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.NETWORK))
   }
 
   private class FakeDeviceLocator : DeviceLocator {
 
-    val location = TestChannel<DeviceLocation?>()
+    val location = Turbine<DeviceLocation?>()
 
     override suspend fun getLocation(): DeviceLocation? {
-      return location.awaitValue()
+      return location.awaitItem()
     }
   }
 }

@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.test
 
+import app.cash.turbine.Turbine
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.util.Navigator
@@ -9,15 +10,15 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
 
   data class Change(val event: StackEvent, val items: List<Screen>)
 
-  private val changes = TestChannel<Change>()
+  private val changes = Turbine<Change>()
 
   suspend fun awaitChange(): Change {
-    return changes.awaitValue()
+    return changes.awaitItem()
   }
 
   suspend fun assertNoChanges() {
     yield() // Give other coroutines a chance to finish.
-    changes.assertEmpty()
+    changes.ensureAllEventsConsumed()
   }
 
   override val items: MutableList<Screen> = mutableListOf()
@@ -61,7 +62,7 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
     return if (canPop) {
       items.removeLast()
       lastEvent = StackEvent.Pop
-      changes.send(Change(lastEvent, items.toList()))
+      changes.add(Change(lastEvent, items.toList()))
       true
     } else {
       false
@@ -87,7 +88,7 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
     }
 
     lastEvent = StackEvent.Pop
-    changes.send(Change(lastEvent, items.toList()))
+    changes.add(Change(lastEvent, items.toList()))
 
     return success
   }
@@ -95,26 +96,26 @@ class FakeNavigator(vararg initialScreens: Screen) : Navigator {
   override infix fun push(item: Screen) {
     items += item
     lastEvent = StackEvent.Push
-    changes.send(Change(lastEvent, items.toList()))
+    changes.add(Change(lastEvent, items.toList()))
   }
 
   override infix fun push(items: List<Screen>) {
     this.items += items
     lastEvent = StackEvent.Push
-    changes.send(Change(lastEvent, items.toList()))
+    changes.add(Change(lastEvent, items.toList()))
   }
 
   override fun replace(item: Screen) {
     if (items.isEmpty()) push(item)
     else items[items.lastIndex] = item
     lastEvent = StackEvent.Replace
-    changes.send(Change(lastEvent, items.toList()))
+    changes.add(Change(lastEvent, items.toList()))
   }
 
   override fun replaceAll(item: Screen) {
     items.clear()
     items += item
     lastEvent = StackEvent.Replace
-    changes.send(Change(lastEvent, items.toList()))
+    changes.add(Change(lastEvent, items.toList()))
   }
 }

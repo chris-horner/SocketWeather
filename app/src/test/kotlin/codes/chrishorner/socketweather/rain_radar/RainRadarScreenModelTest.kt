@@ -87,6 +87,8 @@ class RainRadarScreenModelTest {
         assertThat(subtitle).isEqualTo("3:00pm")
         assertThat(activeTimestampIndex).isEqualTo(0)
       }
+
+      cancelAndIgnoreRemainingEvents()
     }
   }
 

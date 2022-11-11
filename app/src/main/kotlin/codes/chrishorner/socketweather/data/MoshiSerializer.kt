@@ -25,7 +25,9 @@ inline fun <reified T> MoshiSerializer(moshi: Moshi, default: T): Serializer<T> 
   override suspend fun readFrom(input: InputStream): T {
     return try {
       withContext(Dispatchers.IO) {
-        input.source().buffer().use { source -> adapter.fromJson(source) } ?: defaultValue
+        input.source().buffer().use { source ->
+          if (!source.exhausted()) adapter.fromJson(source) else null
+        } ?: defaultValue
       }
     } catch (e: Exception) {
       Timber.e(e, "Failed to read value from disk.")

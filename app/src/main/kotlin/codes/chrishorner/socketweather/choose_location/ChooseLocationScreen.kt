@@ -14,12 +14,20 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
@@ -68,10 +76,6 @@ import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.MoleculeScreen
 import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.navigationBarsWithImePadding
-import com.google.accompanist.insets.statusBarsPadding
 
 data class ChooseLocationScreen(
   val showCloseButton: Boolean
@@ -89,7 +93,7 @@ data class ChooseLocationScreen(
 }
 
 @Composable
-fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLocationUiEvent) -> Unit) {
+fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLocationUiEvent) -> Unit = {}) {
 
   val focusManager = LocalFocusManager.current
   val currentlyIdle = state.loadingStatus == Idle
@@ -103,7 +107,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
     color = MaterialTheme.colors.background,
     modifier = Modifier
       .statusBarsPadding()
-      .navigationBarsPadding(start = true, end = true, bottom = false)
+      .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Start + WindowInsetsSides.End))
   ) {
     Box {
       Column {
@@ -160,14 +164,17 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
             }
           }
         }
-        Spacer(modifier = Modifier.navigationBarsWithImePadding())
+        Spacer(modifier = Modifier
+          .navigationBarsPadding()
+          .imePadding())
       }
 
       ErrorMessagesSnackbar(
         error = state.error,
         modifier = Modifier
           .align(Alignment.BottomStart)
-          .navigationBarsWithImePadding()
+          .navigationBarsPadding()
+          .imePadding()
           .padding(16.dp)
       )
     }
@@ -312,18 +319,14 @@ private fun FollowMeButton(onClick: (hasLocationPermission: Boolean) -> Unit) {
 @Composable
 fun ChooseLocationPreview() {
   SocketWeatherTheme {
-    ProvideWindowInsets {
-      ChooseLocationUi(
-        ChooseLocationState(
-          showCloseButton = true,
-          showFollowMeButton = true,
-          query = "",
-          results = emptyList(),
-          loadingStatus = Idle
-        )
-      ) {
-        // Don't handle events in Preview.
-      }
-    }
+    ChooseLocationUi(
+      ChooseLocationState(
+        showCloseButton = true,
+        showFollowMeButton = true,
+        query = "",
+        results = emptyList(),
+        loadingStatus = Idle
+      )
+    )
   }
 }

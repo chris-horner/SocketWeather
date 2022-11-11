@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.Icon
@@ -48,7 +49,6 @@ import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import codes.chrishorner.socketweather.util.MoleculeScreen
 import codes.chrishorner.socketweather.util.Navigator
-import com.google.accompanist.insets.systemBarsPadding
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.TilesOverlay

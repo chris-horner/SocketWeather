@@ -31,7 +31,6 @@ buildscript {
   ]
   ext.deps = [
     'accompanist': [
-      'insets': "com.google.accompanist:accompanist-insets:${versions.accompanist}",
       'systemUiController': "com.google.accompanist:accompanist-systemuicontroller:${versions.accompanist}",
     ],
     'androidGradlePlugin': "com.android.tools.build:gradle:${versions.androidGradlePlugin}",

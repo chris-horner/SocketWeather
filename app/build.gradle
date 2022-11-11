@@ -109,7 +109,6 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
 }
 
 dependencies {
-  implementation deps.accompanist.insets
   implementation deps.accompanist.systemUiController
   implementation deps.androidx.core
   implementation deps.androidx.activityCompose

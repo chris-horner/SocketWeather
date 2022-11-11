@@ -1,6 +1,13 @@
 package codes.chrishorner.socketweather.util
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.WindowInsetsSides.Companion.End
+import androidx.compose.foundation.layout.WindowInsetsSides.Companion.Start
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.only
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.TopAppBar
@@ -11,14 +18,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.google.accompanist.insets.navigationBarsPadding
-import com.google.accompanist.insets.statusBarsPadding
 
 /**
  * A wrapper around [TopAppBar] which uses [Modifier.statusBarsPadding] to shift the app bar's
  * contents down, but still draws the background behind the status bar too.
- *
- * Thanks Chris: https://github.com/chrisbanes/accompanist/blob/main/sample/src/main/java/dev/chrisbanes/accompanist/sample/insets/EdgeToEdgeLazyColumn.kt
  */
 @Composable
 fun InsetAwareTopAppBar(
@@ -44,7 +47,7 @@ fun InsetAwareTopAppBar(
       elevation = 0.dp,
       modifier = Modifier
         .statusBarsPadding()
-        .navigationBarsPadding(start = true, end = true, bottom = false)
+        .windowInsetsPadding(WindowInsets.navigationBars.only(Start + End))
     )
   }
 }

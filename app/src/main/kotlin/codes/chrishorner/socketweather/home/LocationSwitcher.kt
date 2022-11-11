@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
@@ -49,7 +50,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.styles.scrim
-import com.google.accompanist.insets.systemBarsPadding
 
 @Composable
 fun LocationSwitcher(
@@ -207,7 +207,7 @@ private fun updateVisibilityTransition(visible: Boolean): TransitionData {
 
   val visibilityState = remember { MutableTransitionState(initialState = false) }
   visibilityState.targetState = visible
-  val currentlyVisible = derivedStateOf { visibilityState.targetState || visibilityState.currentState }
+  val currentlyVisible = remember { derivedStateOf { visibilityState.targetState || visibilityState.currentState } }
   val transition = updateTransition(visibilityState, label = "LocationChooser")
 
   val cardScale = transition.animateFloat(

@@ -19,6 +19,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -65,8 +66,6 @@ import codes.chrishorner.socketweather.util.MoleculeScreen
 import codes.chrishorner.socketweather.util.MoleculeScreenModel
 import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
-import com.google.accompanist.insets.ProvideWindowInsets
-import com.google.accompanist.insets.navigationBarsPadding
 
 object HomeScreen : MoleculeScreen<HomeEvent, HomeState>() {
 
@@ -103,8 +102,8 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
             actions = { Menu(onEvent) }
           )
         }
-      ) {
-        Content(state.content, scrollState, onEvent)
+      ) { innerPadding ->
+        Content(state.content, scrollState, onEvent, Modifier.padding(innerPadding))
       }
     }
     LocationSwitcher(
@@ -184,20 +183,20 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit) {
+private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit, modifier: Modifier) {
   when (state) {
-    is Content.Error -> Error(state.type) { onEvent(Refresh) }
-    is Content.Loaded -> ForecastUi(state.conditions, scrollState, onEvent)
-    else -> Loading()
+    is Content.Error -> Error(state.type, modifier, onRefresh = { onEvent(Refresh) })
+    is Content.Loaded -> ForecastUi(state.conditions, scrollState, modifier, onEvent)
+    else -> Loading(modifier)
   }
 }
 
 @Composable
-private fun Loading() {
+private fun Loading(modifier: Modifier = Modifier) {
   Column(
-    modifier = Modifier.fillMaxSize(),
+    modifier = modifier.fillMaxSize(),
     verticalArrangement = Arrangement.Center,
-    horizontalAlignment = Alignment.CenterHorizontally
+    horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     CircularProgressIndicator(modifier = Modifier.padding(bottom = 16.dp))
     Text(stringResource(R.string.home_loading), style = MaterialTheme.typography.subtitle1)
@@ -205,7 +204,7 @@ private fun Loading() {
 }
 
 @Composable
-private fun Error(type: ForecastError, onRefresh: () -> Unit) {
+private fun Error(type: ForecastError, modifier: Modifier = Modifier, onRefresh: () -> Unit = {}) {
   val title: String
   val message: String
   val image: Painter
@@ -239,7 +238,7 @@ private fun Error(type: ForecastError, onRefresh: () -> Unit) {
   }
 
   Column(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxSize()
       .navigationBarsPadding(),
     verticalArrangement = Arrangement.Center,
@@ -280,16 +279,14 @@ private fun ErrorPreview() {
 @Composable
 private fun HomePreview() {
   SocketWeatherTheme {
-    ProvideWindowInsets {
-      HomeUi(
-        HomeState(
-          "Melbourne",
-          "Just now",
-          LocationEntry(LocationSelection.FollowMe, "Melbourne", "VIC"),
-          emptyList(),
-          Content.Loading
-        )
-      ) { /* Don't handle events in preview. */ }
-    }
+    HomeUi(
+      HomeState(
+        "Melbourne",
+        "Just now",
+        LocationEntry(LocationSelection.FollowMe, "Melbourne", "VIC"),
+        emptyList(),
+        Content.Loading
+      )
+    ) { /* Don't handle events in preview. */ }
   }
 }

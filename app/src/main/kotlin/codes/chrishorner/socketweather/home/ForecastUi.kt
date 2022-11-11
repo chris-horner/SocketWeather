@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -52,15 +54,20 @@ import codes.chrishorner.socketweather.styles.LargeTempTextStyle
 import codes.chrishorner.socketweather.styles.MediumTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.styles.TinyTempTextStyle
-import com.google.accompanist.insets.navigationBarsWithImePadding
 
 @Composable
-fun ForecastUi(conditions: FormattedConditions, scrollState: ScrollState, onEvent: (HomeEvent) -> Unit) {
+fun ForecastUi(
+  conditions: FormattedConditions,
+  scrollState: ScrollState,
+  modifier: Modifier = Modifier,
+  onEvent: (HomeEvent) -> Unit = {}
+) {
 
   Column(
-    modifier = Modifier
+    modifier = modifier
       .verticalScroll(scrollState)
-      .navigationBarsWithImePadding()
+      .navigationBarsPadding()
+      .imePadding()
   ) {
 
     Observations(conditions)
@@ -279,8 +286,6 @@ private fun ForecastUiPreview() {
           UpcomingForecast("Saturday", 50, "50%", "shower", "17°", "26°"),
         )
       )
-    ) {
-      // Don't handle events in preview.
-    }
+    )
   }
 }

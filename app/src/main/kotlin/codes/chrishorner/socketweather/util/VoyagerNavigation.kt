@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.util
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -26,6 +27,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.plus
+import kotlinx.parcelize.Parcelize
 import cafe.adriel.voyager.core.screen.Screen as VoyagerScreen
 import cafe.adriel.voyager.navigator.Navigator as VoyagerNavigator
 
@@ -70,7 +72,10 @@ private class DelegatingNavigator(private val voyagerNavigator: VoyagerNavigator
   }
 }
 
-private data class DelegatingVoyagerScreen<Event, State>(private val screen: Screen<Event, State>) : VoyagerScreen {
+@Parcelize
+private data class DelegatingVoyagerScreen<Event, State>(
+  private val screen: Screen<Event, State>,
+) : VoyagerScreen, Parcelable {
   @Composable
   override fun Content() {
     val context: Context = LocalContext.current

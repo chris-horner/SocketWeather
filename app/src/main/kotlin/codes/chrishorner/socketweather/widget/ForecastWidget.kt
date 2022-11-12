@@ -39,7 +39,7 @@ class ForecastWidget : GlanceAppWidget() {
     private val WIDTH_3U = 203.dp
     private val WIDTH_4U = 276.dp
     private val WIDTH_5U = 349.dp
-    private val HEIGHT_1U = 102.dp
+    private val HEIGHT_1U = 90.dp
     private val HEIGHT_2U = 200.dp
     private val HEIGHT_3U = 320.dp
     private val HEIGHT_4U = 440.dp
@@ -47,7 +47,6 @@ class ForecastWidget : GlanceAppWidget() {
     // Using the breakpoints, define widget configurations.
     private val TINY_BOX = DpSize(WIDTH_1U, HEIGHT_1U)
     private val TINY_ROW = DpSize(WIDTH_2U, HEIGHT_1U)
-    private val SMALL_ROW = DpSize(WIDTH_3U, HEIGHT_1U)
     private val ROW = DpSize(WIDTH_4U, HEIGHT_1U)
     private val TINY_SLIM_COLUMN = DpSize(WIDTH_1U, HEIGHT_2U)
     private val SMALL_SLIM_COLUMN = DpSize(WIDTH_1U, HEIGHT_3U)
@@ -67,7 +66,6 @@ class ForecastWidget : GlanceAppWidget() {
     setOf(
       TINY_BOX,
       TINY_ROW,
-      SMALL_ROW,
       ROW,
       TINY_SLIM_COLUMN,
       SMALL_SLIM_COLUMN,
@@ -96,7 +94,7 @@ class ForecastWidget : GlanceAppWidget() {
     when (LocalSize.current) {
       TINY_BOX -> Column(formattedForecast.dateForecasts, itemCount = 1)
       TINY_ROW -> TinyRow(formattedForecast.currentConditions)
-      SMALL_ROW -> SmallRow(formattedForecast.currentConditions)
+      //SMALL_ROW -> SmallRow(formattedForecast.currentConditions)
       ROW -> Row(formattedForecast.currentConditions)
       TINY_SLIM_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 2)
       SMALL_SLIM_COLUMN -> Column(formattedForecast.dateForecasts, itemCount = 3)

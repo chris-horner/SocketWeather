@@ -69,13 +69,6 @@ fun TinyRow(conditions: WidgetCurrentConditions) {
 }
 
 @Composable
-fun SmallRow(conditions: WidgetCurrentConditions) {
-  Box(modifier = parentModifier.padding(8.dp), contentAlignment = Alignment.Center) {
-    SmallCurrentConditionsRow(conditions)
-  }
-}
-
-@Composable
 fun Row(conditions: WidgetCurrentConditions) {
   Box(modifier = parentModifier.padding(horizontal = 8.dp), contentAlignment = Alignment.Center) {
     CurrentConditionsRow(conditions)

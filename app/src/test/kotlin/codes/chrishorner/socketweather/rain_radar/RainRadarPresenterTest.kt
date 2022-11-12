@@ -1,6 +1,5 @@
 package codes.chrishorner.socketweather.rain_radar
 
-import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
@@ -19,7 +18,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Locale
 
-class RainRadarScreenModelTest {
+class RainRadarPresenterTest {
 
   @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
@@ -103,7 +102,7 @@ class RainRadarScreenModelTest {
       "202108290550",
     )
 
-    RainRadarScreenModel(navigator, location, clock).test {
+    RainRadarPresenter(navigator, location, clock).test {
       assertThat(awaitItem()).isEqualTo(
         RainRadarState(
           location = location,
@@ -116,13 +115,10 @@ class RainRadarScreenModelTest {
   }
 
   @Test fun `back press navigates back`() = runBlocking {
-    RainRadarScreenModel(navigator, location, clock).test {
+    RainRadarPresenter(navigator, location, clock).test {
       awaitItem()
       sendEvent(RainRadarBackPressEvent)
-      with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Pop)
-        assertThat(items).containsExactly(HomeScreen)
-      }
+      assertThat(navigator.awaitStackChange()).containsExactly(HomeScreen)
     }
   }
 }

@@ -9,6 +9,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import codes.chrishorner.socketweather.Navigator
+import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Permission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
@@ -31,22 +33,20 @@ import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.util.CollectEffect
-import codes.chrishorner.socketweather.util.MoleculeScreenModel
-import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.update
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class ChooseLocationScreenModel(
+class ChooseLocationPresenter(
   showCloseButton: Boolean,
   private val navigator: Navigator,
   private val api: WeatherApi,
   private val forecastLoader: ForecastLoader,
   private val currentSelection: Store<LocationSelection>,
   private val savedSelections: Store<Set<LocationSelection>>,
-) : MoleculeScreenModel<ChooseLocationUiEvent, ChooseLocationState>() {
+) : Presenter<ChooseLocationUiEvent, ChooseLocationState> {
 
   private val initialState = ChooseLocationState(
     showCloseButton = showCloseButton,
@@ -106,7 +106,7 @@ class ChooseLocationScreenModel(
       currentSelection.set(selection)
       state.update { it.copy(loadingStatus = Submitted) }
       forecastLoader.forceRefresh()
-      if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
+      if (navigator.canPop) navigator.pop() else navigator.replaceAllWith(HomeScreen)
     } catch (e: Exception) {
       Timber.e(e, "Failed to select location.")
       state.update { it.copy(loadingStatus = SearchingDone, error = Submission) }
@@ -121,7 +121,7 @@ class ChooseLocationScreenModel(
       currentSelection.set(LocationSelection.FollowMe)
       state.update { it.copy(loadingStatus = Submitted) }
       forecastLoader.forceRefresh()
-      if (navigator.canPop) navigator.pop() else navigator.replaceAll(HomeScreen)
+      if (navigator.canPop) navigator.pop() else navigator.replaceAllWith(HomeScreen)
     } else {
       state.update { it.copy(loadingStatus = Idle, error = Permission) }
       delay(1_500L)
@@ -130,8 +130,8 @@ class ChooseLocationScreenModel(
   }
 
   companion object {
-    operator fun invoke(showCloseButton: Boolean, navigator: Navigator, context: Context): ChooseLocationScreenModel {
-      return ChooseLocationScreenModel(
+    operator fun invoke(showCloseButton: Boolean, navigator: Navigator, context: Context): ChooseLocationPresenter {
+      return ChooseLocationPresenter(
         showCloseButton = showCloseButton,
         navigator = navigator,
         api = context.appSingletons.networkComponents.api,

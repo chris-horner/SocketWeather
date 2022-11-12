@@ -1,21 +1,40 @@
 package codes.chrishorner.socketweather
 
-import android.annotation.SuppressLint
+import android.content.Context
+import android.os.Parcelable
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
-import cafe.adriel.voyager.navigator.Navigator
-import cafe.adriel.voyager.transitions.ScaleTransition
-import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
-import codes.chrishorner.socketweather.data.LocationSelection
-import codes.chrishorner.socketweather.home.HomeScreen
+import kotlinx.coroutines.flow.Flow
 
-@SuppressLint("StateFlowValueCalledInComposition") // We only want to calculate initialScreen once.
-@Composable
-fun Navigation() {
-  val currentSelection = LocalContext.current.appSingletons.stores.currentSelection.data.value
-  val initialScreen =
-    if (currentSelection != LocationSelection.None) HomeScreen
-    else ChooseLocationScreen(showCloseButton = false)
+/**
+ * Abstracts whatever flavour of navigation library we happen to be using this week.
+ *
+ * Given to [Presenter] instances to navigate to [Screen] destinations.
+ */
+interface Navigator {
+  val canPop: Boolean
+  fun push(screen: Screen<*, *>)
+  fun pop()
+  fun replaceAllWith(screen: Screen<*, *>)
+}
 
-  Navigator(initialScreen) { navigator -> ScaleTransition(navigator) }
+/**
+ * Represents a navigation destination.
+ *
+ * Is responsible for providing:
+ * - A [Presenter] that produces state for the screen and handles events.
+ * - A UI composable
+ */
+interface Screen<Event, State> : Parcelable {
+  fun onCreatePresenter(context: Context, navigator: Navigator): Presenter<Event, State>
+
+  @Composable
+  fun Content(state: State, onEvent: (Event) -> Unit)
+}
+
+/**
+ * Takes a stream of events and produces state over time for a [Screen].
+ */
+interface Presenter<Event, State> {
+  @Composable
+  fun states(events: Flow<Event>): State
 }

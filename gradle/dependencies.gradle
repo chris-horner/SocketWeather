@@ -26,7 +26,7 @@ buildscript {
     'timber': '4.7.1',
     'truth': '1.1.3',
     'turbine': '0.12.0',
-    'voyager': '1.0.0-rc02',
+    'voyager': '1.0.0-beta16', // Don't bump until this is fixed: https://github.com/adrielcafe/voyager/issues/62
     'workManager' : '2.7.1',
   ]
   ext.deps = [

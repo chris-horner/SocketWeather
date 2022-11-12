@@ -60,7 +60,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import codes.chrishorner.socketweather.Navigator
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Permission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.Error.Submission
 import codes.chrishorner.socketweather.choose_location.ChooseLocationState.LoadingStatus.Idle
@@ -73,18 +75,18 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Clo
 import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.ResultSelected
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
-import codes.chrishorner.socketweather.util.MoleculeScreen
-import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class ChooseLocationScreen(
   val showCloseButton: Boolean
-) : MoleculeScreen<ChooseLocationUiEvent, ChooseLocationState>() {
+) : Screen<ChooseLocationUiEvent, ChooseLocationState> {
 
-  override fun onCreateScreenModel(
+  override fun onCreatePresenter(
     context: Context,
     navigator: Navigator,
-  ) = ChooseLocationScreenModel(showCloseButton, navigator, context)
+  ) = ChooseLocationPresenter(showCloseButton, navigator, context)
 
   @Composable
   override fun Content(state: ChooseLocationState, onEvent: (ChooseLocationUiEvent) -> Unit) {

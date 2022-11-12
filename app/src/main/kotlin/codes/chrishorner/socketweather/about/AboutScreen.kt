@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.about
 
+import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.annotation.DrawableRes
@@ -32,18 +33,24 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
 import codes.chrishorner.socketweather.BuildConfig
+import codes.chrishorner.socketweather.Navigator
+import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.Screen
+import codes.chrishorner.socketweather.about.AboutPresenter.BackPressEvent
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import kotlinx.parcelize.Parcelize
 
-object AboutScreen : Screen {
+@Parcelize
+object AboutScreen : Screen<BackPressEvent, Unit> {
+  override fun onCreatePresenter(context: Context, navigator: Navigator): Presenter<BackPressEvent, Unit> {
+    return AboutPresenter(navigator)
+  }
+
   @Composable
-  override fun Content() {
-    val navigator = LocalNavigator.currentOrThrow
-    AboutUi(onBack = { navigator.pop() })
+  override fun Content(state: Unit, onEvent: (BackPressEvent) -> Unit) {
+    AboutUi(onBack = { onEvent(BackPressEvent) })
   }
 }
 

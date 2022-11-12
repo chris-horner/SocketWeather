@@ -9,12 +9,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import codes.chrishorner.socketweather.Navigator
+import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.data.RainTimestamp
 import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.util.CollectEffect
-import codes.chrishorner.socketweather.util.MoleculeScreenModel
-import codes.chrishorner.socketweather.util.Navigator
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -22,11 +22,11 @@ import java.time.Clock
 import java.time.ZoneId
 import kotlin.time.Duration.Companion.minutes
 
-class RainRadarScreenModel(
+class RainRadarPresenter(
   private val navigator: Navigator,
   private val location: RainRadarLocation,
   private val clock: Clock = Clock.systemDefaultZone(),
-) : MoleculeScreenModel<RainRadarBackPressEvent, RainRadarState>() {
+) : Presenter<RainRadarBackPressEvent, RainRadarState> {
 
   @Composable
   override fun states(events: Flow<RainRadarBackPressEvent>): RainRadarState {
@@ -55,18 +55,18 @@ class RainRadarScreenModel(
       zoom = 3.0,
     )
 
-    operator fun invoke(context: Context, navigator: Navigator): RainRadarScreenModel {
+    operator fun invoke(context: Context, navigator: Navigator): RainRadarPresenter {
       val location = context.appSingletons.stores.forecast.data.value?.location
         ?.let { RainRadarLocation(it.latitude, it.longitude, it.timezone, zoom = 9.0) }
         ?: defaultLocation
 
-      return RainRadarScreenModel(navigator, location)
+      return RainRadarPresenter(navigator, location)
     }
   }
 }
 
-// Move this to ScreenModel once Molecule supports Dispatcher control.
-// https://github.com/cashapp/molecule/issues/78
+// TODO: Move this to Presenter once Molecule supports Dispatcher control.
+//  https://github.com/cashapp/molecule/issues/78
 @VisibleForTesting
 fun generateRainRadarStates(
   location: RainRadarLocation,

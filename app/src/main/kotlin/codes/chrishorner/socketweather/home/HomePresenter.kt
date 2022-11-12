@@ -8,6 +8,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import codes.chrishorner.socketweather.Navigator
+import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutScreen
 import codes.chrishorner.socketweather.appSingletons
@@ -30,8 +32,6 @@ import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
 import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 import codes.chrishorner.socketweather.util.CollectEffect
-import codes.chrishorner.socketweather.util.MoleculeScreenModel
-import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.Strings
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
 import codes.chrishorner.socketweather.util.localTimeAtZone
@@ -47,7 +47,7 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
-class HomeScreenModel(
+class HomePresenter(
   private val navigator: Navigator,
   private val forecastLoader: ForecastLoader,
   private val forecast: StateFlow<Forecast?>,
@@ -55,7 +55,7 @@ class HomeScreenModel(
   private val allSelections: StateFlow<Set<LocationSelection>>,
   private val strings: Strings,
   private val clock: Clock = Clock.systemDefaultZone(),
-) : MoleculeScreenModel<HomeEvent, HomeState>() {
+) : Presenter<HomeEvent, HomeState> {
 
   private val timeFormatter = DateTimeFormatter.ofPattern("h a")
 
@@ -233,10 +233,10 @@ class HomeScreenModel(
   }
 
   companion object {
-    operator fun invoke(context: Context, navigator: Navigator): HomeScreenModel {
+    operator fun invoke(context: Context, navigator: Navigator): HomePresenter {
       val singletons = context.appSingletons
       val stores = singletons.stores
-      return HomeScreenModel(
+      return HomePresenter(
         navigator = navigator,
         forecastLoader = singletons.forecastLoader,
         forecast = stores.forecast.data,

@@ -54,7 +54,10 @@ import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
+import codes.chrishorner.socketweather.Navigator
+import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
@@ -62,15 +65,14 @@ import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
-import codes.chrishorner.socketweather.util.MoleculeScreen
-import codes.chrishorner.socketweather.util.MoleculeScreenModel
-import codes.chrishorner.socketweather.util.Navigator
 import codes.chrishorner.socketweather.util.permissionState
+import kotlinx.parcelize.Parcelize
 
-object HomeScreen : MoleculeScreen<HomeEvent, HomeState>() {
+@Parcelize
+object HomeScreen : Screen<HomeEvent, HomeState> {
 
-  override fun onCreateScreenModel(context: Context, navigator: Navigator): MoleculeScreenModel<HomeEvent, HomeState> {
-    return HomeScreenModel(context, navigator)
+  override fun onCreatePresenter(context: Context, navigator: Navigator): Presenter<HomeEvent, HomeState> {
+    return HomePresenter(context, navigator)
   }
 
   @Composable

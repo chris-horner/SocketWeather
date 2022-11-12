@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.test
 
 import app.cash.turbine.ReceiveTurbine
 import app.cash.turbine.test
+import com.google.common.truth.IterableSubject
 import com.google.common.truth.Subject
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.flow.Flow
@@ -20,6 +21,10 @@ suspend fun <T> Flow<T>.testWithScheduler(validate: suspend ReceiveTurbine<T>.()
 
 inline fun <reified T> Subject.isInstanceOf() {
   isInstanceOf(T::class.java)
+}
+
+fun <T> IterableSubject.containsExactlyInOrder(vararg items: T) {
+  containsExactly(*items).inOrder()
 }
 
 @OptIn(ExperimentalContracts::class)

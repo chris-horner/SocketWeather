@@ -43,22 +43,24 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.net.toUri
+import codes.chrishorner.socketweather.Navigator
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.styles.CopyrightTextStyle
 import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
-import codes.chrishorner.socketweather.util.MoleculeScreen
-import codes.chrishorner.socketweather.util.Navigator
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import kotlinx.parcelize.Parcelize
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.overlay.TilesOverlay
 
-object RainRadarScreen : MoleculeScreen<RainRadarBackPressEvent, RainRadarState>() {
+@Parcelize
+object RainRadarScreen : Screen<RainRadarBackPressEvent, RainRadarState> {
 
-  override fun onCreateScreenModel(
+  override fun onCreatePresenter(
     context: Context,
     navigator: Navigator
-  ) = RainRadarScreenModel(context, navigator)
+  ) = RainRadarPresenter(context, navigator)
 
   @Composable
   override fun Content(state: RainRadarState, onEvent: (RainRadarBackPressEvent) -> Unit) {

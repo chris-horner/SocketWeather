@@ -1,6 +1,5 @@
 package codes.chrishorner.socketweather.home
 
-import cafe.adriel.voyager.core.stack.StackEvent
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.about.AboutScreen
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
@@ -18,6 +17,7 @@ import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
 import codes.chrishorner.socketweather.test.TestApi
 import codes.chrishorner.socketweather.test.TestData
+import codes.chrishorner.socketweather.test.containsExactlyInOrder
 import codes.chrishorner.socketweather.test.isInstanceOf
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
@@ -30,7 +30,7 @@ import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.Locale
 
-class HomeScreenModelTest {
+class HomePresenterTest {
 
   @get:Rule val localeRule = DefaultLocaleRule(Locale.forLanguageTag("en-AU"))
 
@@ -40,7 +40,7 @@ class HomeScreenModelTest {
   private val currentSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
   private val allSelections = MutableStateFlow<Set<LocationSelection>>(emptySet())
   private val clock: MutableClock
-  private val screenModel: HomeScreenModel
+  private val presenter: HomePresenter
   private val testApi: TestApi
 
   private val strings = FakeStrings(
@@ -56,13 +56,13 @@ class HomeScreenModelTest {
     val startTime = ZonedDateTime.of(2022, 2, 27, 9, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = MutableClock(startTime.toOffsetDateTime())
     testApi = TestApi(clock)
-    screenModel = HomeScreenModel(
+    presenter = HomePresenter(
       navigator, forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock
     )
   }
 
   @Test fun `null forecast with idle loading shows empty state`() = runBlocking {
-    screenModel.test {
+    presenter.test {
       val state = awaitItem()
       assertThat(state.content).isEqualTo(HomeState.Content.Empty)
     }
@@ -71,7 +71,7 @@ class HomeScreenModelTest {
   @Test fun `loaded forecast with idle loading shows loaded state`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
@@ -87,7 +87,7 @@ class HomeScreenModelTest {
     setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.LoadingForecast
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updating now…")
@@ -100,7 +100,7 @@ class HomeScreenModelTest {
   @Test fun `null forecast with loading shows loading state`() = runBlocking {
     forecastLoader.states.value = State.LoadingForecast
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo("Loading forecast…")
         assertThat(toolbarSubtitle).isEqualTo("Updating now…")
@@ -113,7 +113,7 @@ class HomeScreenModelTest {
   @Test fun `null forecast with error shows error state`() = runBlocking {
     forecastLoader.states.value = State.Error(ForecastError.NETWORK)
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo("Loading forecast…")
         assertThat(toolbarSubtitle).isNull()
@@ -126,7 +126,7 @@ class HomeScreenModelTest {
     setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.Error(ForecastError.NETWORK)
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
@@ -139,7 +139,7 @@ class HomeScreenModelTest {
     setTestDataWith(TestData.location1)
     clock.advanceBy(Duration.ofMinutes(1))
 
-    screenModel.test {
+    presenter.test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated Relative time string")
@@ -151,20 +151,20 @@ class HomeScreenModelTest {
   @Test fun `AddLocation event navigates to ChooseLocationScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       awaitItem()
       sendEvent(HomeEvent.AddLocation)
-      with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Push)
-        assertThat(items.last()).isEqualTo(ChooseLocationScreen(showCloseButton = true))
-      }
+      assertThat(navigator.awaitStackChange()).containsExactlyInOrder(
+        HomeScreen,
+        ChooseLocationScreen(showCloseButton = true),
+      )
     }
   }
 
   @Test fun `Refresh event forces forecast to refresh`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       awaitItem()
       sendEvent(HomeEvent.Refresh)
       forecastLoader.refreshCalls.awaitItem()
@@ -174,7 +174,7 @@ class HomeScreenModelTest {
   @Test fun `SwitchLocation event changes selection and forces refresh`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       awaitItem()
       assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location1))
       sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(TestData.location2)))
@@ -187,26 +187,20 @@ class HomeScreenModelTest {
   @Test fun `ViewAbout event navigates to AboutScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       awaitItem()
       sendEvent(HomeEvent.ViewAbout)
-      with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Push)
-        assertThat(items.last()).isEqualTo(AboutScreen)
-      }
+      assertThat(navigator.awaitStackChange()).containsExactlyInOrder(HomeScreen, AboutScreen)
     }
   }
 
   @Test fun `ViewRainRadar event navigates to RainRadarScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    screenModel.test {
+    presenter.test {
       awaitItem()
       sendEvent(HomeEvent.ViewRainRadar)
-      with(navigator.awaitChange()) {
-        assertThat(event).isEqualTo(StackEvent.Push)
-        assertThat(items.last()).isEqualTo(RainRadarScreen)
-      }
+      assertThat(navigator.awaitStackChange()).containsExactlyInOrder(HomeScreen, RainRadarScreen)
     }
   }
 

@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'app.cash.molecule'
+apply plugin: 'kotlin-parcelize'
 apply plugin: 'com.github.triplet.play'
 
 def versionMajor = 0

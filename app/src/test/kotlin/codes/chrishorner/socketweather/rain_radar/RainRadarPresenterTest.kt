@@ -1,11 +1,9 @@
 package codes.chrishorner.socketweather.rain_radar
 
-import codes.chrishorner.socketweather.data.generateRainRadarTimestamps
 import codes.chrishorner.socketweather.home.HomeScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.test
-import codes.chrishorner.socketweather.test.testWithScheduler
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.advanceTimeBy
@@ -39,7 +37,7 @@ class RainRadarPresenterTest {
   }
 
   @Test fun `active timestamp index and subtitle update over time`() = runTest {
-    generateRainRadarStates(location, generateRainRadarTimestamps(clock)).testWithScheduler {
+    RainRadarPresenter(navigator, location, clock).test {
       with(awaitItem()) {
         assertThat(subtitle).isEqualTo("3:00pm")
         assertThat(activeTimestampIndex).isEqualTo(0)

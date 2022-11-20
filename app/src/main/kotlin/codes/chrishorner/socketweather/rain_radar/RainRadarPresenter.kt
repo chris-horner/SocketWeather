@@ -1,7 +1,6 @@
 package codes.chrishorner.socketweather.rain_radar
 
 import android.content.Context
-import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -46,6 +45,38 @@ class RainRadarPresenter(
     return states.collectAsState(getState(location, rainTimestamps)).value
   }
 
+  private fun generateRainRadarStates(
+    location: RainRadarLocation,
+    rainTimestamps: List<RainTimestamp>,
+  ): Flow<RainRadarState> = flow {
+    val state = getState(location, rainTimestamps)
+    var activeIndex = 0
+
+    // Loop through and display each rainfall overlay.
+    while (true) {
+      emit(state.copy(subtitle = rainTimestamps[activeIndex].label, activeTimestampIndex = activeIndex))
+
+      // Pause on each timestamp for 500ms, or 1s if it's the last.
+      if (activeIndex == rainTimestamps.size - 1) delay(1_000) else delay(500)
+
+      activeIndex++
+      if (activeIndex >= rainTimestamps.size) activeIndex = 0
+    }
+  }
+
+  private fun getState(
+    location: RainRadarLocation,
+    rainTimestamps: List<RainTimestamp>,
+    activeIndex: Int = 0,
+  ): RainRadarState {
+    return RainRadarState(
+      location,
+      rainTimestamps[activeIndex].label,
+      rainTimestamps.map { it.timestamp },
+      activeTimestampIndex = activeIndex
+    )
+  }
+
   companion object {
     // Centre on Australia if there's no current location.
     private val defaultLocation = RainRadarLocation(
@@ -63,39 +94,4 @@ class RainRadarPresenter(
       return RainRadarPresenter(navigator, location)
     }
   }
-}
-
-// TODO: Move this to Presenter once Molecule supports Dispatcher control.
-//  https://github.com/cashapp/molecule/issues/78
-@VisibleForTesting
-fun generateRainRadarStates(
-  location: RainRadarLocation,
-  rainTimestamps: List<RainTimestamp>,
-): Flow<RainRadarState> = flow {
-  val state = getState(location, rainTimestamps)
-  var activeIndex = 0
-
-  // Loop through and display each rainfall overlay.
-  while (true) {
-    emit(state.copy(subtitle = rainTimestamps[activeIndex].label, activeTimestampIndex = activeIndex))
-
-    // Pause on each timestamp for 500ms, or 1s if it's the last.
-    if (activeIndex == rainTimestamps.size - 1) delay(1_000) else delay(500)
-
-    activeIndex++
-    if (activeIndex >= rainTimestamps.size) activeIndex = 0
-  }
-}
-
-private fun getState(
-  location: RainRadarLocation,
-  rainTimestamps: List<RainTimestamp>,
-  activeIndex: Int = 0,
-): RainRadarState {
-  return RainRadarState(
-    location,
-    rainTimestamps[activeIndex].label,
-    rainTimestamps.map { it.timestamp },
-    activeTimestampIndex = activeIndex
-  )
 }

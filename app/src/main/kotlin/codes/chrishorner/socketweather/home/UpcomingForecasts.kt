@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
@@ -35,7 +36,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
     for (forecast in forecasts) {
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.height(48.dp).padding(vertical = 8.dp)
+        modifier = Modifier.heightIn(56.dp).padding(vertical = 8.dp)
       ) {
 
         Text(
@@ -59,7 +60,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
         Icon(
           painter = painterResource(weatherIconRes(forecast.iconDescriptor)),
           contentDescription = null, // Not important for accessibility.
-          modifier = Modifier.padding(end = 16.dp)
+          modifier = Modifier.padding(end = 24.dp)
         )
 
         Text(

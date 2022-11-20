@@ -2,16 +2,19 @@
 
 <appwidget-provider
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:description="@string/widget_description"
     android:minResizeWidth="80dp"
     android:minResizeHeight="50dp"
     android:minWidth="130dp"
     android:minHeight="220dp"
-    android:targetCellWidth="2"
+    android:targetCellWidth="4"
     android:targetCellHeight="2"
     android:maxResizeHeight="600dp"
     android:maxResizeWidth="600dp"
     android:resizeMode="horizontal|vertical"
     android:updatePeriodMillis="0"
     android:widgetCategory="home_screen"
+    android:previewImage="@drawable/widget_preview"
+    tools:ignore="UnusedAttribute"
     />

@@ -1,4 +1,3 @@
-- 🌧 Added rain radar
-- 🗺 Improved reliability of approximate location detection
-- 📈 Tweaked temperature graph for readability
+- 📊 Added resizable home screen widgets
+- 🌧 Fixed rain radar issues by pointing at a difference source from BOM
 - 🔧 Slight UI tweaks here and there

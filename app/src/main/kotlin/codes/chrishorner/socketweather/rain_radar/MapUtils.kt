@@ -118,7 +118,7 @@ private fun getRainOverlay(context: Context, timestamp: String): TilesOverlay {
     10,
     256,
     ".png",
-    arrayOf("https://api.weather.bom.gov.au/v1/rainradar/tiles/$timestamp"),
+    arrayOf("https://radar-tiles.service-.bom.gov.au/tiles/$timestamp"),
     "© Australian Bureau of Meteorology",
     RadarTileSourcePolicy
   ) {

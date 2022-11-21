@@ -1,4 +1,4 @@
-package codes.chrishorner.socketweather.util
+package codes.chrishorner.socketweather.util.navigation
 
 import android.content.Context
 import android.os.Parcelable
@@ -16,7 +16,6 @@ import cafe.adriel.voyager.core.model.rememberScreenModel
 import cafe.adriel.voyager.core.screen.ScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import cafe.adriel.voyager.transitions.ScaleTransition
 import codes.chrishorner.socketweather.Navigator
 import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.Screen
@@ -37,7 +36,7 @@ import cafe.adriel.voyager.navigator.Navigator as VoyagerNavigator
  */
 @Composable
 fun VoyagerNavigation(initialScreen: Screen<*, *>) {
-  VoyagerNavigator(initialScreen.toVoyagerScreen()) { navigator -> ScaleTransition(navigator) }
+  VoyagerNavigator(initialScreen.toVoyagerScreen()) { navigator -> FadeThroughTransition(navigator) }
 }
 
 /**

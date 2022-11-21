@@ -8,7 +8,7 @@ import androidx.core.view.WindowCompat
 import codes.chrishorner.socketweather.choose_location.ChooseLocationScreen
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.home.HomeScreen
-import codes.chrishorner.socketweather.util.VoyagerNavigation
+import codes.chrishorner.socketweather.util.navigation.VoyagerNavigation
 
 class MainActivity : ComponentActivity() {
 

@@ -44,6 +44,7 @@ data class FormattedConditions(
   val humidityPercent: String?,
   val windSpeed: String,
   val uvWarningTimes: String?,
+  val rainChance: String?,
   val description: String?,
   val graphItems: List<TimeForecastGraphItem>,
   val upcomingForecasts: List<UpcomingForecast>,

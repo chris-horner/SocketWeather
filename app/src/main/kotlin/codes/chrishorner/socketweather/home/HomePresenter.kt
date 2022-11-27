@@ -198,6 +198,7 @@ class HomePresenter(
       humidityPercent = humidity?.let { strings.formatPercent(it) },
       windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
       uvWarningTimes = uvWarningTimes,
+      rainChance = strings.formatPercent(todayForecast.rain.chance),
       description = todayForecast.extended_text ?: todayForecast.short_text,
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts

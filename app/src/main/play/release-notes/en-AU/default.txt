@@ -1,3 +1,4 @@
 - 📊 Added resizable home screen widgets
 - 🌧 Fixed rain radar issues by pointing at a difference source from BOM
+- ➕ Added "More" section, expanding to show chance of rain, humidity, etc
 - 🔧 Slight UI tweaks here and there

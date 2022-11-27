@@ -198,16 +198,7 @@ class HomePresenter(
       humidityPercent = humidity?.let { strings.formatPercent(it) },
       windSpeed = strings.get(R.string.home_wind, wind.speed_kilometre),
       uvWarningTimes = uvWarningTimes,
-      description = todayForecast.run {
-        val short = short_text?.takeIf { it.isNotBlank() }
-        val extended = extended_text?.takeIf { it.isNotBlank() }
-        if (short == null && extended == null) return@run null
-        FormattedConditions.Description(
-          short = short ?: extended,
-          extended = extended ?: short,
-          hasExtended = short != null && extended != null && short != extended
-        )
-      },
+      description = todayForecast.extended_text ?: todayForecast.short_text,
       graphItems = graphItems,
       upcomingForecasts = upcomingForecasts
     )

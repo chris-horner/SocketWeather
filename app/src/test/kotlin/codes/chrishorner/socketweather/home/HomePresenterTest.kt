@@ -15,7 +15,7 @@ import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
-import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.FakeApi
 import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.test.containsExactlyInOrder
 import codes.chrishorner.socketweather.test.isInstanceOf
@@ -41,7 +41,7 @@ class HomePresenterTest {
   private val allSelections = MutableStateFlow<Set<LocationSelection>>(emptySet())
   private val clock: MutableClock
   private val presenter: HomePresenter
-  private val testApi: TestApi
+  private val fakeApi: FakeApi
 
   private val strings = FakeStrings(
     R.string.home_loading to "Loading forecast…",
@@ -55,7 +55,7 @@ class HomePresenterTest {
   init {
     val startTime = ZonedDateTime.of(2022, 2, 27, 9, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = MutableClock(startTime.toOffsetDateTime())
-    testApi = TestApi(clock)
+    fakeApi = FakeApi(clock)
     presenter = HomePresenter(
       navigator, forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock
     )
@@ -214,9 +214,9 @@ class HomePresenterTest {
 
   private suspend fun generateFakeForecast(location: Location): Forecast {
 
-    val observations = testApi.getObservations(location.geohash)
-    val dateForecasts = testApi.getDateForecasts(location.geohash)
-    val hourlyForecasts = testApi.getThreeHourlyForecasts(location.geohash)
+    val observations = fakeApi.getObservations(location.geohash)
+    val dateForecasts = fakeApi.getDateForecasts(location.geohash)
+    val hourlyForecasts = fakeApi.getThreeHourlyForecasts(location.geohash)
     val todayForecast = dateForecasts[0]
 
     return Forecast(

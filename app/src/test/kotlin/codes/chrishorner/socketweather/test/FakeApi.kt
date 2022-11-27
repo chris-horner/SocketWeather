@@ -1,5 +1,6 @@
 package codes.chrishorner.socketweather.test
 
+import app.cash.turbine.Turbine
 import codes.chrishorner.socketweather.data.CurrentInformation
 import codes.chrishorner.socketweather.data.CurrentObservations
 import codes.chrishorner.socketweather.data.DateForecast
@@ -12,9 +13,10 @@ import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.data.Uv
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.Wind
-import codes.chrishorner.socketweather.test.TestApi.ResponseMode.DATA_ERROR
-import codes.chrishorner.socketweather.test.TestApi.ResponseMode.NETWORK_ERROR
-import codes.chrishorner.socketweather.test.TestApi.ResponseMode.SUCCESS
+import codes.chrishorner.socketweather.test.FakeApi.ResponseMode.DATA_ERROR
+import codes.chrishorner.socketweather.test.FakeApi.ResponseMode.NETWORK_ERROR
+import codes.chrishorner.socketweather.test.FakeApi.ResponseMode.SUCCESS
+import codes.chrishorner.socketweather.test.FakeApi.ResponseMode.WAIT
 import com.squareup.moshi.JsonDataException
 import java.io.IOException
 import java.time.Clock
@@ -24,18 +26,24 @@ import java.time.LocalDateTime
 import java.time.Period
 import java.time.ZoneOffset
 
-class TestApi(clock: Clock) : WeatherApi {
+class FakeApi(clock: Clock) : WeatherApi {
 
-  enum class ResponseMode { SUCCESS, NETWORK_ERROR, DATA_ERROR }
+  enum class ResponseMode { SUCCESS, NETWORK_ERROR, DATA_ERROR, WAIT }
 
   private val firstDayInstant = LocalDate.now(clock).atTime(0, 0).toInstant(ZoneOffset.UTC)
   private val startingInstant = LocalDateTime.now(clock).toInstant(ZoneOffset.UTC)
 
   var responseMode: ResponseMode = SUCCESS
+  private val nextResponseMode = Turbine<ResponseMode>()
   private val locations = listOf(TestData.location1, TestData.location2)
 
+  fun continueWith(mode: ResponseMode) {
+    responseMode = mode
+    nextResponseMode.add(mode)
+  }
+
   override suspend fun searchForLocation(query: String): List<SearchResult> {
-    failIfNecessary()
+    handleResponseMode()
 
     return when {
       query.contains(',') -> {
@@ -49,7 +57,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getLocation(geohash: String): Location {
-    failIfNecessary()
+    handleResponseMode()
 
     return when (geohash) {
       "1" -> TestData.location1
@@ -59,7 +67,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getObservations(geohash: String): CurrentObservations {
-    failIfNecessary()
+    handleResponseMode()
     return CurrentObservations(
       temp = 21f,
       temp_feels_like = 20f,
@@ -70,7 +78,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getDateForecasts(geohash: String): List<DateForecast> {
-    failIfNecessary()
+    handleResponseMode()
 
     return listOf(
       DateForecast(
@@ -196,7 +204,7 @@ class TestApi(clock: Clock) : WeatherApi {
   }
 
   override suspend fun getThreeHourlyForecasts(geohash: String): List<ThreeHourlyForecast> {
-    failIfNecessary()
+    handleResponseMode()
 
     return listOf(
       ThreeHourlyForecast(
@@ -340,8 +348,12 @@ class TestApi(clock: Clock) : WeatherApi {
 
   private fun Location.toSearchResult() = SearchResult(id, geohash, name, "TEST", state)
 
-  private fun failIfNecessary() {
-    if (responseMode == NETWORK_ERROR) throw IOException("TestApi failure.")
-    else if (responseMode == DATA_ERROR) throw JsonDataException("TestApi failure.")
+  private suspend fun handleResponseMode(mode: ResponseMode = responseMode) {
+    when (mode) {
+      SUCCESS -> Unit
+      NETWORK_ERROR -> throw IOException("FakeApi failure.")
+      DATA_ERROR -> throw JsonDataException("FakeApi failure.")
+      WAIT -> handleResponseMode(nextResponseMode.awaitItem())
+    }
   }
 }

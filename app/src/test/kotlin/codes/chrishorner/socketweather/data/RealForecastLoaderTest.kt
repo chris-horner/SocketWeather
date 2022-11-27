@@ -6,7 +6,7 @@ import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.LocationResolver.Result
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.MutableClock
-import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.FakeApi
 import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.widget.ForecastWidgetUpdater
 import com.google.common.truth.Truth.assertThat
@@ -28,12 +28,12 @@ class RealForecastLoaderTest {
   private val locationSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
   private val forecastWidgetUpdater = FakeForecastWidgetUpdater()
   private val clock: MutableClock
-  private val api: TestApi
+  private val api: FakeApi
 
   init {
     val startTime = ZonedDateTime.of(2022, 2, 19, 9, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = MutableClock(startTime.toOffsetDateTime())
-    api = TestApi(clock)
+    api = FakeApi(clock)
   }
 
   private fun create(scope: CoroutineScope) = RealForecastLoader(
@@ -127,7 +127,7 @@ class RealForecastLoaderTest {
 
   @Test fun `network failure produces error state`() = runBlocking {
     locationSelectionStore.set(LocationSelection.Static(TestData.location1))
-    api.responseMode = TestApi.ResponseMode.NETWORK_ERROR
+    api.responseMode = FakeApi.ResponseMode.NETWORK_ERROR
     val forecastLoader = create(this)
 
     forecastLoader.states.test {
@@ -140,7 +140,7 @@ class RealForecastLoaderTest {
 
   @Test fun `malformed data produces error state`() = runBlocking {
     locationSelectionStore.set(LocationSelection.Static(TestData.location1))
-    api.responseMode = TestApi.ResponseMode.DATA_ERROR
+    api.responseMode = FakeApi.ResponseMode.DATA_ERROR
     val forecastLoader = create(this)
 
     forecastLoader.states.test {

@@ -9,11 +9,11 @@ import codes.chrishorner.socketweather.choose_location.ChooseLocationUiEvent.Res
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.home.HomeScreen
+import codes.chrishorner.socketweather.test.FakeApi
+import codes.chrishorner.socketweather.test.FakeApi.ResponseMode
 import codes.chrishorner.socketweather.test.FakeForecastLoader
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
-import codes.chrishorner.socketweather.test.TestApi
-import codes.chrishorner.socketweather.test.TestApi.ResponseMode
 import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.test.test
 import com.google.common.truth.Truth.assertThat
@@ -26,7 +26,7 @@ import java.time.ZonedDateTime
 class ChooseLocationPresenterTest {
 
   private val clock: Clock
-  private val api: TestApi
+  private val api: FakeApi
   private val navigator = FakeNavigator(ChooseLocationScreen(showCloseButton = false))
   private val forecastLoader = FakeForecastLoader()
   private val currentSelection = FakeStore<LocationSelection>(LocationSelection.None)
@@ -35,7 +35,7 @@ class ChooseLocationPresenterTest {
   init {
     val fixedDateTime = ZonedDateTime.of(2022, 2, 20, 8, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = Clock.fixed(fixedDateTime.toInstant(), fixedDateTime.zone)
-    api = TestApi(clock)
+    api = FakeApi(clock)
   }
 
   private fun createPresenter() = ChooseLocationPresenter(
@@ -117,8 +117,10 @@ class ChooseLocationPresenterTest {
       assertThat(result.name).isEqualTo("Fakezroy")
 
       // Selecting that result should change the loading status and save the selection.
+      api.responseMode = ResponseMode.WAIT
       sendEvent(ResultSelected(result))
-      // TODO: Work out how to assert Submitting state.
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitting)
+      api.continueWith(ResponseMode.SUCCESS)
       assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitted)
       val expectedSelection = LocationSelection.Static(TestData.location1)
       assertThat(savedSelections.data.value).containsExactly(expectedSelection)
@@ -139,10 +141,11 @@ class ChooseLocationPresenterTest {
       val result = item.results.single()
       assertThat(result.name).isEqualTo("Fakezroy")
 
-      api.responseMode = ResponseMode.NETWORK_ERROR
+      api.responseMode = ResponseMode.WAIT
 
       sendEvent(ResultSelected(result))
-      // TODO: Work out how to assert Submitting state.
+      assertThat(awaitItem().loadingStatus).isEqualTo(LoadingStatus.Submitting)
+      api.continueWith(ResponseMode.NETWORK_ERROR)
       assertThat(awaitItem().error).isEqualTo(Error.Submission)
       navigator.assertNoChanges()
     }

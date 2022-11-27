@@ -2,7 +2,7 @@ package codes.chrishorner.socketweather.data
 
 import app.cash.turbine.Turbine
 import codes.chrishorner.socketweather.data.LocationResolver.Result
-import codes.chrishorner.socketweather.test.TestApi
+import codes.chrishorner.socketweather.test.FakeApi
 import codes.chrishorner.socketweather.test.TestData
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.runBlocking
@@ -14,13 +14,13 @@ import java.time.ZonedDateTime
 class RealLocationResolverTest {
 
   private val locationResolver: RealLocationResolver
-  private val api: TestApi
+  private val api: FakeApi
   private val deviceLocator = FakeDeviceLocator()
 
   init {
     val time = ZonedDateTime.of(2022, 2, 19, 10, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     val clock = Clock.fixed(time.toInstant(), time.zone)
-    api = TestApi(clock)
+    api = FakeApi(clock)
     locationResolver = RealLocationResolver(deviceLocator, api)
   }
 
@@ -44,14 +44,14 @@ class RealLocationResolverTest {
   }
 
   @Test fun `malformed response produces error`() = runBlocking {
-    api.responseMode = TestApi.ResponseMode.DATA_ERROR
+    api.responseMode = FakeApi.ResponseMode.DATA_ERROR
     deviceLocator.location.add(TestData.deviceLocation1)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.DATA))
   }
 
   @Test fun `network failure produces error`() = runBlocking {
-    api.responseMode = TestApi.ResponseMode.NETWORK_ERROR
+    api.responseMode = FakeApi.ResponseMode.NETWORK_ERROR
     deviceLocator.location.add(TestData.deviceLocation1)
     val result = locationResolver.getDeviceLocation()
     assertThat(result).isEqualTo(Result.Failure(ForecastError.NETWORK))

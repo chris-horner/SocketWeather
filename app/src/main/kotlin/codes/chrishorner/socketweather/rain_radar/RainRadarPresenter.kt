@@ -68,14 +68,12 @@ class RainRadarPresenter(
     location: RainRadarLocation,
     rainTimestamps: List<RainTimestamp>,
     activeIndex: Int = 0,
-  ): RainRadarState {
-    return RainRadarState(
-      location,
-      rainTimestamps[activeIndex].label,
-      rainTimestamps.map { it.timestamp },
-      activeTimestampIndex = activeIndex
-    )
-  }
+  ) = RainRadarState(
+    location,
+    rainTimestamps[activeIndex].label,
+    rainTimestamps.map { it.timestamp },
+    activeTimestampIndex = activeIndex
+  )
 
   companion object {
     // Centre on Australia if there's no current location.

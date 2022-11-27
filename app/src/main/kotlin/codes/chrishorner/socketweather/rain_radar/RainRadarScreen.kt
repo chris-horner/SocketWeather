@@ -46,6 +46,10 @@ import androidx.core.net.toUri
 import codes.chrishorner.socketweather.Navigator
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
+import codes.chrishorner.socketweather.rain_radar.map.getRainRadarOverlays
+import codes.chrishorner.socketweather.rain_radar.map.getTileProvider
+import codes.chrishorner.socketweather.rain_radar.map.isLoading
+import codes.chrishorner.socketweather.rain_radar.map.rememberMapViewWithLifecycle
 import codes.chrishorner.socketweather.styles.CopyrightTextStyle
 import codes.chrishorner.socketweather.styles.LightColors
 import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
@@ -202,27 +206,11 @@ private val CopyrightText = buildAnnotatedString {
   }
   pop()
 
-  append(", under ")
-
-  pushStringAnnotation(TAG_URL, annotation = "https://creativecommons.org/licenses/by/3.0")
-  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-    append("CC BY 3.0")
-  }
-  pop()
-
   append(". Data by ")
 
   pushStringAnnotation(TAG_URL, annotation = "https://openstreetmap.org")
   withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
     append("OpenStreetMap")
-  }
-  pop()
-
-  append(", under ")
-
-  pushStringAnnotation(TAG_URL, annotation = "https://www.openstreetmap.org/copyright")
-  withStyle(style = SpanStyle(color = Color.Blue, textDecoration = TextDecoration.Underline)) {
-    append("ODbL")
   }
   pop()
 

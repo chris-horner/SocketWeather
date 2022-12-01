@@ -1,8 +1,6 @@
 package codes.chrishorner.socketweather.widget
 
 import android.content.Context
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-import android.os.Build
 import androidx.core.app.NotificationChannelCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
@@ -52,11 +50,7 @@ class WidgetUpdateWorker(context: Context, params: WorkerParameters) : Coroutine
 
     notificationManager.createNotificationChannel(channel)
 
-    return if (Build.VERSION.SDK_INT >= 29) {
-      ForegroundInfo(NOTIFICATION_ID, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC)
-    } else {
-      ForegroundInfo(NOTIFICATION_ID, notification)
-    }
+    return ForegroundInfo(NOTIFICATION_ID, notification)
   }
 
   companion object {

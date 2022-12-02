@@ -25,6 +25,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.ContentAlpha
+import androidx.compose.material.Divider
 import androidx.compose.material.Icon
 import androidx.compose.material.LocalContentAlpha
 import androidx.compose.material.MaterialTheme
@@ -47,7 +48,7 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.style.TextOverflow.Companion.Ellipsis
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
@@ -89,6 +90,10 @@ fun ForecastUi(
     }
 
     var showMoreSection by remember { mutableStateOf(false) }
+
+    AnimatedVisibility(visible = showMoreSection) {
+      Divider(modifier = Modifier.padding(horizontal = 16.dp))
+    }
 
     AnimatedVisibility(visible = showMoreSection) {
       MoreSection(
@@ -199,7 +204,7 @@ private fun ButtonsSection(
     ) {
       Icon(Icons.Rounded.Radar, contentDescription = null)
       Spacer(modifier = Modifier.width(12.dp))
-      Text(stringResource(R.string.home_rainRadarButton))
+      Text(text = stringResource(R.string.home_rainRadarButton), maxLines = 1, overflow = Ellipsis)
     }
     OutlinedButton(
       onClick = onMoreClick,
@@ -214,7 +219,11 @@ private fun ButtonsSection(
         modifier = Modifier.rotate(moreIconRotation)
       )
       Spacer(modifier = Modifier.width(12.dp))
-      Text(if (showingMore) stringResource(R.string.home_lessButton) else stringResource(R.string.home_moreButton))
+      Text(
+        text = if (showingMore) stringResource(R.string.home_lessButton) else stringResource(R.string.home_moreButton),
+        maxLines = 1,
+        overflow = Ellipsis,
+      )
     }
   }
 }
@@ -228,9 +237,7 @@ private fun MoreSection(
 ) {
   Column(
     verticalArrangement = Arrangement.spacedBy(16.dp),
-    modifier = Modifier
-      .padding(horizontal = 16.dp)
-      .padding(bottom = 16.dp)
+    modifier = Modifier.padding(16.dp)
   ) {
     if (chanceOfRain != null) {
       MoreSectionEntry(
@@ -275,9 +282,9 @@ private fun MoreSectionEntry(
       Spacer(modifier = Modifier.width(8.dp))
       Text(
         text = stringResource(titleRes),
-        style = MaterialTheme.typography.h6,
+        style = MaterialTheme.typography.subtitle1,
         maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
+        overflow = Ellipsis,
         modifier = Modifier.alignByBaseline(),
       )
     }

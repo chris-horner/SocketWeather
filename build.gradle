@@ -25,3 +25,9 @@ allprojects {
 task clean(type: Delete) {
   delete rootProject.buildDir
 }
+
+task updateBaselineProfile(type: Copy, dependsOn: ':benchmark:pixel6Api31BenchmarkAndroidTest') {
+  from project(':benchmark').layout.buildDirectory.dir('outputs/managed_device_android_test_additional_output/pixel6Api31/BaselineProfileGenerator_generate-baseline-prof.txt')
+  into project(':app').layout.projectDirectory.dir('src/main')
+  rename 'BaselineProfileGenerator_generate-baseline-prof.txt', 'baseline-prof.txt'
+}

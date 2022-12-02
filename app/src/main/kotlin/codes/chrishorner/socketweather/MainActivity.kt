@@ -20,11 +20,7 @@ class MainActivity : ComponentActivity() {
 
     setContent {
       RootContainer {
-        val currentLocationSelection = remember { appSingletons.stores.currentSelection.data.value }
-        val initialScreen =
-          if (currentLocationSelection != LocationSelection.None) HomeScreen
-          else ChooseLocationScreen(showCloseButton = false)
-
+        val initialScreen = remember { calculateInitialScreen() }
         VoyagerNavigation(initialScreen)
       }
     }
@@ -33,5 +29,19 @@ class MainActivity : ComponentActivity() {
   override fun onResume() {
     super.onResume()
     appSingletons.forecastLoader.refreshIfNecessary()
+  }
+
+  private fun calculateInitialScreen(): Screen<*, *> {
+    val openAtLocationPicker = intent.extras?.getBoolean(EXTRA_OPEN_AT_LOCATION_PICKER) ?: false
+    val currentLocationSelection = appSingletons.stores.currentSelection.data.value
+    return if (openAtLocationPicker || currentLocationSelection == LocationSelection.None) {
+      ChooseLocationScreen(showCloseButton = false)
+    } else {
+      HomeScreen
+    }
+  }
+
+  companion object {
+    const val EXTRA_OPEN_AT_LOCATION_PICKER = "open_at_location_picker"
   }
 }

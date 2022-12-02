@@ -24,6 +24,7 @@ android {
     debug.java.srcDirs += 'src/debug/kotlin'
     release.java.srcDirs += 'src/release/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
+    benchmark.java.srcDirs += 'src/release/kotlin'
   }
 
   signingConfigs {
@@ -54,6 +55,13 @@ android {
       shrinkResources true
       signingConfig signingConfigs.release
       proguardFiles file('shrinker_rules.pro')
+    }
+
+    benchmark {
+      initWith buildTypes.release
+      signingConfig signingConfigs.debug
+      matchingFallbacks = ['release']
+      applicationIdSuffix = '.benchmark'
     }
   }
 
@@ -113,13 +121,14 @@ dependencies {
   implementation deps.accompanist.systemUiController
   implementation deps.androidx.core
   implementation deps.androidx.activityCompose
+  implementation deps.androidx.profileInstaller
   implementation deps.androidx.workManager
   implementation deps.compose.material.core
   implementation deps.compose.material.icons
   implementation deps.compose.material.iconsExtended
   implementation deps.compose.ui
   implementation deps.compose.uiGraphics
-  debugImplementation deps.compose.uiTooling
+  implementation deps.compose.uiTooling
   implementation platform(deps.composeBom)
   implementation deps.coroutines.android
   testImplementation deps.coroutines.test

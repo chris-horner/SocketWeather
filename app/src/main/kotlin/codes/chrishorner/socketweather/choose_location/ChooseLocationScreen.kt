@@ -55,6 +55,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Devices
@@ -152,6 +153,7 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
           },
           singleLine = true,
           modifier = Modifier
+            .testTag("search_input")
             .padding(horizontal = 32.dp)
             .fillMaxWidth()
         )
@@ -209,6 +211,7 @@ private fun ErrorMessagesSnackbar(
 private fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
   Row(
     modifier = Modifier
+      .testTag("search_result_postcode:${result.postcode}")
       .fillMaxWidth()
       .height(64.dp)
       .clickable(onClick = onClick)
@@ -300,6 +303,7 @@ private fun FollowMeButton(onClick: (hasLocationPermission: Boolean) -> Unit) {
       backgroundColor = MaterialTheme.colors.primaryVariant
     ),
     modifier = Modifier
+      .testTag("follow_me")
       .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
       .fillMaxWidth()
       .height(48.dp),

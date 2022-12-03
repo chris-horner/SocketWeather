@@ -40,21 +40,13 @@ fun VoyagerNavigation(initialScreen: Screen<*, *>) {
 }
 
 /**
- * Adapts Voyager's navigator to conform to [Navigator].
- */
-@Composable
-private fun VoyagerNavigator.rememberAsNavigator(): Navigator {
-  return remember(this) { DelegatingNavigator(this) }
-}
-
-/**
  * Adapts a [Screen] to Voyager's concept of a screen.
  */
 private fun <Event, State> Screen<Event, State>.toVoyagerScreen(): VoyagerScreen {
   return DelegatingVoyagerScreen(this)
 }
 
-private class DelegatingNavigator(private val voyagerNavigator: VoyagerNavigator) : Navigator {
+private class DelegatingNavigator(var voyagerNavigator: VoyagerNavigator) : Navigator {
   override val canPop: Boolean
     get() = voyagerNavigator.canPop
 
@@ -77,10 +69,18 @@ private data class DelegatingVoyagerScreen<Event, State>(
 ) : VoyagerScreen, Parcelable {
   @Composable
   override fun Content() {
-    val context: Context = LocalContext.current
+    val context: Context = LocalContext.current.applicationContext
     val voyagerNavigator = LocalNavigator.currentOrThrow
-    val navigator = voyagerNavigator.rememberAsNavigator()
-    val screenModel = rememberScreenModel { MoleculeScreenModel(screen.onCreatePresenter(context, navigator)) }
+    val navigator = remember(voyagerNavigator) { DelegatingNavigator(voyagerNavigator) }
+    val screenModel = rememberScreenModel {
+      MoleculeScreenModel(
+        navigator = navigator,
+        presenter = screen.onCreatePresenter(context, navigator),
+      )
+    }
+    // Voyager recreates its navigator instances on orientation change, so update our delegate if necessary.
+    screenModel.navigator.voyagerNavigator = voyagerNavigator
+
     val state by screenModel.states.collectAsState()
     screen.Content(state) { event -> screenModel.events.tryEmit(event) }
   }
@@ -92,7 +92,10 @@ private data class DelegatingVoyagerScreen<Event, State>(
 /**
  * Similar to Voyager's [StateScreenModel], except using Molecule to handle state generation.
  */
-private class MoleculeScreenModel<Event, State>(presenter: Presenter<Event, State>) : ScreenModel {
+private class MoleculeScreenModel<Event, State>(
+  val navigator: DelegatingNavigator,
+  presenter: Presenter<Event, State>,
+) : ScreenModel {
   val events = MutableSharedFlow<Event>(extraBufferCapacity = 1)
   val states = moleculeScope.launchMolecule(RecompositionClock.Immediate) { presenter.states(events) }
 }

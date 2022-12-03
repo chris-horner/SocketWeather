@@ -10,12 +10,12 @@ import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
+import codes.chrishorner.socketweather.test.FakeApi
 import codes.chrishorner.socketweather.test.FakeForecastLoader
 import codes.chrishorner.socketweather.test.FakeNavigator
 import codes.chrishorner.socketweather.test.FakeStore
 import codes.chrishorner.socketweather.test.FakeStrings
 import codes.chrishorner.socketweather.test.MutableClock
-import codes.chrishorner.socketweather.test.FakeApi
 import codes.chrishorner.socketweather.test.TestData
 import codes.chrishorner.socketweather.test.containsExactlyInOrder
 import codes.chrishorner.socketweather.test.isInstanceOf
@@ -38,7 +38,7 @@ class HomePresenterTest {
   private val forecastLoader = FakeForecastLoader()
   private val forecast = MutableStateFlow<Forecast?>(null)
   private val currentSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
-  private val allSelections = MutableStateFlow<Set<LocationSelection>>(emptySet())
+  private val allSelections = FakeStore<Set<LocationSelection>>(emptySet())
   private val clock: MutableClock
   private val presenter: HomePresenter
   private val fakeApi: FakeApi
@@ -184,6 +184,30 @@ class HomePresenterTest {
     }
   }
 
+  @Test fun `DeleteLocation event removes location from storage and produces update`() = runBlocking {
+    setTestDataWith(TestData.location1, TestData.location2)
+
+    presenter.test {
+      assertThat(allSelections.data.value).containsExactlyInOrder(
+        LocationSelection.Static(TestData.location1),
+        LocationSelection.Static(TestData.location2),
+      )
+      // Location 2 appears as saved location (as it's not currently selected).
+      assertThat(awaitItem().savedLocations.map { it.selection }).containsExactlyInOrder(
+        LocationSelection.Static(TestData.location2),
+      )
+
+      sendEvent(HomeEvent.DeleteLocation(LocationSelection.Static(TestData.location2)))
+
+      // Item should no longer exist in store.
+      assertThat(allSelections.data.value).containsExactlyInOrder(
+        LocationSelection.Static(TestData.location1),
+      )
+      // As the only non-selected location, removing location2 should now produce an empty list in the model.
+      assertThat(awaitItem().savedLocations).isEmpty()
+    }
+  }
+
   @Test fun `ViewAbout event navigates to AboutScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
@@ -204,11 +228,11 @@ class HomePresenterTest {
     }
   }
 
-  private suspend fun setTestDataWith(location: Location) {
-    val locationSelection = LocationSelection.Static(location)
-    currentSelectionStore.set(locationSelection)
-    allSelections.value = setOf(locationSelection)
-    val forecastData = generateFakeForecast(location)
+  private suspend fun setTestDataWith(vararg locations: Location) {
+    val locationSelections = locations.map { LocationSelection.Static(it) }
+    currentSelectionStore.set(locationSelections[0])
+    allSelections.set(locationSelections.toSet())
+    val forecastData = generateFakeForecast(locations[0])
     forecast.value = forecastData
   }
 

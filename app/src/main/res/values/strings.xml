@@ -41,6 +41,7 @@
   <string name="home_humidity">Humidity</string>
   <string name="home_windSpeed">Wind speed</string>
   <string name="home_uvWarningTimes">UV warning times</string>
+  <string name="home_deleteLocationDesc">Delete location button</string>
 
   <string name="home_error_retryButton">Try again</string>
   <string name="home_error_unknownLocation_title">Where are you?</string>

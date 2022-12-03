@@ -25,7 +25,9 @@ import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
 import codes.chrishorner.socketweather.data.Store
+import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
+import codes.chrishorner.socketweather.home.HomeEvent.DeleteLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
@@ -52,7 +54,7 @@ class HomePresenter(
   private val forecastLoader: ForecastLoader,
   private val forecast: StateFlow<Forecast?>,
   private val currentSelectionStore: Store<LocationSelection>,
-  private val allSelections: StateFlow<Set<LocationSelection>>,
+  private val allSelectionsStore: Store<Set<LocationSelection>>,
   private val strings: Strings,
   private val clock: Clock = Clock.systemDefaultZone(),
 ) : Presenter<HomeEvent, HomeState> {
@@ -66,7 +68,7 @@ class HomePresenter(
     val forecast by forecast.collectAsState()
     val loadingState by remember { forecastLoader.states }.collectAsState()
     val currentSelection by remember { currentSelectionStore.data }.collectAsState()
-    val allSelections by allSelections.collectAsState()
+    val allSelections by remember { allSelectionsStore.data }.collectAsState()
     val otherSelections = allSelections.minus(currentSelection).map { it.toLocationEntry() }
 
     LaunchedEffect(Unit) {
@@ -85,6 +87,9 @@ class HomePresenter(
         is SwitchLocation -> launch {
           currentSelectionStore.set(event.selection)
           forecastLoader.forceRefresh()
+        }
+        is DeleteLocation -> launch {
+          allSelectionsStore.update { it.minus(event.selection) }
         }
         ViewAbout -> navigator.push(AboutScreen)
         ViewRainRadar -> navigator.push(RainRadarScreen)
@@ -233,7 +238,7 @@ class HomePresenter(
         forecastLoader = singletons.forecastLoader,
         forecast = stores.forecast.data,
         currentSelectionStore = stores.currentSelection,
-        allSelections = stores.savedSelections.data,
+        allSelectionsStore = stores.savedSelections,
         strings = AndroidStrings(context),
       )
     }

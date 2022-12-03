@@ -29,6 +29,7 @@ data class LocationEntry(
 sealed class HomeEvent {
   data class SwitchLocation(val selection: LocationSelection) : HomeEvent()
   object AddLocation : HomeEvent()
+  data class DeleteLocation(val selection: LocationSelection): HomeEvent()
   object Refresh : HomeEvent()
   object ViewAbout : HomeEvent()
   object ViewRainRadar : HomeEvent()

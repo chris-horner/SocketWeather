@@ -106,9 +106,9 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
       currentLocation = state.currentLocation,
       savedLocations = state.savedLocations,
       onDismissRequest = { locationChooserVisible = false },
-      onEvent = {
-        locationChooserVisible = false
-        onEvent(it)
+      onEvent = { event ->
+        if (event is HomeEvent.AddLocation || event is HomeEvent.SwitchLocation) locationChooserVisible = false
+        onEvent(event)
       }
     )
   }

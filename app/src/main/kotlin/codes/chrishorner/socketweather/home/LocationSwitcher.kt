@@ -1,12 +1,15 @@
 package codes.chrishorner.socketweather.home
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -17,7 +20,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
@@ -27,16 +32,16 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropUp
 import androidx.compose.material.icons.rounded.CheckCircleOutline
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -49,6 +54,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
+import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
+import codes.chrishorner.socketweather.data.LocationSelection.None
+import codes.chrishorner.socketweather.data.LocationSelection.Static
+import codes.chrishorner.socketweather.home.HomeEvent.DeleteLocation
 
 @Composable
 fun LocationSwitcher(
@@ -99,6 +108,7 @@ fun LocationSwitcher(
   }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LocationSwitcherContent(
   currentLocation: LocationEntry,
@@ -106,21 +116,21 @@ private fun LocationSwitcherContent(
   onDismissRequest: () -> Unit,
   onEvent: (HomeEvent) -> Unit
 ) {
-  Column {
+  Column(
+    modifier = Modifier.animateContentSize()
+  ) {
 
     Row(
       verticalAlignment = Alignment.CenterVertically,
       modifier = Modifier
-        .height(64.dp)
+        .heightIn(min = 64.dp)
         .clickable { onDismissRequest() },
     ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-        Icon(
-          Icons.Rounded.CheckCircleOutline,
-          contentDescription = null,
-          modifier = Modifier.padding(horizontal = 20.dp)
-        )
-      }
+      Icon(
+        Icons.Rounded.CheckCircleOutline,
+        contentDescription = null,
+        modifier = Modifier.padding(horizontal = 20.dp)
+      )
       Column {
         Text(currentLocation.title, style = MaterialTheme.typography.titleLarge)
         Text(currentLocation.subtitle, style = MaterialTheme.typography.titleSmall)
@@ -135,29 +145,43 @@ private fun LocationSwitcherContent(
 
     Divider()
 
-    LazyColumn {
-      items(savedLocations) { item ->
+    LazyColumn(
+      modifier = Modifier.animateContentSize()
+    ) {
+      items(
+        items = savedLocations,
+        key = { it.lazyListKey },
+      ) { item ->
         Row(
           verticalAlignment = Alignment.CenterVertically,
           modifier = Modifier
             .fillMaxWidth()
-            .height(64.dp)
+            .heightIn(min = 64.dp)
+            .animateItemPlacement(animationSpec = spring())
             .clickable { onEvent(HomeEvent.SwitchLocation(item.selection)) },
         ) {
           if (item.showTrackingIcon) {
-            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-              Icon(
-                Icons.Rounded.MyLocation,
-                contentDescription = null,
-                Modifier.padding(horizontal = 20.dp)
-              )
-            }
+            Icon(
+              imageVector = Icons.Rounded.MyLocation,
+              contentDescription = null,
+              Modifier.padding(horizontal = 20.dp)
+            )
           } else {
             Spacer(modifier = Modifier.width(64.dp))
           }
           Column {
             Text(item.title, style = MaterialTheme.typography.titleLarge)
             Text(item.subtitle, style = MaterialTheme.typography.titleSmall)
+          }
+          Spacer(modifier = Modifier.weight(1f))
+          IconButton(
+            onClick = { onEvent(DeleteLocation(item.selection)) },
+            modifier = Modifier.size(56.dp)
+          ) {
+            Icon(
+              imageVector = Icons.Rounded.Delete,
+              contentDescription = stringResource(id = R.string.home_deleteLocationDesc)
+            )
           }
         }
       }
@@ -172,13 +196,11 @@ private fun LocationSwitcherContent(
         .height(64.dp)
         .clickable { onEvent(HomeEvent.AddLocation) },
     ) {
-      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
-        Icon(
-          Icons.Rounded.Add,
-          contentDescription = null,
-          modifier = Modifier.padding(horizontal = 20.dp)
-        )
-      }
+      Icon(
+        Icons.Rounded.Add,
+        contentDescription = null,
+        modifier = Modifier.padding(horizontal = 20.dp)
+      )
       Text(stringResource(R.string.switchLocation_add), style = MaterialTheme.typography.labelLarge)
     }
   }
@@ -250,3 +272,10 @@ private fun updateVisibilityTransition(visible: Boolean): TransitionData {
 
   return remember(transition) { TransitionData(currentlyVisible, cardScale, cardAlpha, scrimAlpha) }
 }
+
+private val LocationEntry.lazyListKey: String
+  get() = when (selection) {
+    FollowMe -> "follow_me"
+    None -> "none"
+    is Static -> selection.location.id
+  }

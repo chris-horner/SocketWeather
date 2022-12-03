@@ -15,8 +15,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -24,21 +22,20 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ExpandMore
 import androidx.compose.material.icons.rounded.Radar
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,10 +50,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.common.weatherIconRes
-import codes.chrishorner.socketweather.styles.LargeTempTextStyle
-import codes.chrishorner.socketweather.styles.MediumTempTextStyle
-import codes.chrishorner.socketweather.styles.SmallTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.styles.largeTemp
+import codes.chrishorner.socketweather.styles.mediumTemp
+import codes.chrishorner.socketweather.styles.smallTemp
 
 @Composable
 fun ForecastUi(
@@ -69,8 +66,6 @@ fun ForecastUi(
   Column(
     modifier = modifier
       .verticalScroll(scrollState)
-      .navigationBarsPadding()
-      .imePadding()
       .testTag("forecast_scroll_container")
   ) {
 
@@ -83,17 +78,13 @@ fun ForecastUi(
     if (conditions.description != null) {
       Text(
         text = conditions.description,
-        style = MaterialTheme.typography.body1,
+        style = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.padding(horizontal = 16.dp)
       )
       Spacer(modifier = Modifier.height(16.dp))
     }
 
-    var showMoreSection by remember { mutableStateOf(false) }
-
-    AnimatedVisibility(visible = showMoreSection) {
-      Divider(modifier = Modifier.padding(horizontal = 16.dp))
-    }
+    var showMoreSection by rememberSaveable { mutableStateOf(false) }
 
     AnimatedVisibility(visible = showMoreSection) {
       MoreSection(
@@ -131,13 +122,13 @@ private fun Observations(conditions: FormattedConditions) {
       Image(
         painter = painterResource(weatherIconRes(conditions.iconDescriptor, conditions.isNight)),
         contentDescription = stringResource(R.string.home_currentIconDesc),
-        colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
         modifier = Modifier.size(72.dp),
       )
       Spacer(modifier = Modifier.width(12.dp))
       Text(
         text = conditions.currentTemperature,
-        style = LargeTempTextStyle,
+        style = MaterialTheme.typography.largeTemp,
       )
     }
 
@@ -145,7 +136,7 @@ private fun Observations(conditions: FormattedConditions) {
       Spacer(modifier = Modifier.height(12.dp))
       Text(
         text = conditions.highTemperature,
-        style = MediumTempTextStyle,
+        style = MaterialTheme.typography.mediumTemp,
       )
       Spacer(modifier = Modifier.height(12.dp))
       Box(
@@ -154,27 +145,27 @@ private fun Observations(conditions: FormattedConditions) {
           .height(28.dp)
           .offset(x = (-16).dp)
           .clip(RoundedCornerShape(2.dp))
-          .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+          .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
       )
       Spacer(modifier = Modifier.height(12.dp))
       Row {
-        CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+        CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
           Text(
             text = stringResource(R.string.home_feelsLike),
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.headlineSmall,
             modifier = Modifier.alignByBaseline()
           )
         }
         Spacer(modifier = Modifier.width(8.dp))
         Text(
           text = conditions.feelsLikeTemperature,
-          style = MediumTempTextStyle,
+          style = MaterialTheme.typography.mediumTemp,
           modifier = Modifier.alignByBaseline()
         )
         Spacer(modifier = Modifier.weight(1f))
         Text(
           text = conditions.lowTemperature,
-          style = MediumTempTextStyle,
+          style = MaterialTheme.typography.mediumTemp,
           modifier = Modifier.alignByBaseline()
         )
       }
@@ -195,7 +186,7 @@ private fun ButtonsSection(
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     modifier = Modifier.padding(horizontal = 16.dp),
   ) {
-    OutlinedButton(
+    ElevatedButton(
       onClick = onRainRadarClick,
       modifier = Modifier
         .testTag("rain_radar_button")
@@ -206,7 +197,7 @@ private fun ButtonsSection(
       Spacer(modifier = Modifier.width(12.dp))
       Text(text = stringResource(R.string.home_rainRadarButton), maxLines = 1, overflow = Ellipsis)
     }
-    OutlinedButton(
+    ElevatedButton(
       onClick = onMoreClick,
       modifier = Modifier
         .testTag("more_button")
@@ -235,37 +226,43 @@ private fun MoreSection(
   windSpeed: String?,
   uvWarningTimes: String?,
 ) {
-  Column(
-    verticalArrangement = Arrangement.spacedBy(16.dp),
-    modifier = Modifier.padding(16.dp)
+  Surface(
+    shape = MaterialTheme.shapes.large,
+    color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
+    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp)
   ) {
-    if (chanceOfRain != null) {
-      MoreSectionEntry(
-        iconRes = R.drawable.ic_rain_chance_24dp,
-        titleRes = R.string.home_rainChance,
-        value = chanceOfRain,
-      )
-    }
-    if (humidity != null) {
-      MoreSectionEntry(
-        iconRes = R.drawable.ic_water_24dp,
-        titleRes = R.string.home_humidity,
-        value = humidity,
-      )
-    }
-    if (windSpeed != null) {
-      MoreSectionEntry(
-        iconRes = R.drawable.ic_weather_windy_24dp,
-        titleRes = R.string.home_windSpeed,
-        value = windSpeed,
-      )
-    }
-    if (uvWarningTimes != null) {
-      MoreSectionEntry(
-        iconRes = R.drawable.ic_weather_sunny_alert_24dp,
-        titleRes = R.string.home_uvWarningTimes,
-        value = uvWarningTimes,
-      )
+    Column(
+      verticalArrangement = Arrangement.spacedBy(16.dp),
+      modifier = Modifier.padding(16.dp)
+    ) {
+      if (chanceOfRain != null) {
+        MoreSectionEntry(
+          iconRes = R.drawable.ic_rain_chance_24dp,
+          titleRes = R.string.home_rainChance,
+          value = chanceOfRain,
+        )
+      }
+      if (humidity != null) {
+        MoreSectionEntry(
+          iconRes = R.drawable.ic_water_24dp,
+          titleRes = R.string.home_humidity,
+          value = humidity,
+        )
+      }
+      if (windSpeed != null) {
+        MoreSectionEntry(
+          iconRes = R.drawable.ic_weather_windy_24dp,
+          titleRes = R.string.home_windSpeed,
+          value = windSpeed,
+        )
+      }
+      if (uvWarningTimes != null) {
+        MoreSectionEntry(
+          iconRes = R.drawable.ic_weather_sunny_alert_24dp,
+          titleRes = R.string.home_uvWarningTimes,
+          value = uvWarningTimes,
+        )
+      }
     }
   }
 }
@@ -277,12 +274,12 @@ private fun MoreSectionEntry(
   value: String,
 ) {
   Row {
-    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+    CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
       Icon(painterResource(iconRes), contentDescription = null)
       Spacer(modifier = Modifier.width(8.dp))
       Text(
         text = stringResource(titleRes),
-        style = MaterialTheme.typography.subtitle1,
+        style = MaterialTheme.typography.titleMedium,
         maxLines = 1,
         overflow = Ellipsis,
         modifier = Modifier.alignByBaseline(),
@@ -291,7 +288,7 @@ private fun MoreSectionEntry(
     Spacer(modifier = Modifier.weight(1f))
     Text(
       text = value,
-      style = SmallTempTextStyle,
+      style = MaterialTheme.typography.smallTemp,
       maxLines = 1,
       modifier = Modifier.alignByBaseline(),
     )

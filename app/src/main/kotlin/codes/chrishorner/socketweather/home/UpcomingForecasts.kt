@@ -11,11 +11,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
@@ -27,8 +26,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.common.weatherIconRes
-import codes.chrishorner.socketweather.styles.SmallTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
+import codes.chrishorner.socketweather.styles.smallTemp
 
 @Composable
 fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
@@ -36,22 +35,24 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
     for (forecast in forecasts) {
       Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.heightIn(56.dp).padding(vertical = 8.dp)
+        modifier = Modifier
+          .heightIn(56.dp)
+          .padding(vertical = 8.dp)
       ) {
 
         Text(
           text = forecast.day,
-          style = MaterialTheme.typography.subtitle1,
+          style = MaterialTheme.typography.titleMedium,
           overflow = TextOverflow.Ellipsis
         )
 
         Spacer(modifier = Modifier.weight(1f))
 
         if (forecast.percentChanceOfRain > 0) {
-          CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+          CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
             Text(
               text = forecast.formattedChanceOfRain,
-              style = MaterialTheme.typography.subtitle2,
+              style = MaterialTheme.typography.titleSmall,
               modifier = Modifier.padding(end = 8.dp)
             )
           }
@@ -65,7 +66,7 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
 
         Text(
           text = forecast.lowTemperature,
-          style = SmallTempTextStyle,
+          style = MaterialTheme.typography.smallTemp,
           textAlign = TextAlign.End,
           maxLines = 1,
           modifier = Modifier
@@ -78,12 +79,12 @@ fun UpcomingForecasts(forecasts: List<UpcomingForecast>) {
             .width(24.dp)
             .height(4.dp)
             .clip(RoundedCornerShape(2.dp))
-            .background(MaterialTheme.colors.onBackground.copy(alpha = 0.2f))
+            .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
         )
 
         Text(
           text = forecast.highTemperature,
-          style = SmallTempTextStyle,
+          style = MaterialTheme.typography.smallTemp,
           textAlign = TextAlign.End,
           modifier = Modifier.widthIn(min = 36.dp)
         )

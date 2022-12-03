@@ -17,13 +17,12 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Schedule
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.remember
@@ -38,9 +37,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.styles.SmallTempTextStyle
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
-import codes.chrishorner.socketweather.styles.backgroundSecondary
+import codes.chrishorner.socketweather.styles.smallTemp
 import kotlin.math.abs
 import kotlin.math.sqrt
 
@@ -77,7 +75,8 @@ fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastG
   val listState = rememberLazyListState()
 
   with(LocalDensity.current) {
-    temperatureTextHeight = SmallTempTextStyle.fontSize.toDp() + 8.dp // Add 8dp to approximate the actual height.
+    // Add 8dp to approximate the actual height.
+    temperatureTextHeight = MaterialTheme.typography.smallTemp.fontSize.toDp() + 8.dp
     lineGraphHeight = GraphHeight - temperatureTextHeight - (GraphVerticalPadding * 2)
   }
 
@@ -134,7 +133,7 @@ private fun ScrollableEntries(
           if (index > 0) {
             Text(
               text = entry.time,
-              style = MaterialTheme.typography.overline,
+              style = MaterialTheme.typography.labelMedium,
             )
           }
         }
@@ -149,7 +148,7 @@ private fun ScrollableEntries(
           val yOffset = entry.getGraphY(lineGraphHeight, scale) - 6.dp
           Text(
             text = entry.formattedTemperature,
-            style = SmallTempTextStyle,
+            style = MaterialTheme.typography.smallTemp,
             modifier = Modifier.offset(y = yOffset),
           )
         }
@@ -163,7 +162,7 @@ private fun ScrollableEntries(
           if (entry.rainChancePercent > 0 && index > 0) {
             Text(
               text = entry.formattedRainChance,
-              style = MaterialTheme.typography.overline,
+              style = MaterialTheme.typography.labelSmall,
             )
           }
         }
@@ -184,7 +183,7 @@ private fun LineGraph(
   listState: LazyListState,
   modifier: Modifier,
 ) {
-  val dotColor = MaterialTheme.colors.onBackground
+  val dotColor = MaterialTheme.colorScheme.onBackground
   val lineColor = remember { dotColor.copy(alpha = 0.2f) }
 
   Canvas(modifier) {
@@ -256,13 +255,13 @@ private fun TitleBackgrounds() {
       modifier = Modifier
         .fillMaxWidth()
         .height(TopTitleSectionHeight)
-        .background(MaterialTheme.colors.backgroundSecondary)
+        .background(MaterialTheme.colorScheme.surfaceVariant)
     )
     Box(
       modifier = Modifier
         .fillMaxWidth()
         .height(BottomTitleSectionHeight)
-        .background(MaterialTheme.colors.backgroundSecondary)
+        .background(MaterialTheme.colorScheme.surfaceVariant)
     )
   }
 }
@@ -272,14 +271,14 @@ private fun TitleBackgrounds() {
  */
 @Composable
 private fun TitleIcons() {
-  val transparentBackground = MaterialTheme.colors.backgroundSecondary.copy(alpha = 0f)
+  val transparentBackground = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f)
   val gradientBackground = Brush.horizontalGradient(
-    0f to MaterialTheme.colors.backgroundSecondary,
-    0.7f to MaterialTheme.colors.backgroundSecondary,
+    0f to MaterialTheme.colorScheme.surfaceVariant,
+    0.7f to MaterialTheme.colorScheme.surfaceVariant,
     1f to transparentBackground,
   )
 
-  CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
     Column(
       verticalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxHeight(),

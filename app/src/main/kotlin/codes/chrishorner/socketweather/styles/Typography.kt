@@ -1,106 +1,171 @@
+@file:Suppress("unused") // Even if things aren't used, we want to adhere to the Material spec.
+
 package codes.chrishorner.socketweather.styles
 
-import androidx.compose.material.Typography
+import androidx.compose.material3.Typography
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.sp
-import codes.chrishorner.socketweather.R.font
+import codes.chrishorner.socketweather.R
 
-private val Rubik = FontFamily(
-  Font(font.rubik_regular),
-  Font(font.rubik_medium, weight = FontWeight.Medium)
+private val Inter = FontFamily(
+  Font(R.font.inter_regular),
+  Font(R.font.inter_medium, weight = FontWeight.Medium)
 )
 
 private val ZillaSlab = FontFamily(
-  Font(font.zilla_slab_medium, weight = FontWeight.Medium)
+  Font(R.font.zilla_slab_medium, weight = FontWeight.Medium)
 )
 
 private val RobotoSlab = FontFamily(
-  Font(font.roboto_slab_regular),
-  Font(font.roboto_slab_medium, weight = FontWeight.Medium)
+  Font(R.font.roboto_slab_regular),
+  Font(R.font.roboto_slab_medium, weight = FontWeight.Medium)
 )
 
 val SocketWeatherTypography = Typography(
-  defaultFontFamily = Rubik,
-  h1 = TextStyle(
+  displayLarge = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 96.sp,
+    lineHeight = TextUnit.Unspecified,
     letterSpacing = (-1.5).sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
   ),
-  h2 = TextStyle(
+  displayMedium = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 60.sp,
+    lineHeight = 66.sp,
     letterSpacing = (-0.5).sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
   ),
-  h3 = TextStyle(
+  displaySmall = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 48.sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
+    lineHeight = 52.sp,
+    letterSpacing = 0.sp,
   ),
-  h4 = TextStyle(
+  headlineLarge = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
+    fontSize = 40.sp,
+    lineHeight = 40.sp,
+    letterSpacing = 0.sp,
+  ),
+  headlineMedium = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 34.sp,
+    lineHeight = 36.sp,
     letterSpacing = 0.25.sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
   ),
-  h5 = TextStyle(
+  headlineSmall = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 24.sp,
+    lineHeight = 32.sp,
     letterSpacing = 0.2.sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
   ),
-  h6 = TextStyle(
+  titleLarge = TextStyle(
+    fontFamily = ZillaSlab,
+    fontWeight = FontWeight.Medium,
     fontSize = 20.sp,
+    lineHeight = 28.sp,
     letterSpacing = 0.15.sp,
-    fontFamily = ZillaSlab,
-    fontWeight = FontWeight.Medium
   ),
-  subtitle1 = TextStyle(
-    fontSize = 18.sp,
+  titleMedium = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Medium,
+    fontSize = 16.sp,
+    lineHeight = 24.sp,
     letterSpacing = 0.2.sp,
-    fontWeight = FontWeight.Normal
   ),
-  subtitle2 = TextStyle(
+  titleSmall = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Medium,
     fontSize = 14.sp,
+    lineHeight = 20.sp,
     letterSpacing = 0.1.sp,
-    fontWeight = FontWeight.Normal
   ),
-  overline = TextStyle(
-    fontSize = 15.sp
-  ),
-  body1 = TextStyle(
+  bodyLarge = TextStyle(
+    fontFamily = Inter,
     fontWeight = FontWeight.Normal,
     fontSize = 16.sp,
-    letterSpacing = 0.8.sp,
     lineHeight = 24.sp,
-  )
+    letterSpacing = TextUnit.Unspecified,
+  ),
+  bodyMedium = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Normal,
+    fontSize = 14.sp,
+    lineHeight = 20.sp,
+    letterSpacing = 0.02.sp,
+  ),
+  bodySmall = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Normal,
+    fontSize = 12.sp,
+    lineHeight = 16.sp,
+    letterSpacing = 0.4.sp,
+  ),
+  labelLarge = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Medium,
+    fontSize = 14.sp,
+    lineHeight = 20.sp,
+    letterSpacing = 0.1.sp,
+  ),
+  labelMedium = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Medium,
+    fontSize = 12.sp,
+    lineHeight = 16.sp,
+    letterSpacing = 0.5.sp,
+  ),
+  labelSmall = TextStyle(
+    fontFamily = Inter,
+    fontWeight = FontWeight.Medium,
+    fontSize = 11.sp,
+    lineHeight = 16.sp,
+    letterSpacing = 0.5.sp,
+  ),
 )
 
-val LargeTempTextStyle = SocketWeatherTypography.h2.copy(
+private val LargeTempTextStyle = SocketWeatherTypography.displayMedium.copy(
   fontSize = 64.sp,
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Normal
 )
 
-val MediumTempTextStyle = SocketWeatherTypography.h5.copy(
+private val MediumTempTextStyle = SocketWeatherTypography.headlineSmall.copy(
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Medium
 )
 
-val SmallTempTextStyle = SocketWeatherTypography.body1.copy(
+private val SmallTempTextStyle = SocketWeatherTypography.bodyLarge.copy(
   fontSize = 18.sp,
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Medium
 )
 
-val TinyTempTextStyle = SocketWeatherTypography.body1.copy(
+private val TinyTempTextStyle = SocketWeatherTypography.bodyLarge.copy(
   fontSize = 16.sp,
   fontFamily = RobotoSlab,
   fontWeight = FontWeight.Medium
 )
 
-val CopyrightTextStyle = SocketWeatherTypography.caption.copy(fontSize = 10.sp)
+private val CopyrightTextStyle = SocketWeatherTypography.bodySmall.copy(fontSize = 10.sp)
+
+val Typography.largeTemp
+  get() = LargeTempTextStyle
+
+val Typography.mediumTemp
+  get() = MediumTempTextStyle
+
+val Typography.smallTemp
+  get() = SmallTempTextStyle
+
+val Typography.copyright
+  get() = CopyrightTextStyle

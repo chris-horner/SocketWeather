@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.res.Configuration
 import androidx.activity.compose.LocalActivityResultRegistryOwner
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
@@ -18,27 +17,27 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.DropdownMenu
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowDropDown
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -47,6 +46,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -64,7 +64,6 @@ import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeState.Content
 import codes.chrishorner.socketweather.styles.SocketWeatherTheme
-import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import codes.chrishorner.socketweather.util.permissionState
 import kotlinx.parcelize.Parcelize
 
@@ -85,28 +84,21 @@ object HomeScreen : Screen<HomeEvent, HomeState> {
 private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 
   val scrollState = rememberScrollState()
-  val elevateToolbar by remember {
-    derivedStateOf {
-      scrollState.value > 0
-    }
-  }
-  val toolbarElevation by animateDpAsState(targetValue = if (elevateToolbar) 4.dp else 0.dp)
+  val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
   var locationChooserVisible by rememberSaveable { mutableStateOf(false) }
 
   Box {
-    Surface(color = MaterialTheme.colors.background) {
-      Scaffold(
-        topBar = {
-          InsetAwareTopAppBar(
-            title = { ToolbarTitle(state) { locationChooserVisible = true } },
-            backgroundColor = MaterialTheme.colors.background,
-            elevation = toolbarElevation,
-            actions = { Menu(onEvent) }
-          )
-        }
-      ) { innerPadding ->
-        Content(state.content, scrollState, onEvent, Modifier.padding(innerPadding))
+    Scaffold(
+      modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+      topBar = {
+        TopAppBar(
+          title = { ToolbarTitle(state) { locationChooserVisible = true } },
+          scrollBehavior = scrollBehavior,
+          actions = { Menu(onEvent) },
+        )
       }
+    ) { innerPadding ->
+      Content(state.content, scrollState, onEvent, Modifier.padding(innerPadding))
     }
     LocationSwitcher(
       visible = locationChooserVisible,
@@ -132,18 +124,20 @@ private fun Menu(onEvent: (event: HomeEvent) -> Unit) {
     onDismissRequest = { expanded = false },
     offset = DpOffset(0.dp, (-56).dp),
   ) {
-    DropdownMenuItem(onClick = {
-      onEvent(Refresh)
-      expanded = false
-    }) {
-      Text(stringResource(R.string.home_refresh))
-    }
-    DropdownMenuItem(onClick = {
-      onEvent(ViewAbout)
-      expanded = false
-    }) {
-      Text(stringResource(R.string.home_about))
-    }
+    DropdownMenuItem(
+      text = { Text(stringResource(R.string.home_refresh)) },
+      onClick = {
+        onEvent(Refresh)
+        expanded = false
+      },
+    )
+    DropdownMenuItem(
+      text = { Text(stringResource(R.string.home_about)) },
+      onClick = {
+        onEvent(ViewAbout)
+        expanded = false
+      },
+    )
   }
 }
 
@@ -153,7 +147,7 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
     verticalAlignment = Alignment.CenterVertically,
     modifier = Modifier
       .fillMaxWidth()
-      .height(56.dp)
+      .heightIn(min = 56.dp)
       .clickable { onClick() },
   ) {
 
@@ -164,10 +158,10 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
         .weight(1f)
     ) {
       Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(state.toolbarTitle, style = MaterialTheme.typography.h5)
+        Text(state.toolbarTitle, style = MaterialTheme.typography.headlineSmall)
         Icon(Icons.Rounded.ArrowDropDown, contentDescription = null)
       }
-      state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.caption) }
+      state.toolbarSubtitle?.let { Text(it, style = MaterialTheme.typography.bodySmall) }
     }
 
     AnimatedVisibility(
@@ -201,7 +195,7 @@ private fun Loading(modifier: Modifier = Modifier) {
     horizontalAlignment = Alignment.CenterHorizontally,
   ) {
     CircularProgressIndicator(modifier = Modifier.padding(bottom = 16.dp))
-    Text(stringResource(R.string.home_loading), style = MaterialTheme.typography.subtitle1)
+    Text(stringResource(R.string.home_loading), style = MaterialTheme.typography.titleMedium)
   }
 }
 
@@ -246,10 +240,10 @@ private fun Error(type: ForecastError, modifier: Modifier = Modifier, onRefresh:
     verticalArrangement = Arrangement.Center,
     horizontalAlignment = Alignment.CenterHorizontally
   ) {
-    Text(title, style = MaterialTheme.typography.h4, textAlign = TextAlign.Center)
+    Text(title, style = MaterialTheme.typography.headlineMedium, textAlign = TextAlign.Center)
     Text(
       message,
-      style = MaterialTheme.typography.body1,
+      style = MaterialTheme.typography.bodyLarge,
       textAlign = TextAlign.Center,
       modifier = Modifier
         .width(280.dp)

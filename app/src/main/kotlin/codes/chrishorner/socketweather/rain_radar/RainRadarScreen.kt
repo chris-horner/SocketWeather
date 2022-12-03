@@ -8,6 +8,7 @@ import android.graphics.PorterDuffColorFilter
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,13 +18,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.text.ClickableText
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons.Rounded
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -50,9 +53,8 @@ import codes.chrishorner.socketweather.rain_radar.map.getRainRadarOverlays
 import codes.chrishorner.socketweather.rain_radar.map.getTileProvider
 import codes.chrishorner.socketweather.rain_radar.map.isLoading
 import codes.chrishorner.socketweather.rain_radar.map.rememberMapViewWithLifecycle
-import codes.chrishorner.socketweather.styles.CopyrightTextStyle
-import codes.chrishorner.socketweather.styles.LightColors
-import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
+import codes.chrishorner.socketweather.styles.LightColorScheme
+import codes.chrishorner.socketweather.styles.copyright
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import kotlinx.parcelize.Parcelize
 import org.osmdroid.util.GeoPoint
@@ -69,7 +71,7 @@ object RainRadarScreen : Screen<RainRadarBackPressEvent, RainRadarState> {
   @Composable
   override fun Content(state: RainRadarState, onEvent: (RainRadarBackPressEvent) -> Unit) {
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
+    val useDarkIcons = !isSystemInDarkTheme()
 
     // Force dark system icons while viewing this screen.
     DisposableEffect(Unit) {
@@ -81,7 +83,7 @@ object RainRadarScreen : Screen<RainRadarBackPressEvent, RainRadarState> {
 
     // Force a light theme while viewing this screen.
     MaterialTheme(
-      colors = LightColors,
+      colorScheme = LightColorScheme,
       typography = MaterialTheme.typography,
     ) {
       RainRadarUi(state) { onEvent(RainRadarBackPressEvent) }
@@ -97,20 +99,21 @@ private fun RainRadarUi(state: RainRadarState, onBackPressed: () -> Unit = {}) {
   Box {
     RainRadar(state) { loading = it }
 
-    InsetAwareTopAppBar(
+    TopAppBar(
       title = { ToolbarTitle(state.subtitle, loading) },
       navigationIcon = {
         IconButton(onClick = onBackPressed) {
           Icon(Rounded.ArrowBack, contentDescription = stringResource(R.string.rainRadar_backDesc))
         }
       },
-      backgroundColor = MaterialTheme.colors.surface.copy(alpha = 0.6f),
-      elevation = 0.dp,
+      colors = TopAppBarDefaults.smallTopAppBarColors(
+        containerColor = MaterialTheme.colorScheme.background.copy(alpha = 0.6f)
+      ),
     )
 
     ClickableText(
       text = CopyrightText,
-      style = CopyrightTextStyle,
+      style = MaterialTheme.typography.copyright,
       modifier = Modifier
         .align(Alignment.BottomCenter)
         .systemBarsPadding()
@@ -177,8 +180,8 @@ private fun ToolbarTitle(subtitle: String, loading: Boolean) {
         .fillMaxHeight()
         .weight(1f)
     ) {
-      Text(stringResource(R.string.rainRadar_title), style = MaterialTheme.typography.h5)
-      Text(text = subtitle, style = MaterialTheme.typography.caption)
+      Text(stringResource(R.string.rainRadar_title), style = MaterialTheme.typography.headlineSmall)
+      Text(text = subtitle, style = MaterialTheme.typography.bodySmall)
     }
 
     AnimatedVisibility(

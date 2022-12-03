@@ -15,39 +15,35 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Snackbar
-import androidx.compose.material.SnackbarHost
-import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.MyLocation
 import androidx.compose.material.icons.rounded.Search
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -58,6 +54,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -100,110 +97,100 @@ fun ChooseLocationUi(state: ChooseLocationState, eventHandler: (event: ChooseLoc
 
   val focusManager = LocalFocusManager.current
   val currentlyIdle = state.loadingStatus == Idle
+  val snackbarHostState = remember { SnackbarHostState() }
 
   BackHandler(enabled = !currentlyIdle) {
     focusManager.clearFocus()
     eventHandler(ClearInput)
   }
 
-  Surface(
-    color = MaterialTheme.colors.background,
-    modifier = Modifier
-      .statusBarsPadding()
-      .windowInsetsPadding(WindowInsets.navigationBars.only(WindowInsetsSides.Start + WindowInsetsSides.End))
-  ) {
-    Box {
-      Column {
-        if (state.showCloseButton) {
-          AnimatedVisibility(visible = currentlyIdle) {
-            IconButton(onClick = { eventHandler(CloseClicked) }) {
-              CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.chooseLocation_closeDesc))
-              }
-            }
-          }
-        }
-        Spacer(
-          modifier = Modifier
-            .animateContentSize()
-            .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
-        )
-        AnimatedVisibility(visible = currentlyIdle) {
-          Text(
-            text = stringResource(R.string.chooseLocation_title),
-            style = MaterialTheme.typography.h4,
-            modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
-          )
-        }
-        AnimatedVisibility(visible = currentlyIdle && state.showFollowMeButton) {
-          FollowMeButton { hasLocationPermission ->
-            eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
-          }
-        }
-        OutlinedTextField(
-          value = state.query,
-          label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
-          onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
-          leadingIcon = {
-            Icon(
-              Icons.Rounded.Search,
-              contentDescription = null,
-              modifier = Modifier.padding(start = 2.dp)
-            )
-          },
-          singleLine = true,
-          modifier = Modifier
-            .testTag("search_input")
-            .padding(horizontal = 32.dp)
-            .fillMaxWidth()
-        )
-        Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
-          when (loadingStatus) {
-            Searching -> SearchLoading()
-            Submitting -> SubmittingLocationChoice()
-            SearchingError -> SearchError()
-            SearchingDone -> SearchResults(state.results) { eventHandler(ResultSelected(it)) }
-            else -> {
-              // Don't display anything when Idle or Submitted.
-            }
-          }
-        }
-        Spacer(modifier = Modifier
-          .navigationBarsPadding()
-          .imePadding())
-      }
-
-      ErrorMessagesSnackbar(
-        error = state.error,
-        modifier = Modifier
-          .align(Alignment.BottomStart)
-          .navigationBarsPadding()
-          .imePadding()
-          .padding(16.dp)
-      )
-    }
-  }
-}
-
-@Composable
-private fun ErrorMessagesSnackbar(
-  error: ChooseLocationState.Error?,
-  modifier: Modifier = Modifier,
-) {
-  val hostState = remember { SnackbarHostState() }
-
-  val message = when (error) {
+  // TODO: Move this calculation into presenter.
+  val errorMessage = when (state.error) {
     Permission -> stringResource(R.string.chooseLocation_permissionError)
     Submission -> stringResource(R.string.chooseLocation_submissionError)
     else -> null
   }
 
-  if (message != null) {
-    LaunchedEffect(message) { hostState.showSnackbar(message) }
+  LaunchedEffect(errorMessage) {
+    if (errorMessage != null) {
+      snackbarHostState.showSnackbar(errorMessage)
+    }
   }
 
-  SnackbarHost(hostState = hostState, modifier = modifier) {
-    Snackbar { Text(it.message) }
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    topBar = {
+      if (currentlyIdle) {
+        TopAppBar(
+          title = {},
+          navigationIcon = {
+            if (state.showCloseButton) {
+              IconButton(onClick = { eventHandler(CloseClicked) }) {
+                CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+                  Icon(Icons.Rounded.Close, contentDescription = stringResource(R.string.chooseLocation_closeDesc))
+                }
+              }
+            }
+          },
+        )
+      }
+    },
+    snackbarHost = { SnackbarHost(snackbarHostState) },
+  ) { innerPadding ->
+    Column(
+      modifier = Modifier
+        .fillMaxSize()
+        .padding(top = innerPadding.calculateTopPadding())
+    ) {
+      Spacer(
+        modifier = Modifier
+          .animateContentSize()
+          .then(if (currentlyIdle) Modifier.weight(1f) else Modifier.height(0.dp))
+      )
+      AnimatedVisibility(visible = currentlyIdle) {
+        Text(
+          text = stringResource(R.string.chooseLocation_title),
+          style = MaterialTheme.typography.headlineMedium,
+          modifier = Modifier.padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
+        )
+      }
+      AnimatedVisibility(visible = currentlyIdle && state.showFollowMeButton) {
+        FollowMeButton { hasLocationPermission ->
+          eventHandler(ChooseLocationUiEvent.FollowMeClicked(hasLocationPermission))
+        }
+      }
+      OutlinedTextField(
+        shape = CircleShape,
+        value = state.query,
+        label = { Text(text = stringResource(R.string.chooseLocation_searchHint)) },
+        onValueChange = { eventHandler(ChooseLocationUiEvent.InputSearch(it)) },
+        leadingIcon = {
+          Icon(
+            Icons.Rounded.Search,
+            contentDescription = null,
+            modifier = Modifier.padding(start = 24.dp, end = 8.dp)
+          )
+        },
+        singleLine = true,
+        modifier = Modifier
+          .testTag("search_input")
+          .padding(horizontal = 32.dp)
+          .padding(top = 16.dp)
+          .fillMaxWidth()
+      )
+      Crossfade(modifier = Modifier.weight(2f), targetState = state.loadingStatus) { loadingStatus ->
+        when (loadingStatus) {
+          Searching -> SearchLoading()
+          Submitting -> SubmittingLocationChoice()
+          SearchingError -> SearchError()
+          SearchingDone -> SearchResults(state.results) { eventHandler(ResultSelected(it)) }
+          else -> {
+            // Don't display anything when Idle or Submitted.
+          }
+        }
+      }
+      Spacer(modifier = Modifier.imePadding())
+    }
   }
 }
 
@@ -213,7 +200,7 @@ private fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
     modifier = Modifier
       .testTag("search_result_postcode:${result.postcode}")
       .fillMaxWidth()
-      .height(64.dp)
+      .heightIn(min = 64.dp)
       .clickable(onClick = onClick)
       .padding(horizontal = 32.dp)
   ) {
@@ -222,11 +209,27 @@ private fun SearchResultItem(result: SearchResult, onClick: () -> Unit) {
         .weight(1f)
         .align(Alignment.CenterVertically)
     ) {
-      Text(text = result.name, maxLines = 1)
-      Text(text = result.state, maxLines = 1)
+      Text(
+        text = result.name,
+        maxLines = 1,
+        overflow = TextOverflow.Ellipsis,
+        style = MaterialTheme.typography.titleMedium
+      )
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
+        Text(
+          text = result.state,
+          maxLines = 1,
+          overflow = TextOverflow.Ellipsis,
+          style = MaterialTheme.typography.titleSmall
+        )
+      }
     }
     result.postcode?.let {
-      Text(text = it, modifier = Modifier.align(Alignment.CenterVertically))
+      Text(
+        text = it,
+        modifier = Modifier.align(Alignment.CenterVertically),
+        style = MaterialTheme.typography.labelMedium
+      )
     }
   }
 }
@@ -237,7 +240,7 @@ private fun SearchResults(results: List<SearchResult>, onClick: (item: SearchRes
     Box(modifier = Modifier.fillMaxSize()) {
       Text(
         text = stringResource(R.string.chooseLocation_searchEmpty),
-        style = MaterialTheme.typography.subtitle1,
+        style = MaterialTheme.typography.titleMedium,
         textAlign = TextAlign.Center,
         modifier = Modifier
           .align(Alignment.Center)
@@ -246,7 +249,7 @@ private fun SearchResults(results: List<SearchResult>, onClick: (item: SearchRes
       )
     }
   } else {
-    LazyColumn {
+    LazyColumn(contentPadding = WindowInsets.navigationBars.asPaddingValues()) {
       items(results) {
         SearchResultItem(it) { onClick(it) }
       }
@@ -266,7 +269,7 @@ private fun SearchError() {
   Box(modifier = Modifier.fillMaxSize()) {
     Text(
       text = stringResource(R.string.chooseLocation_searchError),
-      style = MaterialTheme.typography.subtitle1,
+      style = MaterialTheme.typography.titleMedium,
       textAlign = TextAlign.Center,
       modifier = Modifier
         .align(Alignment.Center)
@@ -282,7 +285,7 @@ private fun SubmittingLocationChoice() {
     CircularProgressIndicator(modifier = Modifier.align(Alignment.CenterHorizontally))
     Text(
       text = stringResource(R.string.chooseLocation_submitting),
-      style = MaterialTheme.typography.subtitle1,
+      style = MaterialTheme.typography.titleMedium,
       textAlign = TextAlign.Center,
       modifier = Modifier
         .align(Alignment.CenterHorizontally)
@@ -298,15 +301,11 @@ private fun FollowMeButton(onClick: (hasLocationPermission: Boolean) -> Unit) {
     onClick(granted)
   }
 
-  Button(
-    colors = ButtonDefaults.buttonColors(
-      backgroundColor = MaterialTheme.colors.primaryVariant
-    ),
+  ElevatedButton(
     modifier = Modifier
-      .testTag("follow_me")
-      .padding(start = 32.dp, end = 32.dp, bottom = 16.dp)
       .fillMaxWidth()
-      .height(48.dp),
+      .padding(horizontal = 32.dp)
+      .heightIn(min = 56.dp),
     onClick = {
       if (locationPermissionState?.hasPermission == true) {
         onClick(true)

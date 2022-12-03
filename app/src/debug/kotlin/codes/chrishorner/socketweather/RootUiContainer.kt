@@ -1,8 +1,8 @@
 package codes.chrishorner.socketweather
 
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.ui.Modifier
@@ -15,7 +15,7 @@ import com.google.accompanist.systemuicontroller.rememberSystemUiController
 fun RootContainer(content: @Composable () -> Unit) {
   SocketWeatherTheme {
     val systemUiController = rememberSystemUiController()
-    val useDarkIcons = MaterialTheme.colors.isLight
+    val useDarkIcons = !isSystemInDarkTheme()
     SideEffect {
       systemUiController.setSystemBarsColor(Color.Transparent, darkIcons = useDarkIcons)
     }

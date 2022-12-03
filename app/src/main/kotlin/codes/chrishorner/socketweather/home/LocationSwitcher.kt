@@ -23,18 +23,18 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Card
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Divider
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.ArrowDropUp
 import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material.icons.rounded.MyLocation
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Divider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.State
@@ -49,7 +49,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import codes.chrishorner.socketweather.R
-import codes.chrishorner.socketweather.styles.scrim
 
 @Composable
 fun LocationSwitcher(
@@ -77,11 +76,11 @@ fun LocationSwitcher(
             indication = null
           ) { onDismissRequest() }
           .alpha(transition.scrimAlpha)
-          .background(MaterialTheme.colors.scrim)
+          .background(MaterialTheme.colorScheme.scrim)
       )
 
       Card(
-        elevation = 8.dp,
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         modifier = Modifier
           .systemBarsPadding()
           .padding(horizontal = 8.dp)
@@ -115,7 +114,7 @@ private fun LocationSwitcherContent(
         .height(64.dp)
         .clickable { onDismissRequest() },
     ) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Icon(
           Icons.Rounded.CheckCircleOutline,
           contentDescription = null,
@@ -123,8 +122,8 @@ private fun LocationSwitcherContent(
         )
       }
       Column {
-        Text(currentLocation.title, style = MaterialTheme.typography.h6)
-        Text(currentLocation.subtitle, style = MaterialTheme.typography.subtitle2)
+        Text(currentLocation.title, style = MaterialTheme.typography.titleLarge)
+        Text(currentLocation.subtitle, style = MaterialTheme.typography.titleSmall)
       }
       Spacer(modifier = Modifier.weight(1f))
       Icon(
@@ -146,7 +145,7 @@ private fun LocationSwitcherContent(
             .clickable { onEvent(HomeEvent.SwitchLocation(item.selection)) },
         ) {
           if (item.showTrackingIcon) {
-            CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+            CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
               Icon(
                 Icons.Rounded.MyLocation,
                 contentDescription = null,
@@ -157,8 +156,8 @@ private fun LocationSwitcherContent(
             Spacer(modifier = Modifier.width(64.dp))
           }
           Column {
-            Text(item.title, style = MaterialTheme.typography.h6)
-            Text(item.subtitle, style = MaterialTheme.typography.subtitle2)
+            Text(item.title, style = MaterialTheme.typography.titleLarge)
+            Text(item.subtitle, style = MaterialTheme.typography.titleSmall)
           }
         }
       }
@@ -173,14 +172,14 @@ private fun LocationSwitcherContent(
         .height(64.dp)
         .clickable { onEvent(HomeEvent.AddLocation) },
     ) {
-      CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
+      CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {
         Icon(
           Icons.Rounded.Add,
           contentDescription = null,
           modifier = Modifier.padding(horizontal = 20.dp)
         )
       }
-      Text(stringResource(R.string.switchLocation_add), style = MaterialTheme.typography.button)
+      Text(stringResource(R.string.switchLocation_add), style = MaterialTheme.typography.labelLarge)
     }
   }
 }

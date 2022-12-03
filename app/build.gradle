@@ -112,7 +112,9 @@ tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {
     '-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi',
     '-Xopt-in=kotlin.ExperimentalStdlibApi',
     '-Xopt-in=kotlin.time.ExperimentalTime',
+    '-Xopt-in=androidx.compose.foundation.layout.ExperimentalLayoutApi',
     '-Xopt-in=androidx.compose.material.ExperimentalMaterialApi',
+    '-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api',
     '-Xopt-in=androidx.compose.animation.ExperimentalAnimationApi'
   ]
 }
@@ -126,6 +128,9 @@ dependencies {
   implementation deps.compose.material.core
   implementation deps.compose.material.icons
   implementation deps.compose.material.iconsExtended
+  debugImplementation(deps.compose.material.m2) {
+    because 'debugDrawer still uses Material 2'
+  }
   implementation deps.compose.ui
   implementation deps.compose.uiGraphics
   implementation deps.compose.uiTooling

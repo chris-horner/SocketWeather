@@ -5,7 +5,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,20 +14,19 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -39,7 +37,6 @@ import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.about.AboutPresenter.BackPressEvent
-import codes.chrishorner.socketweather.util.InsetAwareTopAppBar
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -58,80 +55,71 @@ object AboutScreen : Screen<BackPressEvent, Unit> {
 private fun AboutUi(onBack: () -> Unit) {
 
   val scrollState = rememberScrollState()
-  val elevateToolbar by remember {
-    derivedStateOf {
-      scrollState.value > 0
+  val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+
+  Scaffold(
+    modifier = Modifier
+      .fillMaxSize()
+      .nestedScroll(scrollBehavior.nestedScrollConnection),
+    topBar = {
+      TopAppBar(
+        navigationIcon = {
+          IconButton(onClick = onBack) {
+            Icon(
+              Icons.Rounded.ArrowBack,
+              contentDescription = stringResource(R.string.common_backButtonDesc)
+            )
+          }
+        },
+        title = { Text(stringResource(R.string.about_title), style = MaterialTheme.typography.titleLarge) },
+        scrollBehavior = scrollBehavior,
+      )
     }
-  }
-  val toolbarElevation by animateDpAsState(targetValue = if (elevateToolbar) 4.dp else 0.dp)
+  ) { innerPadding ->
+    Column(
+      modifier = Modifier
+        .verticalScroll(scrollState)
+        .padding(innerPadding)
+        .padding(vertical = 16.dp)
+        .navigationBarsPadding()
+    ) {
 
-  Surface(
-    color = MaterialTheme.colors.background,
-    modifier = Modifier.fillMaxSize()
-  ) {
-    Scaffold(
-      topBar = {
-        InsetAwareTopAppBar(
-          navigationIcon = {
-            IconButton(onClick = onBack) {
-              Icon(
-                Icons.Rounded.ArrowBack,
-                contentDescription = stringResource(R.string.common_backButtonDesc)
-              )
-            }
-          },
-          title = { Text(stringResource(R.string.about_title), style = MaterialTheme.typography.h6) },
-          backgroundColor = MaterialTheme.colors.background,
-          elevation = toolbarElevation,
-        )
-      },
-      content = { innerPadding ->
-        Column(
-          modifier = Modifier
-            .verticalScroll(scrollState)
-            .padding(innerPadding)
-            .padding(vertical = 16.dp)
-            .navigationBarsPadding()
-        ) {
+      Text(
+        text = stringResource(R.string.appName),
+        style = MaterialTheme.typography.headlineMedium,
+        modifier = Modifier.padding(horizontal = 16.dp),
+      )
 
-          Text(
-            text = stringResource(R.string.appName),
-            style = MaterialTheme.typography.h4,
-            modifier = Modifier.padding(horizontal = 16.dp),
-          )
+      Text(
+        text = BuildConfig.VERSION_NAME,
+        style = MaterialTheme.typography.titleSmall,
+        modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
+      )
 
-          Text(
-            text = BuildConfig.VERSION_NAME,
-            style = MaterialTheme.typography.subtitle2,
-            modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
-          )
+      Text(
+        text = stringResource(R.string.about_body),
+        style = MaterialTheme.typography.bodyLarge,
+        modifier = Modifier.padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
+      )
 
-          Text(
-            text = stringResource(R.string.about_body),
-            style = MaterialTheme.typography.body1,
-            modifier = Modifier.padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
-          )
+      AboutLink(
+        iconRes = R.drawable.ic_sunny_24dp,
+        textRes = R.string.about_bomWebsite,
+        url = "http://www.bom.gov.au/",
+      )
 
-          AboutLink(
-            iconRes = R.drawable.ic_sunny_24dp,
-            textRes = R.string.about_bomWebsite,
-            url = "http://www.bom.gov.au/",
-          )
+      AboutLink(
+        iconRes = R.drawable.ic_github_24dp,
+        textRes = R.string.about_source,
+        url = "https://github.com/chris-horner/SocketWeather",
+      )
 
-          AboutLink(
-            iconRes = R.drawable.ic_github_24dp,
-            textRes = R.string.about_source,
-            url = "https://github.com/chris-horner/SocketWeather",
-          )
-
-          AboutLink(
-            iconRes = R.drawable.ic_web_24dp,
-            textRes = R.string.about_chrisWebsite,
-            url = "https://chrishorner.codes",
-          )
-        }
-      }
-    )
+      AboutLink(
+        iconRes = R.drawable.ic_web_24dp,
+        textRes = R.string.about_chrisWebsite,
+        url = "https://chrishorner.codes",
+      )
+    }
   }
 }
 
@@ -158,7 +146,7 @@ private fun AboutLink(@DrawableRes iconRes: Int, @StringRes textRes: Int, url: S
 
     Text(
       text = stringResource(textRes),
-      style = MaterialTheme.typography.button,
+      style = MaterialTheme.typography.labelLarge,
       modifier = Modifier.weight(1f),
     )
   }

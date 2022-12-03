@@ -22,14 +22,15 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.ArrowDropDown
-import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -246,11 +247,11 @@ private fun Error(type: ForecastError, modifier: Modifier = Modifier, onRefresh:
       style = MaterialTheme.typography.bodyLarge,
       textAlign = TextAlign.Center,
       modifier = Modifier
-        .width(280.dp)
+        .widthIn(max = 320.dp)
         .padding(top = 8.dp, bottom = 16.dp)
     )
     Image(painter = image, contentDescription = null)
-    Button(
+    FilledTonalButton(
       modifier = Modifier.width(200.dp),
       onClick = {
         if (type == ForecastError.LOCATION) {

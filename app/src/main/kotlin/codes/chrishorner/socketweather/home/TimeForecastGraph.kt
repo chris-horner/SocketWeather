@@ -30,6 +30,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
@@ -73,6 +74,7 @@ fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastG
 
   val scale = getTemperatureScale(entries)
   val listState = rememberLazyListState()
+  val headerFooterColor = MaterialTheme.colorScheme.surfaceVariant
 
   with(LocalDensity.current) {
     // Add 8dp to approximate the actual height.
@@ -83,7 +85,7 @@ fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastG
   Box(modifier = modifier.requiredHeight(TotalComponentHeight)) {
 
     // Start by drawing some background colour to sit behind the time and chance of rain.
-    TitleBackgrounds()
+    TitleBackgrounds(headerFooterColor)
 
     // Then draw time, temperature, and chance of rain as scrollable LazyRow items.
     ScrollableEntries(lineGraphHeight, scale, entries, listState)
@@ -99,7 +101,7 @@ fun TimeForecastGraph(modifier: Modifier = Modifier, entries: List<TimeForecastG
     )
 
     // Finally, render some icons to sit on top of the title sections.
-    TitleIcons()
+    TitleIcons(headerFooterColor)
   }
 }
 
@@ -246,7 +248,7 @@ private fun LineGraph(
  * The slightly different coloured bars that sit on the top and bottom of the graph.
  */
 @Composable
-private fun TitleBackgrounds() {
+private fun TitleBackgrounds(backgroundColor: Color) {
   Column(
     verticalArrangement = Arrangement.SpaceBetween,
     modifier = Modifier.fillMaxSize(),
@@ -255,13 +257,13 @@ private fun TitleBackgrounds() {
       modifier = Modifier
         .fillMaxWidth()
         .height(TopTitleSectionHeight)
-        .background(MaterialTheme.colorScheme.surfaceVariant)
+        .background(backgroundColor)
     )
     Box(
       modifier = Modifier
         .fillMaxWidth()
         .height(BottomTitleSectionHeight)
-        .background(MaterialTheme.colorScheme.surfaceVariant)
+        .background(backgroundColor)
     )
   }
 }
@@ -270,12 +272,11 @@ private fun TitleBackgrounds() {
  * The icons for time and chance of rain that sit at the start of the title section.
  */
 @Composable
-private fun TitleIcons() {
-  val transparentBackground = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0f)
+private fun TitleIcons(backgroundColor: Color) {
   val gradientBackground = Brush.horizontalGradient(
-    0f to MaterialTheme.colorScheme.surfaceVariant,
-    0.7f to MaterialTheme.colorScheme.surfaceVariant,
-    1f to transparentBackground,
+    0f to backgroundColor,
+    0.7f to backgroundColor,
+    1f to backgroundColor.copy(alpha = 0f),
   )
 
   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant) {

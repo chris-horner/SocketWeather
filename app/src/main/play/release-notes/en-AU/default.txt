@@ -1,4 +1,7 @@
 - 📊 Added resizable home screen widgets
 - 🌧 Fixed rain radar issues by pointing at a difference source from BOM
 - ➕ Added "More" section, expanding to show chance of rain, humidity, etc
+- 🎨 Added support for Material You dynamic colour
+- 🗑️ Added ability to delete previously added locations
 - 🔧 Slight UI tweaks here and there
+- 🏎️ Improved start up time

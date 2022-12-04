@@ -35,7 +35,7 @@ jobs:
         run: bash ./gradlew publishReleaseBundle
 
       - name: Update store listing
-        run: bash ./gradlew publishListing
+        run: bash ./gradlew publishReleaseListing
 
       - name: Build APKs
         env:

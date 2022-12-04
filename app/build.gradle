@@ -102,7 +102,7 @@ android {
 play {
   serviceAccountCredentials = file('keys/play_access.json')
   defaultToAppBundles = true
-  resolutionStrategy = 'ignore'
+  resolutionStrategy = com.github.triplet.gradle.androidpublisher.ResolutionStrategy.IGNORE
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

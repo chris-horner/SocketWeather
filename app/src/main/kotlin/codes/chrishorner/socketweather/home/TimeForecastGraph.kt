@@ -164,7 +164,7 @@ private fun ScrollableEntries(
           if (entry.rainChancePercent > 0 && index > 0) {
             Text(
               text = entry.formattedRainChance,
-              style = MaterialTheme.typography.labelSmall,
+              style = MaterialTheme.typography.labelMedium,
             )
           }
         }

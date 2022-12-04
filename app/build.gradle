@@ -97,11 +97,18 @@ android {
   lint {
     disable 'InvalidPackage'
   }
+
+  playConfigs {
+    register("release") {
+      enabled = true
+    }
+  }
 }
 
 play {
   serviceAccountCredentials = file('keys/play_access.json')
   defaultToAppBundles = true
+  enabled = false
 }
 
 tasks.withType(org.jetbrains.kotlin.gradle.tasks.KotlinCompile).all {

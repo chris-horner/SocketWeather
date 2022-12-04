@@ -1,6 +1,7 @@
 package codes.chrishorner.socketweather.home
 
 import android.content.Context
+import android.os.Build
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,12 +25,14 @@ import codes.chrishorner.socketweather.data.LocationSelection
 import codes.chrishorner.socketweather.data.LocationSelection.FollowMe
 import codes.chrishorner.socketweather.data.LocationSelection.None
 import codes.chrishorner.socketweather.data.LocationSelection.Static
+import codes.chrishorner.socketweather.data.Settings
 import codes.chrishorner.socketweather.data.Store
 import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.home.HomeEvent.AddLocation
 import codes.chrishorner.socketweather.home.HomeEvent.DeleteLocation
 import codes.chrishorner.socketweather.home.HomeEvent.Refresh
 import codes.chrishorner.socketweather.home.HomeEvent.SwitchLocation
+import codes.chrishorner.socketweather.home.HomeEvent.ToggleDynamicColor
 import codes.chrishorner.socketweather.home.HomeEvent.ViewAbout
 import codes.chrishorner.socketweather.home.HomeEvent.ViewRainRadar
 import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
@@ -55,7 +58,9 @@ class HomePresenter(
   private val forecast: StateFlow<Forecast?>,
   private val currentSelectionStore: Store<LocationSelection>,
   private val allSelectionsStore: Store<Set<LocationSelection>>,
+  private val settingsStore: Store<Settings>,
   private val strings: Strings,
+  private val dynamicColorsAvailable: Boolean,
   private val clock: Clock = Clock.systemDefaultZone(),
 ) : Presenter<HomeEvent, HomeState> {
 
@@ -70,6 +75,7 @@ class HomePresenter(
     val currentSelection by remember { currentSelectionStore.data }.collectAsState()
     val allSelections by remember { allSelectionsStore.data }.collectAsState()
     val otherSelections = allSelections.minus(currentSelection).map { it.toLocationEntry() }
+    val settings by remember { settingsStore.data }.collectAsState()
 
     LaunchedEffect(Unit) {
       forecastLoader.refreshIfNecessary()
@@ -93,6 +99,7 @@ class HomePresenter(
         }
         ViewAbout -> navigator.push(AboutScreen)
         ViewRainRadar -> navigator.push(RainRadarScreen)
+        ToggleDynamicColor -> launch { settingsStore.update { it.copy(useDynamicColors = !it.useDynamicColors) } }
       }
     }
 
@@ -103,6 +110,8 @@ class HomePresenter(
       savedLocations = otherSelections,
       content = getContent(loadingState, forecast),
       showRefreshingIndicator = shouldShowRefreshingIndicator(loadingState, forecast),
+      showDynamicColorOption = dynamicColorsAvailable,
+      dynamicColorEnabled = settings.useDynamicColors,
     )
   }
 
@@ -239,6 +248,8 @@ class HomePresenter(
         forecast = stores.forecast.data,
         currentSelectionStore = stores.currentSelection,
         allSelectionsStore = stores.savedSelections,
+        settingsStore = stores.settings,
+        dynamicColorsAvailable = Build.VERSION.SDK_INT >= 31,
         strings = AndroidStrings(context),
       )
     }

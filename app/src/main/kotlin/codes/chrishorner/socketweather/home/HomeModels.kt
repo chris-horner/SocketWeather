@@ -10,6 +10,8 @@ data class HomeState(
   val savedLocations: List<LocationEntry>,
   val content: Content,
   val showRefreshingIndicator: Boolean = false,
+  val showDynamicColorOption: Boolean = false,
+  val dynamicColorEnabled: Boolean = false,
 ) {
   sealed class Content {
     object Empty : Content()
@@ -33,6 +35,7 @@ sealed class HomeEvent {
   object Refresh : HomeEvent()
   object ViewAbout : HomeEvent()
   object ViewRainRadar : HomeEvent()
+  object ToggleDynamicColor : HomeEvent()
 }
 
 data class FormattedConditions(

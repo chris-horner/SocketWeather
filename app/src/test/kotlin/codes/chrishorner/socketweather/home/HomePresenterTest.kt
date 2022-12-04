@@ -8,6 +8,8 @@ import codes.chrishorner.socketweather.data.ForecastError
 import codes.chrishorner.socketweather.data.ForecastLoader.State
 import codes.chrishorner.socketweather.data.Location
 import codes.chrishorner.socketweather.data.LocationSelection
+import codes.chrishorner.socketweather.data.Settings
+import codes.chrishorner.socketweather.data.update
 import codes.chrishorner.socketweather.rain_radar.RainRadarScreen
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
 import codes.chrishorner.socketweather.test.FakeApi
@@ -39,8 +41,8 @@ class HomePresenterTest {
   private val forecast = MutableStateFlow<Forecast?>(null)
   private val currentSelectionStore = FakeStore<LocationSelection>(LocationSelection.None)
   private val allSelections = FakeStore<Set<LocationSelection>>(emptySet())
+  private val settingsStore = FakeStore(Settings(useDynamicColors = false))
   private val clock: MutableClock
-  private val presenter: HomePresenter
   private val fakeApi: FakeApi
 
   private val strings = FakeStrings(
@@ -56,13 +58,22 @@ class HomePresenterTest {
     val startTime = ZonedDateTime.of(2022, 2, 27, 9, 0, 0, 0, ZoneId.of("Australia/Melbourne"))
     clock = MutableClock(startTime.toOffsetDateTime())
     fakeApi = FakeApi(clock)
-    presenter = HomePresenter(
-      navigator, forecastLoader, forecast, currentSelectionStore, allSelections, strings, clock
-    )
   }
 
+  private fun createPresenter(dynamicColorsAvailable: Boolean = false) = HomePresenter(
+    navigator = navigator,
+    forecastLoader = forecastLoader,
+    forecast = forecast,
+    currentSelectionStore = currentSelectionStore,
+    allSelectionsStore = allSelections,
+    settingsStore = settingsStore,
+    strings = strings,
+    dynamicColorsAvailable = dynamicColorsAvailable,
+    clock = clock
+  )
+
   @Test fun `null forecast with idle loading shows empty state`() = runBlocking {
-    presenter.test {
+    createPresenter().test {
       val state = awaitItem()
       assertThat(state.content).isEqualTo(HomeState.Content.Empty)
     }
@@ -71,7 +82,7 @@ class HomePresenterTest {
   @Test fun `loaded forecast with idle loading shows loaded state`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
@@ -87,7 +98,7 @@ class HomePresenterTest {
     setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.LoadingForecast
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updating now…")
@@ -100,7 +111,7 @@ class HomePresenterTest {
   @Test fun `null forecast with loading shows loading state`() = runBlocking {
     forecastLoader.states.value = State.LoadingForecast
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo("Loading forecast…")
         assertThat(toolbarSubtitle).isEqualTo("Updating now…")
@@ -113,7 +124,7 @@ class HomePresenterTest {
   @Test fun `null forecast with error shows error state`() = runBlocking {
     forecastLoader.states.value = State.Error(ForecastError.NETWORK)
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo("Loading forecast…")
         assertThat(toolbarSubtitle).isNull()
@@ -126,7 +137,7 @@ class HomePresenterTest {
     setTestDataWith(TestData.location1)
     forecastLoader.states.value = State.Error(ForecastError.NETWORK)
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated just now")
@@ -139,7 +150,7 @@ class HomePresenterTest {
     setTestDataWith(TestData.location1)
     clock.advanceBy(Duration.ofMinutes(1))
 
-    presenter.test {
+    createPresenter().test {
       with(awaitItem()) {
         assertThat(toolbarTitle).isEqualTo(TestData.location1.name)
         assertThat(toolbarSubtitle).isEqualTo("Updated Relative time string")
@@ -151,7 +162,7 @@ class HomePresenterTest {
   @Test fun `AddLocation event navigates to ChooseLocationScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       awaitItem()
       sendEvent(HomeEvent.AddLocation)
       assertThat(navigator.awaitStackChange()).containsExactlyInOrder(
@@ -164,7 +175,7 @@ class HomePresenterTest {
   @Test fun `Refresh event forces forecast to refresh`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       awaitItem()
       sendEvent(HomeEvent.Refresh)
       forecastLoader.refreshCalls.awaitItem()
@@ -174,7 +185,7 @@ class HomePresenterTest {
   @Test fun `SwitchLocation event changes selection and forces refresh`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       awaitItem()
       assertThat(currentSelectionStore.data.value).isEqualTo(LocationSelection.Static(TestData.location1))
       sendEvent(HomeEvent.SwitchLocation(LocationSelection.Static(TestData.location2)))
@@ -187,7 +198,7 @@ class HomePresenterTest {
   @Test fun `DeleteLocation event removes location from storage and produces update`() = runBlocking {
     setTestDataWith(TestData.location1, TestData.location2)
 
-    presenter.test {
+    createPresenter().test {
       assertThat(allSelections.data.value).containsExactlyInOrder(
         LocationSelection.Static(TestData.location1),
         LocationSelection.Static(TestData.location2),
@@ -211,7 +222,7 @@ class HomePresenterTest {
   @Test fun `ViewAbout event navigates to AboutScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       awaitItem()
       sendEvent(HomeEvent.ViewAbout)
       assertThat(navigator.awaitStackChange()).containsExactlyInOrder(HomeScreen, AboutScreen)
@@ -221,10 +232,38 @@ class HomePresenterTest {
   @Test fun `ViewRainRadar event navigates to RainRadarScreen`() = runBlocking {
     setTestDataWith(TestData.location1)
 
-    presenter.test {
+    createPresenter().test {
       awaitItem()
       sendEvent(HomeEvent.ViewRainRadar)
       assertThat(navigator.awaitStackChange()).containsExactlyInOrder(HomeScreen, RainRadarScreen)
+    }
+  }
+
+  @Test fun `dynamic colors not available doesn't show option`() = runBlocking {
+    createPresenter(dynamicColorsAvailable = false).test {
+      assertThat(awaitItem().showDynamicColorOption).isFalse()
+    }
+  }
+
+  @Test fun `dynamic colors available shows option`() = runBlocking {
+    createPresenter(dynamicColorsAvailable = true).test {
+      assertThat(awaitItem().showDynamicColorOption).isTrue()
+    }
+  }
+
+  @Test fun `toggling dynamic colors updates setting and model`() = runBlocking {
+    settingsStore.update { it.copy(useDynamicColors = false) }
+
+    createPresenter(dynamicColorsAvailable = true).test {
+      assertThat(awaitItem().dynamicColorEnabled).isFalse()
+
+      sendEvent(HomeEvent.ToggleDynamicColor)
+      assertThat(settingsStore.data.value.useDynamicColors).isTrue()
+      assertThat(awaitItem().dynamicColorEnabled).isTrue()
+
+      sendEvent(HomeEvent.ToggleDynamicColor)
+      assertThat(settingsStore.data.value.useDynamicColors).isFalse()
+      assertThat(awaitItem().dynamicColorEnabled).isFalse()
     }
   }
 

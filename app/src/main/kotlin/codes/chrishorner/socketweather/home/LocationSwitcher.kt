@@ -85,7 +85,7 @@ fun LocationSwitcher(
             indication = null
           ) { onDismissRequest() }
           .alpha(transition.scrimAlpha)
-          .background(MaterialTheme.colorScheme.scrim)
+          .background(MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f))
       )
 
       Card(

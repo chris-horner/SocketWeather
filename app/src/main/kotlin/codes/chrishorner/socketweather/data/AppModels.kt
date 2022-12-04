@@ -47,3 +47,7 @@ enum class ForecastError {
 }
 
 data class RainTimestamp(val timestamp: String, val label: String)
+
+data class Settings(
+  val useDynamicColors: Boolean = false,
+)

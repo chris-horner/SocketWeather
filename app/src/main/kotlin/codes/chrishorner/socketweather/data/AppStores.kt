@@ -2,6 +2,7 @@ package codes.chrishorner.socketweather.data
 
 import android.app.Application
 import android.content.Context.MODE_PRIVATE
+import android.os.Build
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import codes.chrishorner.socketweather.util.getOrCreateFile
@@ -16,6 +17,7 @@ interface AppStores {
   val savedSelections: Store<Set<LocationSelection>>
   val currentSelection: Store<LocationSelection>
   val lastKnownLocation: Store<DeviceLocation?>
+  val settings: Store<Settings>
   suspend fun clear()
 }
 
@@ -45,12 +47,17 @@ class AppDiskStores(
     fileName = "last_known_location",
     default = null,
   )
+  override val settings: Store<Settings> = blockingCreateStore(
+    fileName = "settings",
+    default = Settings(useDynamicColors = Build.VERSION.SDK_INT >= 31)
+  )
 
   override suspend fun clear() {
     forecast.clear()
     savedSelections.clear()
     currentSelection.clear()
     lastKnownLocation.clear()
+    settings.clear()
   }
 
   /**

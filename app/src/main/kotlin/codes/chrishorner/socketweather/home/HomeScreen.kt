@@ -35,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
@@ -95,7 +96,13 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
         TopAppBar(
           title = { ToolbarTitle(state) { locationChooserVisible = true } },
           scrollBehavior = scrollBehavior,
-          actions = { Menu(onEvent) },
+          actions = {
+            Menu(
+              showColorSwitch = state.showDynamicColorOption,
+              colorSwitchChecked = state.dynamicColorEnabled,
+              onEvent = onEvent
+            )
+          },
         )
       }
     ) { innerPadding ->
@@ -115,7 +122,7 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 }
 
 @Composable
-private fun Menu(onEvent: (event: HomeEvent) -> Unit) {
+private fun Menu(showColorSwitch: Boolean, colorSwitchChecked: Boolean, onEvent: (event: HomeEvent) -> Unit) {
   var expanded by remember { mutableStateOf(false) }
   IconButton(onClick = { expanded = true }) {
     Icon(Icons.Default.MoreVert, contentDescription = null)
@@ -139,6 +146,20 @@ private fun Menu(onEvent: (event: HomeEvent) -> Unit) {
         expanded = false
       },
     )
+    if (showColorSwitch) {
+      DropdownMenuItem(
+        text = {
+          Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            Text("Dynamic color")
+            Switch(
+              checked = colorSwitchChecked,
+              onCheckedChange = { onEvent(HomeEvent.ToggleDynamicColor) },
+            )
+          }
+        },
+        onClick = { onEvent(HomeEvent.ToggleDynamicColor) },
+      )
+    }
   }
 }
 

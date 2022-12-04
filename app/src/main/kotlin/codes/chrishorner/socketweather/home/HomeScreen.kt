@@ -150,7 +150,7 @@ private fun Menu(showColorSwitch: Boolean, colorSwitchChecked: Boolean, onEvent:
       DropdownMenuItem(
         text = {
           Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text("Dynamic color")
+            Text(stringResource(R.string.home_dynamicColor))
             Switch(
               checked = colorSwitchChecked,
               onCheckedChange = { onEvent(HomeEvent.ToggleDynamicColor) },

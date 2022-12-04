@@ -22,6 +22,7 @@
   <string name="home_findingLocation">Finding location…</string>
   <string name="home_refresh">Refresh</string>
   <string name="home_about">About</string>
+  <string name="home_dynamicColor">Dynamic colour</string>
   <string name="home_feelsLike">Feels like</string>
   <string name="home_loading">Loading forecast…</string>
   <string name="home_networkError">Network request failed</string>

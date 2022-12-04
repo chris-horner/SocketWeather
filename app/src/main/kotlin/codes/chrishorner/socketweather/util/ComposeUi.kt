@@ -60,7 +60,7 @@ fun TextWithLinks(
 
   ClickableText(
     text = annotatedString,
-    style = style,
+    style = style.copy(color = MaterialTheme.colorScheme.onBackground),
     modifier = modifier,
     onClick = { offset ->
       annotatedString.getStringAnnotations(offset, offset).firstOrNull()?.let { annotation ->

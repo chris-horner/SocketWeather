@@ -41,7 +41,7 @@ jobs:
         env:
           socket_weather_alias: ${{ secrets.socket_weather_alias }}
           socket_weather_password: ${{ secrets.socket_weather_password }}
-        run: bash ./gradlew assemble
+        run: bash ./gradlew assembleDebug assembleRelease
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@v1

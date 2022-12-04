@@ -37,6 +37,8 @@ import codes.chrishorner.socketweather.Presenter
 import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.Screen
 import codes.chrishorner.socketweather.about.AboutPresenter.BackPressEvent
+import codes.chrishorner.socketweather.util.TextLink
+import codes.chrishorner.socketweather.util.TextWithLinks
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -96,10 +98,20 @@ private fun AboutUi(onBack: () -> Unit) {
         modifier = Modifier.padding(start = 16.dp, top = 4.dp, end = 16.dp),
       )
 
-      Text(
+      TextWithLinks(
         text = stringResource(R.string.about_body),
         style = MaterialTheme.typography.bodyLarge,
-        modifier = Modifier.padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp)
+        modifier = Modifier.padding(start = 16.dp, top = 32.dp, end = 16.dp, bottom = 16.dp),
+        links = listOf(
+          TextLink(
+            text = stringResource(R.string.about_contributorsLink),
+            url = "https://github.com/chris-horner/SocketWeather/graphs/contributors",
+          ),
+          TextLink(
+            text = stringResource(R.string.about_pocketWeatherLink),
+            url = "https://ausdroid.net/2018/08/31/shifty-jelly-announces-end-pocket-weather-au-will-last-least-another-12-months-shutting/",
+          )
+        ),
       )
 
       AboutLink(

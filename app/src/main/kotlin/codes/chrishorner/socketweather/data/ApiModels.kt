@@ -65,7 +65,7 @@ data class CurrentInformation(
   val temp_later: Int
 )
 
-data class ThreeHourlyForecast(
+data class HourlyForecast(
   val rain: Rain,
   val temp: Int,
   val wind: Wind,

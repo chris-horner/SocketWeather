@@ -4,9 +4,9 @@ import codes.chrishorner.socketweather.R
 import codes.chrishorner.socketweather.data.CurrentInformation
 import codes.chrishorner.socketweather.data.DateForecast
 import codes.chrishorner.socketweather.data.Forecast
+import codes.chrishorner.socketweather.data.HourlyForecast
 import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.Rain.Amount
-import codes.chrishorner.socketweather.data.ThreeHourlyForecast
 import codes.chrishorner.socketweather.data.Uv
 import codes.chrishorner.socketweather.data.Wind
 import codes.chrishorner.socketweather.test.DefaultLocaleRule
@@ -53,7 +53,7 @@ class WidgetFormatterTest {
       ),
     ),
     hourlyForecasts = listOf(
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(null, null, "mm"), 0),
         temp = -5,
         wind = Wind(3, "E"),
@@ -61,7 +61,7 @@ class WidgetFormatterTest {
         time = ZonedDateTime.of(2022, 7, 1, 19, 30, 0, 0, ZoneId.of("Australia/Melbourne")).toInstant(),
         is_night = false,
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(null, null, "mm"), 0),
         temp = -4,
         wind = Wind(2, "N"),
@@ -139,7 +139,7 @@ class WidgetFormatterTest {
     assertThat(output.dateForecasts).containsExactly(
       WidgetDateForecast(
         day = "Today",
-        dayShort = "Fri.",
+        dayShort = "Fri",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-7°",
@@ -147,7 +147,7 @@ class WidgetFormatterTest {
       ),
       WidgetDateForecast(
         day = "Tomorrow",
-        dayShort = "Sat.",
+        dayShort = "Sat",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-6°",
@@ -155,7 +155,7 @@ class WidgetFormatterTest {
       ),
       WidgetDateForecast(
         day = "Sunday",
-        dayShort = "Sun.",
+        dayShort = "Sun",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-5°",

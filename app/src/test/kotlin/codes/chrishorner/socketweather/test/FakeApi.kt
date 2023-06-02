@@ -9,7 +9,7 @@ import codes.chrishorner.socketweather.data.Rain
 import codes.chrishorner.socketweather.data.Rain.Amount
 import codes.chrishorner.socketweather.data.SearchResult
 import codes.chrishorner.socketweather.data.Station
-import codes.chrishorner.socketweather.data.ThreeHourlyForecast
+import codes.chrishorner.socketweather.data.HourlyForecast
 import codes.chrishorner.socketweather.data.Uv
 import codes.chrishorner.socketweather.data.WeatherApi
 import codes.chrishorner.socketweather.data.Wind
@@ -203,11 +203,11 @@ class FakeApi(clock: Clock) : WeatherApi {
     )
   }
 
-  override suspend fun getThreeHourlyForecasts(geohash: String): List<ThreeHourlyForecast> {
+  override suspend fun getHourlyForecasts(geohash: String): List<HourlyForecast> {
     handleResponseMode()
 
     return listOf(
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 17,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -215,7 +215,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant,
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 15,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -223,7 +223,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(3)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 15,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -231,7 +231,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(6)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 14,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -239,7 +239,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(6)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 15,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -247,7 +247,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(12)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 22,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -255,7 +255,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(15)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 27,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -263,7 +263,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(18)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 28,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -271,7 +271,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(21)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 25,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -279,7 +279,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(24)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 20,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -287,7 +287,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(27)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 17,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -295,7 +295,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(30)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 15,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -303,7 +303,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(33)),
         is_night = true
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 17,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -311,7 +311,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(36)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 24,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -319,7 +319,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(39)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 28,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -327,7 +327,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(41)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 28,
         wind = Wind(speed_kilometre = 0, direction = "N"),
@@ -335,7 +335,7 @@ class FakeApi(clock: Clock) : WeatherApi {
         time = startingInstant.plus(Duration.ofHours(44)),
         is_night = false
       ),
-      ThreeHourlyForecast(
+      HourlyForecast(
         rain = Rain(Amount(0f, null, "mm"), chance = 0),
         temp = 22,
         wind = Wind(speed_kilometre = 0, direction = "N"),

@@ -130,10 +130,11 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
   // first 6 characters. Super annoying, but that's the price of an undocumented API.
   val observationsRequest = async { api.getObservations(location.geohash.take(6)) }
   val dateForecastsRequest = async { api.getDateForecasts(location.geohash.take(6)) }
-  val hourlyForecastsRequest = async { api.getThreeHourlyForecasts(location.geohash.take(6)) }
+  val hourlyForecastsRequest = async { api.getHourlyForecasts(location.geohash.take(6)) }
   val observations: CurrentObservations = observationsRequest.await()
   val dateForecasts: List<DateForecast> = dateForecastsRequest.await()
-  val hourlyForecasts: List<ThreeHourlyForecast> = hourlyForecastsRequest.await()
+  val hourlyForecasts: List<HourlyForecast> = hourlyForecastsRequest.await()
+  val threeHourlyForecasts = hourlyForecasts.filterIndexed { index, _ -> index % 3 == 0 }
 
   val currentInfo: CurrentInformation = dateForecasts.getOrNull(0)?.now
     ?: throw JsonDataException("Invalid dateForecasts. First element must contain a valid 'now' field.")
@@ -164,7 +165,7 @@ private suspend fun loadForecast(api: WeatherApi, clock: Clock, location: Locati
     highTemp = todayForecast.temp_max,
     lowTemp = lowTemp,
     todayForecast = todayForecast,
-    hourlyForecasts = hourlyForecasts,
+    hourlyForecasts = threeHourlyForecasts,
     upcomingForecasts = upcomingForecasts
   )
 }

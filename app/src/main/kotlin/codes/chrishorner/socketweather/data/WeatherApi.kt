@@ -18,6 +18,6 @@ interface WeatherApi {
   @GET("locations/{geohash}/forecasts/daily")
   suspend fun getDateForecasts(@Path("geohash") geohash: String): List<DateForecast>
 
-  @GET("locations/{geohash}/forecasts/3-hourly")
-  suspend fun getThreeHourlyForecasts(@Path("geohash") geohash: String): List<ThreeHourlyForecast>
+  @GET("locations/{geohash}/forecasts/hourly")
+  suspend fun getHourlyForecasts(@Path("geohash") geohash: String): List<HourlyForecast>
 }

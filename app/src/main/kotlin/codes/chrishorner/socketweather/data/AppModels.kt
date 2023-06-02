@@ -20,7 +20,7 @@ data class Forecast(
   val highTemp: Int,
   val lowTemp: Int,
   val todayForecast: DateForecast,
-  val hourlyForecasts: List<ThreeHourlyForecast>,
+  val hourlyForecasts: List<HourlyForecast>,
   val upcomingForecasts: List<DateForecast>
 )
 

@@ -279,7 +279,7 @@ class HomePresenterTest {
 
     val observations = fakeApi.getObservations(location.geohash)
     val dateForecasts = fakeApi.getDateForecasts(location.geohash)
-    val hourlyForecasts = fakeApi.getThreeHourlyForecasts(location.geohash)
+    val hourlyForecasts = fakeApi.getHourlyForecasts(location.geohash)
     val todayForecast = dateForecasts[0]
 
     return Forecast(

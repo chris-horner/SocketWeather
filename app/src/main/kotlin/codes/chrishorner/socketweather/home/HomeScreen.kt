@@ -35,6 +35,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -87,11 +89,13 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
 
   val scrollState = rememberScrollState()
   val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+  val snackbarHostState = remember { SnackbarHostState() }
   var locationChooserVisible by rememberSaveable { mutableStateOf(false) }
 
   Box {
     Scaffold(
       modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
+      snackbarHost = { SnackbarHost(snackbarHostState)},
       topBar = {
         TopAppBar(
           title = { ToolbarTitle(state) { locationChooserVisible = true } },
@@ -106,7 +110,7 @@ private fun HomeUi(state: HomeState, onEvent: (event: HomeEvent) -> Unit) {
         )
       }
     ) { innerPadding ->
-      Content(state.content, scrollState, onEvent, Modifier.padding(innerPadding))
+      Content(state.content, scrollState, snackbarHostState, onEvent, Modifier.padding(innerPadding))
     }
     LocationSwitcher(
       visible = locationChooserVisible,
@@ -201,10 +205,16 @@ private fun ToolbarTitle(state: HomeState, onClick: () -> Unit) {
 }
 
 @Composable
-private fun Content(state: Content, scrollState: ScrollState, onEvent: (event: HomeEvent) -> Unit, modifier: Modifier) {
+private fun Content(
+  state: Content,
+  scrollState: ScrollState,
+  snackbarHostState: SnackbarHostState,
+  onEvent: (event: HomeEvent) -> Unit,
+  modifier: Modifier,
+) {
   when (state) {
     is Content.Error -> Error(state.type, modifier, onRefresh = { onEvent(Refresh) })
-    is Content.Loaded -> ForecastUi(state.conditions, scrollState, modifier, onEvent)
+    is Content.Loaded -> ForecastUi(state.conditions, scrollState, snackbarHostState, modifier, onEvent)
     else -> Loading(modifier)
   }
 }
@@ -233,16 +243,19 @@ private fun Error(type: ForecastError, modifier: Modifier = Modifier, onRefresh:
       message = stringResource(R.string.home_error_data_message)
       image = painterResource(R.drawable.gfx_data_error)
     }
+
     ForecastError.NETWORK -> {
       title = stringResource(R.string.home_error_network_title)
       message = stringResource(R.string.home_error_network_message)
       image = painterResource(R.drawable.gfx_network_error)
     }
+
     ForecastError.LOCATION -> {
       title = stringResource(R.string.home_error_location_title)
       message = stringResource(R.string.home_error_location_message)
       image = painterResource(R.drawable.gfx_location_error)
     }
+
     ForecastError.NOT_AUSTRALIA -> {
       title = stringResource(R.string.home_error_unknownLocation_title)
       message = stringResource(R.string.home_error_unknownLocation_message)

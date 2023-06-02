@@ -7,6 +7,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -29,12 +31,14 @@ import androidx.compose.material3.ElevatedButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -54,11 +58,13 @@ import codes.chrishorner.socketweather.styles.SocketWeatherTheme
 import codes.chrishorner.socketweather.styles.largeTemp
 import codes.chrishorner.socketweather.styles.mediumTemp
 import codes.chrishorner.socketweather.styles.smallTemp
+import kotlinx.coroutines.launch
 
 @Composable
 fun ForecastUi(
   conditions: FormattedConditions,
   scrollState: ScrollState,
+  snackbarHostState: SnackbarHostState,
   modifier: Modifier = Modifier,
   onEvent: (HomeEvent) -> Unit = {}
 ) {
@@ -97,6 +103,7 @@ fun ForecastUi(
 
     ButtonsSection(
       showingMore = showMoreSection,
+      snackbarHostState = snackbarHostState,
       onRainRadarClick = { onEvent(HomeEvent.ViewRainRadar) },
       onMoreClick = { showMoreSection = !showMoreSection }
     )
@@ -178,26 +185,45 @@ private fun Observations(conditions: FormattedConditions) {
 @Composable
 private fun ButtonsSection(
   showingMore: Boolean,
+  snackbarHostState: SnackbarHostState,
   onRainRadarClick: () -> Unit,
   onMoreClick: () -> Unit,
 ) {
 
   val moreIconRotation: Float by animateFloatAsState(if (showingMore) 180f else 0f)
+  val scope = rememberCoroutineScope()
+  val rainRadarMessage = stringResource(R.string.home_rainRadarMessage)
 
   Row(
     horizontalArrangement = Arrangement.spacedBy(16.dp),
     modifier = Modifier.padding(horizontal = 16.dp),
   ) {
-    ElevatedButton(
-      onClick = onRainRadarClick,
-      modifier = Modifier
-        .testTag("rain_radar_button")
-        .weight(1f)
-        .heightIn(min = 48.dp)
-    ) {
-      Icon(Icons.Rounded.Radar, contentDescription = null)
-      Spacer(modifier = Modifier.width(12.dp))
-      Text(text = stringResource(R.string.home_rainRadarButton), maxLines = 1, overflow = Ellipsis)
+    Box(modifier = Modifier.weight(1f)) {
+      ElevatedButton(
+        onClick = onRainRadarClick,
+        enabled = false,
+        modifier = Modifier
+          .testTag("rain_radar_button")
+          .fillMaxWidth()
+          .heightIn(min = 48.dp)
+      ) {
+        Icon(Icons.Rounded.Radar, contentDescription = null)
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(text = stringResource(R.string.home_rainRadarButton), maxLines = 1, overflow = Ellipsis)
+      }
+
+      // Add an invisible box over the rain radar button to intercept touch events and show the disabled message.
+      Box(
+        modifier = Modifier
+          .matchParentSize()
+          .clickable(
+            interactionSource = MutableInteractionSource(),
+            indication = null,
+            onClick = {
+              scope.launch { snackbarHostState.showSnackbar(rainRadarMessage) }
+            }
+          )
+      )
     }
     ElevatedButton(
       onClick = onMoreClick,
@@ -231,7 +257,9 @@ private fun MoreSection(
   Surface(
     shape = MaterialTheme.shapes.large,
     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f),
-    modifier = Modifier.padding(horizontal = 16.dp).padding(bottom = 16.dp)
+    modifier = Modifier
+      .padding(horizontal = 16.dp)
+      .padding(bottom = 16.dp)
   ) {
     Column(
       verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -303,6 +331,7 @@ private fun ForecastUiPreview() {
   SocketWeatherTheme {
     ForecastUi(
       scrollState = rememberScrollState(),
+      snackbarHostState = SnackbarHostState(),
       conditions = FormattedConditions(
         iconDescriptor = "hazy",
         isNight = false,

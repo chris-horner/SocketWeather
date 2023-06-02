@@ -36,6 +36,7 @@
   <string name="home_wind">%1$d km/h</string>
   <string name="home_uvProtection">%1$s–%2$s</string>
   <string name="home_rainRadarButton">Rain radar</string>
+  <string name="home_rainRadarMessage">BOM has broken rain radar for now 😢</string>
   <string name="home_moreButton">More</string>
   <string name="home_lessButton">Less</string>
   <string name="home_rainChance">Chance of rain</string>

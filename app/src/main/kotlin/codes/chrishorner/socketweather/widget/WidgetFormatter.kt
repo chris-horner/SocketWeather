@@ -9,7 +9,7 @@ import java.time.Clock
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle.FULL
-import java.time.format.TextStyle.SHORT
+import java.time.format.TextStyle.SHORT_STANDALONE
 import java.util.Locale
 import kotlin.math.roundToInt
 
@@ -64,7 +64,7 @@ private fun Forecast.getWidgetDateForecasts(
 
   val todayEntry = WidgetDateForecast(
     day = strings[R.string.widget_today],
-    dayShort = forecastDate.dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
+    dayShort = forecastDate.dayOfWeek.getDisplayName(SHORT_STANDALONE, Locale.getDefault()),
     iconRes = weatherIconRes(todayForecast.icon_descriptor, night),
     description = todayForecast.short_text,
     minTemp = strings.formatDegrees(lowTemp),
@@ -82,7 +82,7 @@ private fun Forecast.getWidgetDateForecasts(
 
     WidgetDateForecast(
       day = dayText,
-      dayShort = zonedDate.dayOfWeek.getDisplayName(SHORT, Locale.getDefault()),
+      dayShort = zonedDate.dayOfWeek.getDisplayName(SHORT_STANDALONE, Locale.getDefault()),
       iconRes = weatherIconRes(it.icon_descriptor),
       description = it.short_text,
       minTemp = strings.formatDegrees(it.temp_min),

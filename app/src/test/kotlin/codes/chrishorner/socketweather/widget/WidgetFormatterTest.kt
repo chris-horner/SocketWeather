@@ -139,7 +139,7 @@ class WidgetFormatterTest {
     assertThat(output.dateForecasts).containsExactly(
       WidgetDateForecast(
         day = "Today",
-        dayShort = "Fri.",
+        dayShort = "Fri",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-7°",
@@ -147,7 +147,7 @@ class WidgetFormatterTest {
       ),
       WidgetDateForecast(
         day = "Tomorrow",
-        dayShort = "Sat.",
+        dayShort = "Sat",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-6°",
@@ -155,7 +155,7 @@ class WidgetFormatterTest {
       ),
       WidgetDateForecast(
         day = "Sunday",
-        dayShort = "Sun.",
+        dayShort = "Sun",
         iconRes = R.drawable.ic_weather_snow_24dp,
         description = "Snow",
         minTemp = "-5°",

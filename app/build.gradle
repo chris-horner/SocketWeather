@@ -1,3 +1,7 @@
+plugins {
+  id 'com.google.devtools.ksp' version '1.8.20-1.0.11'
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'app.cash.molecule'
@@ -68,12 +72,12 @@ android {
 
   compileOptions {
     coreLibraryDesugaringEnabled true
-    sourceCompatibility JavaVersion.VERSION_11
-    targetCompatibility JavaVersion.VERSION_11
+    sourceCompatibility JavaVersion.VERSION_17
+    targetCompatibility JavaVersion.VERSION_17
   }
 
   kotlinOptions {
-    jvmTarget = JavaVersion.VERSION_11
+    jvmTarget = JavaVersion.VERSION_17
   }
 
   buildFeatures {
@@ -159,7 +163,9 @@ dependencies {
   debugImplementation deps.leakcanary.android
   implementation deps.lifecycle
   implementation deps.moshi.core
-  implementation deps.moshi.kotlin
+  ksp deps.moshi.kotlinCodegen
+  implementation deps.moshix.sealedRuntime
+  ksp deps.moshix.sealedCodegen
   implementation deps.okhttp.core
   debugImplementation deps.okhttp.logging
   testImplementation deps.okhttp.mock

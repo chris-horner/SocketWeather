@@ -4,12 +4,10 @@ import com.squareup.moshi.FromJson
 import com.squareup.moshi.JsonAdapter
 import com.squareup.moshi.JsonDataException
 import com.squareup.moshi.JsonReader
-import com.squareup.moshi.JsonReader.Token
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.ToJson
 import com.squareup.moshi.Types
-import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import okhttp3.Interceptor
 import okhttp3.Interceptor.Chain
 import okhttp3.Response
@@ -36,9 +34,7 @@ object DataConfig {
   val moshi: Moshi = Moshi.Builder()
     .add(InstantAdapter)
     .add(ZoneIdAdapter)
-    .add(LocationSelectionAdapter)
     .add(SkipBadElementsListAdapterFactory)
-    .add(KotlinJsonAdapterFactory())
     .build()
 
   private object InstantAdapter {
@@ -49,41 +45,6 @@ object DataConfig {
   private object ZoneIdAdapter {
     @ToJson fun toJson(value: ZoneId) = value.toString()
     @FromJson fun fromJson(value: String): ZoneId = ZoneId.of(value)
-  }
-
-  /**
-   * Moshi doesn't handle Kotlin sealed classes automatically. If we need to serialise
-   * more of these in the future it might be worth using the `moshi-sealed` library,
-   * but for now we'll parse this one type by hand.
-   */
-  private object LocationSelectionAdapter {
-
-    @ToJson fun toJson(
-      writer: JsonWriter,
-      value: LocationSelection,
-      stringAdapter: JsonAdapter<String>,
-      staticAdapter: JsonAdapter<LocationSelection.Static>
-    ) {
-      when (value) {
-        is LocationSelection.None -> stringAdapter.toJson(writer, "None")
-        is LocationSelection.FollowMe -> stringAdapter.toJson(writer, "FollowMe")
-        is LocationSelection.Static -> staticAdapter.toJson(writer, value)
-      }
-    }
-
-    @FromJson fun fromJson(
-      reader: JsonReader,
-      staticAdapter: JsonAdapter<LocationSelection.Static>
-    ): LocationSelection {
-
-      val selection: LocationSelection? = when {
-        reader.peek() == Token.BEGIN_OBJECT -> staticAdapter.fromJson(reader)
-        reader.nextString() == "FollowMe" -> LocationSelection.FollowMe
-        else -> LocationSelection.None
-      }
-
-      return selection ?: throw JsonDataException("Failed to deserialize SelectedLocation.")
-    }
   }
 
   /**

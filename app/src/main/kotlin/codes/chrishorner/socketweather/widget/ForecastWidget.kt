@@ -5,11 +5,12 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
-import androidx.glance.LocalContext
+import androidx.glance.GlanceId
 import androidx.glance.LocalSize
 import androidx.glance.appwidget.GlanceAppWidget
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
 import androidx.glance.appwidget.SizeMode
+import androidx.glance.appwidget.provideContent
 import codes.chrishorner.socketweather.appSingletons
 import codes.chrishorner.socketweather.util.Strings.AndroidStrings
 
@@ -82,10 +83,13 @@ class ForecastWidget : GlanceAppWidget() {
     )
   )
 
+  override suspend fun provideGlance(context: Context, id: GlanceId) {
+    provideContent { Content(context) }
+  }
+
   @SuppressLint("StateFlowValueCalledInComposition") // Get the current forecast once per invalidation.
   @Composable
-  override fun Content() {
-    val context = LocalContext.current
+  private fun Content(context: Context) {
     val forecast = context.appSingletons.stores.forecast.data.value ?: return
     val strings = AndroidStrings(context)
     val formattedForecast = forecast.formatForWidget(strings)

@@ -10,6 +10,7 @@ def versionPatch = 1
 
 android {
   compileSdkVersion versions.compileSdk
+  namespace 'codes.chrishorner.socketweather'
 
   defaultConfig {
     applicationId "codes.chrishorner.socketweather"
@@ -77,6 +78,7 @@ android {
 
   buildFeatures {
     compose true
+    buildConfig true
   }
 
   testOptions {
